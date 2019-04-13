@@ -34,7 +34,7 @@ async function processCommand(string = "nop", channel) {
         case "image": 
         {
             const url = args.shift()
-            let message = args.shift()
+            let message = args.join(" ")
 
             if (!url) return console.error("No url provided")
             if (!message) message = ""
@@ -44,12 +44,13 @@ async function processCommand(string = "nop", channel) {
         break;
         case "clean":
         {
-            let num = parseInt(args.shift()) || 1
-            await channel.fetchMessages({ limit: num }).then(async msgs => {
-                let ms = msgs.filter(m => m.author.id !== bot.user.id)
+            let num = args.shift() || "1"
+            await channel.fetchMessages({ limit: parseInt(num) })
+            .then(async msgs => {
+                let ms = msgs.filter(m => m.author.id === bot.user.id)
                 if (ms.size === 1) await ms.first().delete()
-                if (ms.size < 1) return;
-                await channel.bulkDelete(ms, true);
+                if (ms.size < 1) return
+                await channel.bulkDelete(ms, true)
             });
         }
         break;
