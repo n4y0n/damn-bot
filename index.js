@@ -7,6 +7,14 @@ const start = Date.now()
 // const delay = parseInt(process.env.DELAY) || 1
 // const message = process.env.MESSAGE
 
+
+let bot = new Client({
+    disabledEvents: ["TYPING_START"],
+    messageCacheMaxSize: 25,
+    messageCacheLifetime: 120,
+    messageSweepInterval: 120
+})
+
 async function genMessage() {
     if (message) return message
 
@@ -21,19 +29,28 @@ async function genMessage() {
 
 async function processCommand(string = "nop", channel) {
     const args = string.split(" ")
-    if (args.shift() === "image") {
-        const url = args.shift()
-        if (!url) return console.error("No url provided")
-        await channel.send("", { files: [url] })
+    const cmd = args.shift()
+    switch (cmd) {
+        case "image": 
+        {
+            const url = args.shift()
+            if (!url) return console.error("No url provided")
+            await channel.send("", { files: [url] })
+        }
+        break;
+        case "clean":
+        {
+            let num = parseInt(args.shift()) || 1
+            await channel.fetchMessages({ limit: num }).then(async msgs => {
+                let ms = msgs.filter(m => m.author.id !== bot.user.id)
+                if (ms.size === 1) await ms.first().delete()
+                if (ms.size < 1) return;
+                await channel.bulkDelete(ms, true);
+            });
+        }
+        break;
     }
 }
-
-let bot = new Client({
-    disabledEvents: ["TYPING_START"],
-    messageCacheMaxSize: 25,
-    messageCacheLifetime: 120,
-    messageSweepInterval: 120
-})
 
 bot.on("ready", () => {
     console.log("Bot took: " + (new Date().getTime() - start) + "MS")
