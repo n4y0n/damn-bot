@@ -34,8 +34,12 @@ async function processCommand(string = "nop", channel) {
         case "image": 
         {
             const url = args.shift()
+            let message = args.shift()
+
             if (!url) return console.error("No url provided")
-            await channel.send("", { files: [url] })
+            if (!message) message = ""
+            
+            await channel.send(message, { files: [url] })
         }
         break;
         case "clean":
