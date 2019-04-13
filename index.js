@@ -19,6 +19,15 @@ async function genMessage() {
     return result
 }
 
+async function processCommand(string = "nop", channel) {
+    const args = string.split(" ")
+    if (args.shift() === "image") {
+        const url = args.shift()
+        if (!url) return console.error("No url provided")
+        await channel.send("", { files: [url] })
+    }
+}
+
 let bot = new Client({
     disabledEvents: ["TYPING_START"],
     messageCacheMaxSize: 25,
@@ -34,7 +43,11 @@ bot.on("ready", () => {
         input: process.stdin,
         output: process.stdout
     }).on("line", async line => {
-        await bot.channels.get("538747728763682817").send(line)
+        if (line.split(" ")[0].toUpperCase().startsWith("!")) {
+            await processCommand(line.substr(1), bot.channels.get("538747728763682817"))
+        } else {
+            await bot.channels.get("538747728763682817").send(line)
+        }
     })
 })
 
