@@ -1,15 +1,21 @@
 require("dotenv").config()
 const { Client } = require("discord.js")
+const axios = require("axios").default
 const start = Date.now()
 
 const delay = parseInt(process.env.DELAY) || 1
 const message = process.env.MESSAGE
 
-function genMessage() {
+async function genMessage() {
     if (message) return message
 
-    
+    const result = (await axios.get("https://icanhazdadjoke.com/", {
+        headers: {
+            Accept: "application/json"
+        }
+    })).data.joke
 
+    return result
 }
 
 let bot = new Client({
@@ -21,7 +27,7 @@ let bot = new Client({
 
 bot.on("ready", () => {
     console.log("Bot took: " + (new Date().getTime() - start) + "MS")
-    setInterval(() => bot.channels.get("538747728763682817").send(genMessage()), delay * 1000 * 60)
+    setInterval(async () => {await bot.channels.get("538747728763682817").send(await genMessage())}, delay * 1000 * 60)
 })
 
 bot.on("error", err => {
