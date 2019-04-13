@@ -27,7 +27,7 @@ async function genMessage() {
     return result
 }
 
-async function processCommand(string = "nop", channel) {
+async function processCommand(string = "nop", channel, voice = null) {
     const args = string.split(" ")
     const cmd = args.shift()
     switch (cmd) {
@@ -54,19 +54,34 @@ async function processCommand(string = "nop", channel) {
             });
         }
         break;
+        // case "say":
+        // {
+        //     if (!voice) {
+        //         console.error("No connection to voice channel")
+        //         break;
+        //     }
+        //     await channel.send(args.join(" "), { tts: true })
+        // }
+        // break;
     }
 }
 
-bot.on("ready", () => {
+bot.on("ready", async () => {
     console.log("Bot took: " + (new Date().getTime() - start) + "MS")
     // setInterval(async () => {await bot.channels.get("538747728763682817").send(await genMessage())}, delay * 1000 * 60)
+    // for(let channel of bot.channels.array()) {
+    //     console.log(`${channel.id} - ${channel.type} - ${channel.name}`)
+    // }
+
+    // const fare_robe = bot.channels.get("224616803618390029")
+    // await fare_robe.join()
 
     readline.createInterface({
         input: process.stdin,
         output: process.stdout
     }).on("line", async line => {
         if (line.split(" ")[0].toUpperCase().startsWith("!")) {
-            await processCommand(line.substr(1), bot.channels.get("538747728763682817"))
+            await processCommand(line.substr(1), bot.channels.get("538747728763682817"))//, fare_robe)
         } else {
             await bot.channels.get("538747728763682817").send(line)
         }
