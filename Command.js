@@ -2,29 +2,22 @@
 class Command {
     constructor(fullcommand, alias = "", options = {}) {
         const {
-            args_schema = null,
             caseSensitive = true
         } = options
 
         this.fullcommand = fullcommand
         this.alias = alias
-        this.args_schema = args_schema
         this.caseSensitive = caseSensitive
     }
     async exec(executer = async (args = []) => { }, args = [], onerrorexecuter = null) {
-        if (this.checkSchema(args)) {
+        try {
             await executer(args)
-        } else {
-            console.error(`Arguments not respect the schema declared for command [${this.fullcommand}|${this.alias}]`)
+        } catch(e) {
+            console.error(e)
             if (onerrorexecuter && onerrorexecuter instanceof Function) {
-                await onerrorexecuter(err)
+                await onerrorexecuter(e)
             }
         }
-    }
-
-    checkSchema(args = []) {
-        if (!this.args_schema) return true
-        //return validate(args)
     }
 
     match(strcommand) {
