@@ -2,20 +2,21 @@ require("dotenv").config()
 const { Client } = require("discord.js")
 const readline = require("readline")
 const axios = require("axios").default
+const validate = require("./validatejs/validate")
 const start = Date.now()
 
 // const delay = parseInt(process.env.DELAY) || 1
 // const message = process.env.MESSAGE
 
 class Command {
-    constructor(fullcommand, alias = "", args_schema = {}) {
+    constructor(fullcommand, alias = "", args_schema = null) {
         this.fullcommand = fullcommand
         this.alias = alias
-        this.args = args
+        this.args_schema = args_schema
     }
     async exec(executer = async (args = []) => { }, args = [], onerrorexecuter = null) {
         if (this.checkSchema(args)) {
-            await executer(args)
+            await executer(...args)
         } else {
             console.error(`Arguments not respect the schema declared for command [${this.fullcommand}|${this.alias}]`)
             if (onerrorexecuter && onerrorexecuter instanceof Function) {
@@ -24,8 +25,13 @@ class Command {
         }
     }
 
+    checkSchema(args = []) {
+        if (!this.args_schema) return true
+        //return validate(args)
+    }
+
     match(strcommand) {
-        return strcommand === this.fullcommand || strcommand === alias
+        return strcommand === this.fullcommand || strcommand === this.alias
     }
 }
 
@@ -44,8 +50,14 @@ class Commander {
 
         for (const com of this.commands) {
             if (com.command.match(cmd)) {
-                await com.exec(com.listener.bind(channel), args, com.errorlistener.bind(this))
-                break
+                try {
+                    if (com.errorlistener) await com.command.exec(com.listener.bind(channel), args, com.errorlistener.bind(this))
+                    else await com.command.exec(com.listener.bind(channel), args)
+                } catch(e) {
+                    console.error(e)
+                } finally {
+                    break
+                }
             }
         }
     }
