@@ -3,7 +3,7 @@ const { Client } = require("discord.js")
 const axios = require("axios").default
 const start = Date.now()
 
-const delay = parseInt(process.env.DELAY) || 1
+//const delay = parseInt(process.env.DELAY) || 1
 const message = process.env.MESSAGE
 
 const Commander = require("./Commander")
@@ -21,12 +21,13 @@ async function genMessage() {
     return result
 }
 
-const commander = new Commander("!")
+const commander = new Commander("|")
 commander.addCommand(new Command("image", "img"), async function ([board = "a", thread = null]) {
-    //await this.send(message, { files: [url] })
+    let m = await this.channel.send("WIP")
+    setTimeout(() => m.delete(), 5000)
 })
 commander.addCommand(new Command("clean", "cln"), async function ([num = 1]) {
-    await this.channel.fetchMessages({ limit: 1 }).delete()
+    (await this.channel.fetchMessages({ limit: 1 })).first().delete()
     
     const msgs = await this.channel.fetchMessages({ limit: num })
 
@@ -37,6 +38,9 @@ commander.addCommand(new Command("clean", "cln"), async function ([num = 1]) {
     if (ms.size < 1) return
     
     await this.channel.bulkDelete(ms, true)
+})
+commander.addCommand(new Command("say", "s"), async function (message = []) {
+    await this.channel.send(message.join(" "))
 })
 
 let bot = new Client({

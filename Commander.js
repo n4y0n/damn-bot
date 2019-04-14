@@ -10,6 +10,7 @@ class Commander {
     }
 
     async process(message) {
+        const start = Date.now()
         const args = message.content.split(" ")
         
         if (args <= 0) {
@@ -24,13 +25,14 @@ class Commander {
         const cmd = args.shift().substr(this.prefix.length)
 
         for (const com of this.commands) {
-            if (com.command.match()) {
+            if (com.command.match(cmd)) {
                 try {
                     if (com.errorlistener) await com.command.exec(com.listener.bind(message), args, com.errorlistener.bind(message))
                     else await com.command.exec(com.listener.bind(message), args)
                 } catch(e) {
                     console.error(e)
                 } finally {
+                    console.log(`Command took ${Date.now() - start}ms to execute`)
                     return
                 }
             }
