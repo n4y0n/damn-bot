@@ -8,6 +8,14 @@ const start = Date.now()
 // const delay = parseInt(process.env.DELAY) || 1
 // const message = process.env.MESSAGE
 
+
+let bot = new Client({
+    disabledEvents: ["TYPING_START"],
+    messageCacheMaxSize: 25,
+    messageCacheLifetime: 120,
+    messageSweepInterval: 120
+})
+
 class Command {
     constructor(fullcommand, alias = "", args_schema = null) {
         this.fullcommand = fullcommand
@@ -67,7 +75,6 @@ const commander = new Commander()
 commander.addCommand(new Command("image", "img"), async function(url, message = "") {
     await this.send(message, { files: [url] })
 })
-
 commander.addCommand(new Command("clean", "cln"), async function (num = 1) {
     await this.fetchMessages({ limit: num })
         .then(async msgs => {
@@ -78,16 +85,12 @@ commander.addCommand(new Command("clean", "cln"), async function (num = 1) {
         });
 })
 commander.addCommand(new Command("exit", "q"), async function() {
-    await this.send(`Shutting down...`)
-    await this.send(`Bye 👋`)
-    process.exit(0)
-})
-
-let bot = new Client({
-    disabledEvents: ["TYPING_START"],
-    messageCacheMaxSize: 25,
-    messageCacheLifetime: 120,
-    messageSweepInterval: 120
+    try {
+        await this.send(`Shutting down... Bye 👋`)
+        await bot.destroy()
+    } finally {
+        process.exit(0)
+    }
 })
 
 async function genMessage() {
