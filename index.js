@@ -77,6 +77,11 @@ commander.addCommand(new Command("clean", "cln"), async function (num = 1) {
             await this.bulkDelete(ms, true)
         });
 })
+commander.addCommand(new Command("exit", "q"), async function() {
+    await this.send(`Shutting down...`)
+    await this.send(`Bye 👋`)
+    process.exit(0)
+})
 
 let bot = new Client({
     disabledEvents: ["TYPING_START"],
