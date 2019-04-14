@@ -2,12 +2,14 @@
 class Command {
     constructor(fullcommand, alias = "", options = {}) {
         const {
-            args_schema = null
+            args_schema = null,
+            caseSensitive = true
         } = options
 
         this.fullcommand = fullcommand
         this.alias = alias
         this.args_schema = args_schema
+        this.caseSensitive = caseSensitive
     }
     async exec(executer = async (args = []) => { }, args = [], onerrorexecuter = null) {
         if (this.checkSchema(args)) {
@@ -26,7 +28,8 @@ class Command {
     }
 
     match(strcommand) {
-        return strcommand === this.fullcommand || strcommand === this.alias
+        if (!this.caseSensitive) return (strcommand.toUpperCase() === this.fullcommand.toUpperCase() || strcommand.toUpperCase() === this.alias.toUpperCase())
+        return (strcommand === this.fullcommand || strcommand === this.alias)
     }
 }
 
