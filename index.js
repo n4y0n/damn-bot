@@ -7,6 +7,64 @@ const start = Date.now()
 // const delay = parseInt(process.env.DELAY) || 1
 // const message = process.env.MESSAGE
 
+class Command {
+    constructor(fullcommand, alias = "", args_schema = {}) {
+        this.fullcommand = fullcommand
+        this.alias = alias
+        this.args = args
+    }
+    async exec(executer = async (args = []) => { }, args = [], onerrorexecuter = null) {
+        if (this.checkSchema(args)) {
+            await executer(args)
+        } else {
+            console.error(`Arguments not respect the schema declared for command [${this.fullcommand}|${this.alias}]`)
+            if (onerrorexecuter && onerrorexecuter instanceof Function) {
+                await onerrorexecuter(err)
+            }
+        }
+    }
+
+    match(strcommand) {
+        return strcommand === this.fullcommand || strcommand === alias
+    }
+}
+
+class Commander {
+    constructor() {
+        this.commands = []
+    }
+
+    addCommand(command, listener, errorlistener = null) {
+        this.commands.push({ command, listener, errorlistener })
+    }
+
+    async process(content, channel) {
+        const args = content.split(" ")
+        const cmd = args.shift()
+
+        for (const com of this.commands) {
+            if (com.command.match(cmd)) {
+                await com.exec(com.listener.bind(channel), args, com.errorlistener.bind(this))
+                break
+            }
+        }
+    }
+}
+
+const commander = new Commander()
+commander.addCommand(new Command("image", "img"), async function(url, message = "") {
+    await this.send(message, { files: [url] })
+})
+
+commander.addCommand(new Command("clean", "cln"), async function (num = 1) {
+    await this.fetchMessages({ limit: num })
+        .then(async msgs => {
+            let ms = msgs.filter(m => m.author.id === bot.user.id)
+            if (ms.size === 1) return await ms.first().delete()
+            if (ms.size < 1) return
+            await this.bulkDelete(ms, true)
+        });
+})
 
 let bot = new Client({
     disabledEvents: ["TYPING_START"],
@@ -27,44 +85,6 @@ async function genMessage() {
     return result
 }
 
-async function processCommand(string = "nop", channel, voice = null) {
-    const args = string.split(" ")
-    const cmd = args.shift()
-    switch (cmd) {
-        case "image": 
-        {
-            const url = args.shift()
-            let message = args.join(" ")
-
-            if (!url) return console.error("No url provided")
-            if (!message) message = ""
-            
-            await channel.send(message, { files: [url] })
-        }
-        break;
-        case "clean":
-        {
-            let num = args.shift() || "1"
-            await channel.fetchMessages({ limit: parseInt(num) })
-            .then(async msgs => {
-                let ms = msgs.filter(m => m.author.id === bot.user.id)
-                if (ms.size === 1) return await ms.first().delete()
-                if (ms.size < 1) return
-                await channel.bulkDelete(ms, true)
-            });
-        }
-        break;
-        // case "say":
-        // {
-        //     if (!voice) {
-        //         console.error("No connection to voice channel")
-        //         break;
-        //     }
-        //     await channel.send(args.join(" "), { tts: true })
-        // }
-        // break;
-    }
-}
 
 bot.on("ready", async () => {
     console.log("Bot took: " + (Date.now() - start) + "ms")
@@ -81,7 +101,7 @@ bot.on("ready", async () => {
         output: process.stdout
     }).on("line", async line => {
         if (line.split(" ")[0].toUpperCase().startsWith("!")) {
-            await processCommand(line.substr(1), bot.channels.get("538747728763682817"))//, fare_robe)
+            await commander.process(line.substr(1), bot.channels.get("538747728763682817"))
         } else {
             await bot.channels.get("538747728763682817").send(line)
         }
