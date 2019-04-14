@@ -34,6 +34,10 @@ class MyBot extends Client {
 
         return result
     }
+
+    addCommand(command, listener, errorlistener = null) {
+        this.commander.addCommand(command, listener, errorlistener)
+    }
 }
 
 
