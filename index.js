@@ -67,7 +67,7 @@ async function processCommand(string = "nop", channel, voice = null) {
 }
 
 bot.on("ready", async () => {
-    console.log("Bot took: " + (new Date().getTime() - start) + "MS")
+    console.log("Bot took: " + (Date.now() - start) + "ms")
     // setInterval(async () => {await bot.channels.get("538747728763682817").send(await genMessage())}, delay * 1000 * 60)
     // for(let channel of bot.channels.array()) {
     //     console.log(`${channel.id} - ${channel.type} - ${channel.name}`)
