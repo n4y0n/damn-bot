@@ -6,6 +6,9 @@ const start = Date.now()
 const delay = parseInt(process.env.DELAY) || 1
 const message = process.env.MESSAGE
 
+const Commander = require("./Commander")
+const Command = require("./Command")
+
 async function genMessage() {
     if (message) return message
 
@@ -18,6 +21,24 @@ async function genMessage() {
     return result
 }
 
+const commander = new Commander("!")
+commander.addCommand(new Command("image", "img"), async function ([board = "a", thread = null]) {
+    //await this.send(message, { files: [url] })
+})
+commander.addCommand(new Command("clean", "cln"), async function ([num = 1]) {
+    await this.channel.fetchMessages({ limit: 1 }).delete()
+    
+    const msgs = await this.channel.fetchMessages({ limit: num })
+
+    let ms = msgs.filter(m => m.author.id === bot.user.id)
+    
+    if (ms.size === 1) return await ms.first().delete()
+    
+    if (ms.size < 1) return
+    
+    await this.channel.bulkDelete(ms, true)
+})
+
 let bot = new Client({
     disabledEvents: ["TYPING_START"],
     messageCacheMaxSize: 25,
@@ -25,9 +46,14 @@ let bot = new Client({
     messageSweepInterval: 120
 })
 
+bot.on("message", async message => {
+    if (message.author.id == bot.user.id || !(message.channel.id == "538747728763682817")) return
+    await commander.process(message)
+})
+
 bot.on("ready", () => {
     console.log("Bot took: " + (new Date().getTime() - start) + "MS")
-    setInterval(async () => {await bot.channels.get("538747728763682817").send(await genMessage())}, delay * 1000 * 60)
+    //setInterval(async () => {await bot.channels.get("538747728763682817").send(await genMessage())}, delay * 1000 * 60)
 })
 
 bot.on("error", err => {
