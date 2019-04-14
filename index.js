@@ -48,7 +48,7 @@ async function processCommand(string = "nop", channel, voice = null) {
             await channel.fetchMessages({ limit: parseInt(num) })
             .then(async msgs => {
                 let ms = msgs.filter(m => m.author.id === bot.user.id)
-                if (ms.size === 1) await ms.first().delete()
+                if (ms.size === 1) return await ms.first().delete()
                 if (ms.size < 1) return
                 await channel.bulkDelete(ms, true)
             });
