@@ -4,7 +4,7 @@ const axios = require("axios").default
 const start = Date.now()
 
 //const delay = parseInt(process.env.DELAY) || 1
-const message = process.env.MESSAGE
+//const message = process.env.MESSAGE
 
 const Commander = require("./Commander")
 const Command = require("./Command")
@@ -21,7 +21,7 @@ async function genMessage() {
     return result
 }
 
-const commander = new Commander("|")
+const commander = new Commander("-")
 commander.addCommand(new Command("image", "img"), async function ([board = "a", thread = null]) {
     let m = await this.channel.send("WIP")
     setTimeout(() => m.delete(), 5000)
