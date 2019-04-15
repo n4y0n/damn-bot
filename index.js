@@ -53,9 +53,9 @@ const cliCommander = new Commander("!", {
 })
 
 cliCommander.addCommand(new Command("image", "img", {
-    listener: async function ([board = "a", thread = null]) {
+    listener: async function ([url, message]) {
         let m = await this.channel.send("WIP")
-        setTimeout(() => m.delete(), 5000)
+        setTimeout(async () => await m.delete(), 5000)
     }
 }))
 cliCommander.addCommand(new Command("clean", "cln", {
