@@ -25,8 +25,8 @@ class DBot extends Client {
         })
     }
 
-    addCommand(command, listener, errorlistener = null) {
-        this.commander.addCommand(command, listener, errorlistener)
+    addCommand(command) {
+        this.commander.addCommand(command)
     }
 }
 

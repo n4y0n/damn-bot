@@ -1,21 +1,35 @@
 
 class Command {
-    constructor(fullcommand, alias = "", options = {}) {
+    constructor(fullcommand, alias = "", options = { caseSensitive: true, listener: null, errorlistener: null }) {
         const {
-            caseSensitive = true
+            caseSensitive = true,
+            listener = null,
+            errorlistener = null
         } = options
+
+        if (!this.listener || !(this.listener instanceof Function)) {
+            throw new Error("Listener must be declared and must be a function.")
+        }
 
         this.fullcommand = fullcommand
         this.alias = alias
         this.caseSensitive = caseSensitive
+        this.listener = listener
+        this.errorlistener = errorlistener
     }
-    async exec(executer = async (args = []) => { }, args = [], onerrorexecuter = null) {
+
+    async exec(thisobj, args = []) {
         try {
-            await executer(args)
-        } catch(e) {
-            console.error(e)
-            if (onerrorexecuter && onerrorexecuter instanceof Function) {
-                await onerrorexecuter(e)
+            if (this.listener && this.listener instanceof Function) {
+                await this.listener.call(thisobj, args)
+            } else {
+                throw Error("No listener function declared!")
+            }
+        } catch (e) {
+            if (this.errorlistener && this.errorlistener instanceof Function) {
+                await this.errorlistener.call(thisobj, e)
+            } else {
+                throw e
             }
         }
     }
