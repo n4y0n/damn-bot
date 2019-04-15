@@ -17,26 +17,32 @@ let bot = new MyBot("-", {
 })
 
 
-bot.addCommand(new Command("image", "img"), async function ([board = "a", thread = null]) {
-    let m = await this.channel.send("WIP")
-    setTimeout(() => m.delete(), 5000)
-})
+bot.addCommand(new Command("image", "img", {
+    listener: async function ([board = "a", thread = null]) {
+        let m = await this.channel.send("WIP")
+        setTimeout(() => m.delete(), 5000)
+    }
+}))
 
-bot.addCommand(new Command("clean", "cln"), async function ([num = 1]) {    
-    const msgs = await this.channel.fetchMessages({ limit: num })
+bot.addCommand(new Command("clean", "cln", {
+    listener: async function ([num = 1]) {
+        const msgs = await this.channel.fetchMessages({ limit: num })
 
-    let ms = msgs.filter(m => m.author.id === bot.user.id)
-    
-    if (ms.size === 1) return await ms.first().delete()
-    
-    if (ms.size < 1) return
-    
-    await this.channel.bulkDelete(ms, true)
-})
+        let ms = msgs.filter(m => m.author.id === bot.user.id)
 
-bot.addCommand(new Command("say", "s"), async function (message = []) {
-    await this.channel.send(message.join(" "))
-})
+        if (ms.size === 1) return await ms.first().delete()
+
+        if (ms.size < 1) return
+
+        await this.channel.bulkDelete(ms, true)
+    }
+}))
+
+bot.addCommand(new Command("say", "s", {
+    listener: async function (message = []) {
+        await this.channel.send(message.join(" "))
+    }
+}))
 
 const cliCommander = new Commander("!", {
     hooks: {
@@ -46,22 +52,28 @@ const cliCommander = new Commander("!", {
     }
 })
 
-cliCommander.addCommand(new Command("image", "img"), async function ([board = "a", thread = null]) {
-    let m = await this.channel.send("WIP")
-    setTimeout(() => m.delete(), 5000)
-})
-cliCommander.addCommand(new Command("clean", "cln"), async function ([num = 1]) {
-    const ms = await this.channel.fetchMessages({ limit: num })
-
-    if (ms.size === 1) return await ms.first().delete()
-
-    if (ms.size < 1) return
-
-    await this.channel.bulkDelete(ms, true)
-})
-cliCommander.addCommand(new Command("say", "s"), async function (message = []) {
-    await this.channel.send(message.join(" "))
-})
+cliCommander.addCommand(new Command("image", "img", {
+    listener: async function ([board = "a", thread = null]) {
+        let m = await this.channel.send("WIP")
+        setTimeout(() => m.delete(), 5000)
+    }
+}))
+cliCommander.addCommand(new Command("clean", "cln", {
+    listener: async function ([num = 1]) {
+        const ms = await this.channel.fetchMessages({ limit: num })
+    
+        if (ms.size === 1) return await ms.first().delete()
+    
+        if (ms.size < 1) return
+    
+        await this.channel.bulkDelete(ms, true)
+    }
+}))
+cliCommander.addCommand(new Command("say", "s", {
+    listener: async function (message = []) {
+        await this.channel.send(message.join(" "))
+    } 
+}))
 
 bot.on("ready", () => {
     console.log("Bot took: " + (Date.now() - start) + "ms")
