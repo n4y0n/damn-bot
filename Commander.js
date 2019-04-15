@@ -1,8 +1,9 @@
 
 class Commander {
-    constructor(prefix = "") {
+    constructor(prefix = "", options = { hooks: { onFinishExecution: null, onStartExecution: null } }) {
         this.commands = []
         this.prefix = prefix
+        this.hooks = options.hooks
     }
 
     addCommand(command, listener, errorlistener = null) {
@@ -12,7 +13,7 @@ class Commander {
     async process(message) {
         const start = Date.now()
         const args = message.content.split(" ")
-        
+
         if (args <= 0) {
             console.error("Message with no content")
             return
@@ -27,18 +28,33 @@ class Commander {
         for (const com of this.commands) {
             if (com.command.match(cmd)) {
                 try {
+                    this._startCommandExecutionHook(message, com.command)
                     if (com.errorlistener) await com.command.exec(com.listener.bind(message), args, com.errorlistener.bind(message))
                     else await com.command.exec(com.listener.bind(message), args)
-                } catch(e) {
-                    console.error(e)
+                } catch (e) {
+                    console.error(`Error executing command: ${command}: ${e}`)
+                    this._endCommandExecutionHook(message, false, com.command)
                 } finally {
                     console.log(`Command took ${Date.now() - start}ms to execute`)
+                    this._endCommandExecutionHook(message, true, com.command)
                     return
                 }
             }
         }
+        this._endCommandExecutionHook(message, false, cmd)
         console.error(`No command "${cmd}"`)
-        await message.channel.send(`No command "${cmd}"`)
+    }
+
+
+    _startCommandExecutionHook(thisarg, ...args) {
+        if (this.hooks.onStartExecution && this.hooks.onStartExecution instanceof Function) {
+            this.hooks.onStartExecution.call(thisarg, ...args)
+        }
+    }
+    _endCommandExecutionHook(thisarg, ...args) {
+        if (this.hooks.onFinishExecution && this.hooks.onFinishExecution instanceof Function) {
+            this.hooks.onFinishExecution.call(thisarg, ...args)
+        }
     }
 }
 
