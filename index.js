@@ -9,7 +9,6 @@ const MyBot = require("./DBot")
 const Commander = require("./Commander")
 const Command = require("./Command")
 
-
 let bot = new MyBot("-", {
     disabledEvents: ["TYPING_START"],
     messageCacheMaxSize: 25,
@@ -23,15 +22,15 @@ bot.addCommand(new Command("image", "img"), async function ([board = "a", thread
     setTimeout(() => m.delete(), 5000)
 })
 
-bot.addCommand(new Command("clean", "cln"), async function ([num = 1]) {
+bot.addCommand(new Command("clean", "cln"), async function ([num = 1]) {    
     const msgs = await this.channel.fetchMessages({ limit: num })
 
     let ms = msgs.filter(m => m.author.id === bot.user.id)
-
+    
     if (ms.size === 1) return await ms.first().delete()
-
+    
     if (ms.size < 1) return
-
+    
     await this.channel.bulkDelete(ms, true)
 })
 
