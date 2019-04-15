@@ -6,8 +6,8 @@ class Commander {
         this.hooks = options.hooks
     }
 
-    addCommand(command, listener, errorlistener = null) {
-        this.commands.push({ command, listener, errorlistener })
+    addCommand(command) {
+        this.commands.push(command)
     }
 
     async process(message) {
@@ -22,15 +22,14 @@ class Commander {
             console.log(`Not a command: ${message.content}`)
             return
         }
-
+        
         const cmd = args.shift().substr(this.prefix.length)
 
         for (const com of this.commands) {
             if (com.command.match(cmd)) {
                 try {
                     this._startCommandExecutionHook(message, com.command)
-                    if (com.errorlistener) await com.command.exec(com.listener.bind(message), args, com.errorlistener.bind(message))
-                    else await com.command.exec(com.listener.bind(message), args)
+                    await com.command.exec(message, args)
                 } catch (e) {
                     console.error(`Error executing command: ${command}: ${e}`)
                     this._endCommandExecutionHook(message, false, com.command)
