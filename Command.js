@@ -1,5 +1,5 @@
 
-class Command {
+module.exports = class Command {
     constructor(fullcommand, alias = "", options = { caseSensitive: true, listener: null, errorlistener: null }) {
         const {
             caseSensitive = true,
@@ -43,5 +43,3 @@ class Command {
         return (strcommand === this.fullcommand || strcommand === this.alias)
     }
 }
-
-module.exports = Command

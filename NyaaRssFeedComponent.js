@@ -8,6 +8,7 @@ module.exports = class NyaaRssFeedComponent extends Component {
         let watcher = new Watcher(feed)
 
         watcher.on('new article', (article) => {
+            console.log(article)
             this.sendArticle(article)
         })
 

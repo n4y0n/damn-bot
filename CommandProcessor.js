@@ -1,5 +1,5 @@
 
-class Commander {
+module.exports = class CommandProcessor {
     constructor(prefix = "", options = { hooks: { onFinishExecution: null, onStartExecution: null } }) {
         this.commands = []
         this.prefix = prefix
@@ -56,5 +56,3 @@ class Commander {
         }
     }
 }
-
-module.exports = Commander

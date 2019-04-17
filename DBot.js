@@ -1,5 +1,5 @@
 const { Client } = require("discord.js")
-const Commander = require("./Commander")
+const Commander = require("./CommandProcessor")
 
 class DBot extends Client {
 

@@ -8,7 +8,7 @@ const start = Date.now()
 //const message = process.env.MESSAGE
 
 const MyBot = require("./DBot")
-const Commander = require("./Commander")
+const Commander = require("./CommandProcessor")
 const Command = require("./Command")
 const NyaaRssFeedComponent = require("./NyaaRssFeedComponent")
 
