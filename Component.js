@@ -17,4 +17,6 @@ module.exports = class Component {
     isInstalled() {
         return this.installed && this.bot
     }
+
+    async _cleanUp() {console.warn("To implement (_cleanUp in Component superclass)")}
 }
