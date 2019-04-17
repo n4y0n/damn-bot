@@ -6,7 +6,7 @@ class Command {
             listener = null,
             errorlistener = null
         } = options
-        
+
         if (!listener || !(listener instanceof Function)) {
             throw new Error("Listener must be declared and must be a function.")
         }

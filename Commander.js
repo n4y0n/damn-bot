@@ -22,7 +22,7 @@ class Commander {
             console.log(`Not a command: ${message.content}`)
             return
         }
-        
+
         const cmd = args.shift().substr(this.prefix.length)
 
         for (const com of this.commands) {
