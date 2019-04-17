@@ -1,4 +1,6 @@
 require("dotenv").config()
+
+const isDocker = require("is-docker")
 const readline = require("readline")
 const start = Date.now()
 
@@ -44,36 +46,41 @@ bot.addCommand(new Command("say", "s", {
     }
 }))
 
-const cliCommander = new Commander("!", {
-    hooks: {
-        async onFinishExecution(found) {
-            console.log("Command found?: " + found ? "Yes" : "No")
+let cliCommander
+if (!isDocker()) {
+    cliCommander = new Commander("!", {
+        hooks: {
+            async onFinishExecution(found) {
+                console.log("Command found?: " + found ? "Yes" : "No")
+            }
         }
-    }
-})
+    })
 
-cliCommander.addCommand(new Command("image", "img", {
-    listener: async function ([url, message]) {
-        let m = await this.channel.send("WIP")
-        setTimeout(async () => await m.delete(), 5000)
-    }
-}))
-cliCommander.addCommand(new Command("clean", "cln", {
-    listener: async function ([num = 1]) {
-        const ms = await this.channel.fetchMessages({ limit: num })
-    
-        if (ms.size === 1) return await ms.first().delete()
-    
-        if (ms.size < 1) return
-    
-        await this.channel.bulkDelete(ms, true)
-    }
-}))
-cliCommander.addCommand(new Command("say", "s", {
-    listener: async function (message = []) {
-        await this.channel.send(message.join(" "))
-    } 
-}))
+    cliCommander.addCommand(new Command("image", "img", {
+        listener: async function ([url, message]) {
+            let m = await this.channel.send("WIP")
+            setTimeout(async () => await m.delete(), 5000)
+        }
+    }))
+
+    cliCommander.addCommand(new Command("clean", "cln", {
+        listener: async function ([num = 1]) {
+            const ms = await this.channel.fetchMessages({ limit: num })
+
+            if (ms.size === 1) return await ms.first().delete()
+
+            if (ms.size < 1) return
+
+            await this.channel.bulkDelete(ms, true)
+        }
+    }))
+
+    cliCommander.addCommand(new Command("say", "s", {
+        listener: async function (message = []) {
+            await this.channel.send(message.join(" "))
+        }
+    }))
+}
 
 bot.on("ready", () => {
     console.log("Bot took: " + (Date.now() - start) + "ms")
@@ -84,13 +91,14 @@ bot.on("ready", () => {
 
     // const fare_robe = bot.channels.get("224616803618390029")
     // await fare_robe.join()
-
-    readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-    }).on("line", async line => {
-        await cliCommander.process({ content: line, channel: bot.channels.get("538747728763682817") })
-    })
+    if (!isDocker()) {
+        readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        }).on("line", async line => {
+            await cliCommander.process({ content: line, channel: bot.channels.get("538747728763682817") })
+        })
+    }
 })
 
 bot.on("error", err => {

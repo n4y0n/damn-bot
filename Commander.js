@@ -26,16 +26,16 @@ class Commander {
         const cmd = args.shift().substr(this.prefix.length)
 
         for (const com of this.commands) {
-            if (com.command.match(cmd)) {
+            if (com.match(cmd)) {
                 try {
-                    this._startCommandExecutionHook(message, com.command)
-                    await com.command.exec(message, args)
+                    this._startCommandExecutionHook(message, com)
+                    await com.exec(message, args)
                 } catch (e) {
                     console.error(`Error executing command: ${command}: ${e}`)
-                    this._endCommandExecutionHook(message, false, com.command)
+                    this._endCommandExecutionHook(message, false, com)
                 } finally {
                     console.log(`Command took ${Date.now() - start}ms to execute`)
-                    this._endCommandExecutionHook(message, true, com.command)
+                    this._endCommandExecutionHook(message, true, com)
                     return
                 }
             }
