@@ -10,6 +10,7 @@ const start = Date.now()
 const MyBot = require("./DBot")
 const Commander = require("./Commander")
 const Command = require("./Command")
+const NyaaRssFeedComponent = require("./NyaaRssFeedComponent")
 
 let bot = new MyBot("-", {
     disabledEvents: ["TYPING_START"],
@@ -18,6 +19,7 @@ let bot = new MyBot("-", {
     messageSweepInterval: 120
 })
 
+bot.addComponent(new NyaaRssFeedComponent())
 
 bot.addCommand(new Command("image", "img", {
     listener: async function ([board = "a", thread = null]) {

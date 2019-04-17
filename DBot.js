@@ -2,6 +2,7 @@ const { Client } = require("discord.js")
 const Commander = require("./Commander")
 
 class DBot extends Client {
+
     /**
      * 
      * @param {string} commands_prefix prefix for all commands
@@ -9,11 +10,13 @@ class DBot extends Client {
      */
     constructor(commands_prefix = "-", options) {
         super(options)
+        this.components = []
         this.prefix = commands_prefix
+        
         this.commander = new Commander(commands_prefix, {
             hooks: {
                 async onFinishExecution(ok, command) {
-                    if(!ok) await this.channel.send(`Error excecuting ${command}`)
+                    if (!ok) await this.channel.send(`Error excecuting ${command}`)
                 }
             }
         })
@@ -27,6 +30,15 @@ class DBot extends Client {
 
     addCommand(command) {
         this.commander.addCommand(command)
+    }
+
+    addComponent(component) {
+        component.install(this)
+        this.components.push(component)
+    }
+
+    getChannel(id) {
+        return this.channels.get(id)
     }
 }
 
