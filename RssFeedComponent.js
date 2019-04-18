@@ -21,7 +21,7 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     async sendArticle(article) {
-        if (!this.isInstalled()) return console.error("Component not installed (data loss)")
+        if (!this.isInstalled()) return console.error("❌ Component not installed (data loss)")
         await this.bot.getChannel("538747728763682817").send(this._formatAricle(article))
     }
 
@@ -30,6 +30,6 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     toString() {
-        return `-RssFeedComponent-`
+        return `RssFeedComponent(${this.getID()})`
     }
 }

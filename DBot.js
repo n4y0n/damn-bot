@@ -1,31 +1,6 @@
-const crypto = require("crypto")
 const { Client } = require("discord.js")
 const Processor = require("./interfaces/Processor")
 const Component = require("./interfaces/Component")
-
-function circular(object) {
-    var i = 0;
-
-    return function (key, value) {
-        if (i !== 0 && typeof (object) === 'object' && typeof (value) == 'object' && object == value)
-            return '[Circular]';
-
-        if (i >= 29) // seems to be a harded maximum of 30 serialized objects?
-            return '[Unknown]';
-
-        ++i; // so we know we aren't using the original object anymore
-
-        return value;
-    }
-
-}
-
-function getkey(objtohash) {
-    const sha1 = crypto.createHash("sha1")
-    const stringthis = JSON.stringify(objtohash, circular(objtohash))
-    sha1.update(stringthis)
-    return sha1.digest("hex")
-}
 
 class DBot extends Client {
 
@@ -49,17 +24,17 @@ class DBot extends Client {
     }
 
     addComponent(component) {
-        if (!(component instanceof Component)) return console.error(`${component} id not a componet`)
+        if (!(component instanceof Component)) return console.error(`❌ ${component} id not a componet`)
         component.install(this)
-        this.components[getkey(component)] = component
+        this.components[component.getID()] = component
+        console.log(`✔ Added Component >> ${component}`)
     }
 
     removeComponent(component) {
-        if (!(component instanceof Component)) return console.error(`${component} is not a componet`)
-        const key = getkey(component)
-        const retrivedcomponent = this.components[key]
-        if (retrivedcomponent == null) return console.error(`${component} not installed in this bot`)
-        this.components[key] = null
+        if (!(component instanceof Component)) return console.error(`❌ ${component} is not a componet`)
+        const retrivedcomponent = this.components[component.getID()]
+        if (retrivedcomponent == null) return console.error(`❌ ${component} not installed in this bot`)
+        this.components[component.getID()] = null
         retrivedcomponent.uninstall(this)
     }
 

@@ -9,10 +9,10 @@ const start = Date.now()
 const MyBot = require("./DBot")
 
 const Command = require("./Command")
-const Commander = require("./CommandProcessor")
+const CommandProcessor = require("./CommandProcessor")
 
 const RssFeedComponent = require("./RssFeedComponent")
-const CPCC = require("./CommandProcessorComponet")
+const CommandProcessorComponent = require("./CommandProcessorComponet")
 
 let bot = new MyBot({
     disabledEvents: ["TYPING_START"],
@@ -23,7 +23,7 @@ let bot = new MyBot({
 
 bot.addComponent(new RssFeedComponent('https://nyaa.si/?page=rss'))
 
-const commander = new Commander("-", {
+const commander = new CommandProcessor("-", {
     hooks: {
         async onFinishExecution(ok, command) {
             if (!ok) await this.channel.send(`Error excecuting "${command}"`)
@@ -31,7 +31,9 @@ const commander = new Commander("-", {
     }
 })
 
-const CPC = new CPCC(commander)
+const CPC = new CommandProcessorComponent(commander)
+const CPC2 = new CommandProcessorComponent(new Object())
+
 bot.addComponent(CPC)
 
 CPC.addCommand(new Command("image", "img", {
@@ -63,7 +65,7 @@ CPC.addCommand(new Command("say", "s", {
 
 let cliCommander
 if (!isDocker()) {
-    cliCommander = new Commander("!", {
+    cliCommander = new CommandProcessor("!", {
         hooks: {
             async onFinishExecution(found) {
                 console.log("Command found?: " + found ? "Yes" : "No")
@@ -117,11 +119,11 @@ bot.on("ready", () => {
 })
 
 bot.on("error", err => {
-    console.error(err.code)
+    console.error(err)
     process.exit(-1)
 })
 
 bot.login(process.env.TOKEN).then(token => console.log("Ok"), err => {
-    console.error(err.code)
+    console.error(err)
     process.exit(-1)
 })

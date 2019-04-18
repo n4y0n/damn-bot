@@ -8,9 +8,9 @@ module.exports = class CommandProcessor {
     }
 
     addCommand(command) {
-        if (!(command instanceof Command)) return console.error(`${__filename.split(path.sep).pop()}: ${command} is not a command`)
+        if (!(command instanceof Command)) return console.error(`❌ ${__filename.split(path.sep).pop()}: ${command} is not a command`)
         this.commands.push(command)
-        console.log(`Added command >> ${command}`)
+        console.log(`✔ Added command >> ${command}`)
     }
 
     async process(message) {
@@ -18,11 +18,11 @@ module.exports = class CommandProcessor {
         const args = message.content.split(" ")
 
         if (args <= 0) {
-            console.error("Message with no content")
+            console.error("❌ Message with no content")
             return
         }
         if (!args[0].toUpperCase().startsWith(this.prefix)) {
-            console.log(`Not a command: ${message.content}`)
+            console.log(`❌ Not a command: ${message.content}`)
             return
         }
 
@@ -34,10 +34,10 @@ module.exports = class CommandProcessor {
                     this._startCommandExecutionHook(message, com)
                     await com.exec(message, args)
                 } catch (e) {
-                    console.error(`Error executing command: ${command}: ${e}`)
+                    console.error(`❌ Error executing command: ${command}: ${e}`)
                     this._endCommandExecutionHook(message, false, com)
                 } finally {
-                    console.log(`Command took ${Date.now() - start}ms to execute`)
+                    console.log(`✔ Command took ${Date.now() - start}ms to execute`)
                     this._endCommandExecutionHook(message, true, com)
                     return
                 }
