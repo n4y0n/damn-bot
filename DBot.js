@@ -28,7 +28,7 @@ class DBot extends Client {
     }
 
     addComponent(component) {
-        if (!(component instanceof Component)) return logger.warn(`❌ ${component} id not a componet`, { location: this })
+        if (!(component instanceof Component)) return logger.warn(`❌ ${component} is not a componet`, { location: this })
         if (component === this.components[component.getID()]) return logger.info(`❌ ${component} already installed`, { location: this })
         component.install(this)
         this.components[component.getID()] = component
