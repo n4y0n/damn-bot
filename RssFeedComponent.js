@@ -5,10 +5,11 @@ const logger = require("./utils/logging")
 
 
 module.exports = class RssFeedComponent extends Component {
-    constructor(feedurl) {
+    constructor(feedurl, feedname = "") {
         super()
         this._watcher = new Watcher(feedurl)
         this._channelsToUpdate = []
+        this._feedName = feedname
 
         this._watcher.on('new article', async article => {
             await this.sendArticle(article)
@@ -28,8 +29,13 @@ module.exports = class RssFeedComponent extends Component {
         return this._channelsToUpdate
     }
 
+    getFeedName() {
+        if (this._feedName == null || this._feedName === "") return this.getShortID()
+        return this._feedName
+    }
+
     _formatAricle(article) {
-        return `[${moment(article.date).format("DD/MM/YYYY HH:mm:ss")}] New episode: ${article.title}\nLink: ${article.link}`
+        return `[${this.getFeedName()}] (${moment(article.date).format("DD/MM/YYYY HH:mm:ss")}) New episode: ${article.title}\nLink: ${article.link}`
     }
 
     async sendArticle(article) {
@@ -43,6 +49,6 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     toString() {
-        return `RssFeedComponent(${this.getShortID()})`
+        return `RssFeedComponent(${this.getFeedName()})`
     }
 }
