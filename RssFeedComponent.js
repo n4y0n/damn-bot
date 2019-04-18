@@ -12,12 +12,15 @@ module.exports = class RssFeedComponent extends Component {
         this._channelsToUpdate = []
         this._feedName = feedname
 
+
+        this._watcher.set({ interval: 120 })
         this._watcher.on('new article', async article => {
             await this.sendArticle(article)
         })
 
         this._watcher.run((err, articles) => {
             if (err) return logger.error(err, { location: this })
+            logger.info("Connected to nyaa rss feed", { location: this })
         })
     }
 
