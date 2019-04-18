@@ -23,7 +23,8 @@ let bot = new MyBot({
     messageSweepInterval: 120
 })
 
-bot.addComponent(new RssFeedComponent('https://nyaa.si/?f=0&c=1_2&q=&page=rss', "NyaaAnime {English-Translated}").addChannel("538747728763682817"))
+const rssfeed = new RssFeedComponent('https://nyaa.si/?f=0&c=1_2&q=&page=rss', "NyaaAnime {English-Translated}").addChannel("538747728763682817")
+bot.addComponent(rssfeed)
 
 const commander = new CommandProcessor("-", {
     hooks: {
@@ -74,10 +75,9 @@ if (!isDocker()) {
         }
     })
 
-    cliCommander.addCommand(new Command("image", "img", {
-        listener: async function ([url, message]) {
-            let m = await this.channel.send("WIP")
-            setTimeout(async () => await m.delete(), 5000)
+    cliCommander.addCommand(new Command("testfeed", "tf", {
+        listener: async function () {
+            await rssfeed.test()
         }
     }))
 

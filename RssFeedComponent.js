@@ -1,6 +1,7 @@
 const Watcher = require("rss-watcher")
 const Component = require("./interfaces/Component")
 const moment = require("moment")
+const { RichEmbed } = require("discord.js")
 const logger = require("./utils/logging")
 
 
@@ -16,7 +17,7 @@ module.exports = class RssFeedComponent extends Component {
         })
 
         this._watcher.run((err, articles) => {
-            if (err) return logger.error(e)
+            if (err) return logger.error(err)
         })
     }
 
@@ -35,7 +36,13 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     _formatAricle(article) {
-        return `[${this.getFeedName()}] (${moment(article.date).format("DD/MM/YYYY HH:mm:ss")}) New episode: ${article.title}\nLink: ${article.link}`
+        const embed = new RichEmbed()
+        embed.setTitle(`[${this.getFeedName()}] New episode`)
+        embed.setColor("#4DD0D9")
+        embed.addField("Date", `(${moment(article.date).format("DD/MM/YYYY HH:mm:ss")})`)
+        embed.addField("Title", article.title)
+        embed.addField("Link", article.link)
+        return embed
     }
 
     async sendArticle(article) {
@@ -46,6 +53,14 @@ module.exports = class RssFeedComponent extends Component {
 
     async _cleanUp() {
         return this._watcher.close()
+    }
+
+    async test() {
+        await this.sendArticle({
+            date: Date.now(),
+            title: "Test",
+            link: "https://example.com"
+        })
     }
 
     toString() {
