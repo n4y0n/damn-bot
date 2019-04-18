@@ -1,12 +1,12 @@
 
-class Command {
+module.exports = class Command {
     constructor(fullcommand, alias = "", options = { caseSensitive: true, listener: null, errorlistener: null }) {
         const {
             caseSensitive = true,
             listener = null,
             errorlistener = null
         } = options
-        
+
         if (!listener || !(listener instanceof Function)) {
             throw new Error("Listener must be declared and must be a function.")
         }
@@ -43,5 +43,3 @@ class Command {
         return (strcommand === this.fullcommand || strcommand === this.alias)
     }
 }
-
-module.exports = Command

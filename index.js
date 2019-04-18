@@ -6,31 +6,46 @@ const start = Date.now()
 
 //const delay = parseInt(process.env.DELAY) || 1
 //const message = process.env.MESSAGE
-
 const MyBot = require("./DBot")
-const Commander = require("./Commander")
-const Command = require("./Command")
 
-let bot = new MyBot("-", {
+const Command = require("./Command")
+const Commander = require("./CommandProcessor")
+
+const RssFeedComponent = require("./RssFeedComponent")
+const CPCC = require("./CommandProcessorComponet")
+
+let bot = new MyBot({
     disabledEvents: ["TYPING_START"],
     messageCacheMaxSize: 25,
     messageCacheLifetime: 120,
     messageSweepInterval: 120
 })
 
+bot.addComponent(new RssFeedComponent('https://nyaa.si/?page=rss'))
 
-bot.addCommand(new Command("image", "img", {
+const commander = new Commander("-", {
+    hooks: {
+        async onFinishExecution(ok, command) {
+            if (!ok) await this.channel.send(`Error excecuting "${command}"`)
+        }
+    }
+})
+
+const CPC = new CPCC(commander)
+bot.addComponent(CPC)
+
+CPC.addCommand(new Command("image", "img", {
     listener: async function ([board = "a", thread = null]) {
         let m = await this.channel.send("WIP")
         setTimeout(() => m.delete(), 5000)
     }
 }))
 
-bot.addCommand(new Command("clean", "cln", {
+CPC.addCommand(new Command("clean", "cln", {
     listener: async function ([num = 1]) {
         const msgs = await this.channel.fetchMessages({ limit: num })
 
-        let ms = msgs.filter(m => m.author.id === bot.user.id)
+        let ms = msgs.filter(m => (m.author.id === bot.user.id) && m.deletable)
 
         if (ms.size === 1) return await ms.first().delete()
 
@@ -40,7 +55,7 @@ bot.addCommand(new Command("clean", "cln", {
     }
 }))
 
-bot.addCommand(new Command("say", "s", {
+CPC.addCommand(new Command("say", "s", {
     listener: async function (message = []) {
         await this.channel.send(message.join(" "))
     }

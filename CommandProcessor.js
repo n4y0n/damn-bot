@@ -1,5 +1,6 @@
-
-class Commander {
+const Command = require("./Command")
+const path = require("path")
+module.exports = class CommandProcessor {
     constructor(prefix = "", options = { hooks: { onFinishExecution: null, onStartExecution: null } }) {
         this.commands = []
         this.prefix = prefix
@@ -7,7 +8,9 @@ class Commander {
     }
 
     addCommand(command) {
+        if (!(command instanceof Command)) return console.error(`${__filename.split(path.sep).pop()}: ${command} is not a command`)
         this.commands.push(command)
+        console.log(`Added command >> ${command}`)
     }
 
     async process(message) {
@@ -22,7 +25,7 @@ class Commander {
             console.log(`Not a command: ${message.content}`)
             return
         }
-        
+
         const cmd = args.shift().substr(this.prefix.length)
 
         for (const com of this.commands) {
@@ -55,6 +58,8 @@ class Commander {
             this.hooks.onFinishExecution.call(thisarg, ...args)
         }
     }
-}
 
-module.exports = Commander
+    toString() {
+        return `CommandProcessor(${this.prefix})`
+    }
+}
