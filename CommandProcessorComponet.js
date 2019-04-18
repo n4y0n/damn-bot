@@ -6,7 +6,7 @@ module.exports = class CommandProcessorComponet extends Processor {
         super()
         
         if (!(cli instanceof CommandProcessor)) 
-            return console.error(`❌ ${this.toString()} : No command processor found`)
+            throw Error(`❌ ${this.toString()} : No command processor found`)
             
         this._cli = cli
     }

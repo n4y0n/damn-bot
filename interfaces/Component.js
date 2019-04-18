@@ -5,11 +5,13 @@ function genid() {
     return sha1.digest("hex")
 }
 
+const logger = require("../utils/logging")
+
 module.exports = class Component {
     constructor() {
         this._id = genid()
         this.installed = false
-        this.bot = null    
+        this.bot = null
     }
 
     install(bot) {
@@ -27,7 +29,7 @@ module.exports = class Component {
     }
 
     async _cleanUp() {
-        console.warn("❌🔧To implement (_cleanUp in Component superclass)🔧❌")
+        logger.warn("❌🔧To implement (_cleanUp in Component superclass)🔧❌", { location: this })
     }
 
     getID() {

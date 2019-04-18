@@ -1,5 +1,7 @@
 const Watcher = require("rss-watcher")
 const Component = require("./interfaces/Component")
+const logger = require("./utils/logging")
+
 
 module.exports = class RssFeedComponent extends Component {
     constructor(feedurl) {
@@ -12,7 +14,7 @@ module.exports = class RssFeedComponent extends Component {
         })
 
         this._watcher.run((err, articles) => { 
-            if (err) return console.error(err)
+            if (err) return logger.error(e)
         })
     }
 
@@ -21,7 +23,7 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     async sendArticle(article) {
-        if (!this.isInstalled()) return console.error("❌ Component not installed (data loss)")
+        if (!this.isInstalled()) return logger.warn("❌ Component not installed (data loss)")
         await this.bot.getChannel("538747728763682817").send(this._formatAricle(article))
     }
 

@@ -3,6 +3,8 @@ require("dotenv").config()
 const isDocker = require("is-docker")
 const readline = require("readline")
 const start = Date.now()
+const logger = require("./utils/logging")
+
 
 //const delay = parseInt(process.env.DELAY) || 1
 //const message = process.env.MESSAGE
@@ -67,7 +69,7 @@ if (!isDocker()) {
     cliCommander = new CommandProcessor("!", {
         hooks: {
             async onFinishExecution(found) {
-                console.log("Command found?: " + found ? "Yes" : "No")
+                logger.info("Command found?: " + found ? "Yes" : "No", { location: cliCommander.toString()+" onFinishExecution()" })
             }
         }
     })
@@ -99,10 +101,10 @@ if (!isDocker()) {
 }
 
 bot.on("ready", () => {
-    console.log("Bot took: " + (Date.now() - start) + "ms")
+    logger.info("Bot took: " + (Date.now() - start) + "ms", { location: "Main" })
     // setInterval(async () => {await bot.channels.get("538747728763682817").send(await genMessage())}, delay * 1000 * 60)
     // for(let channel of bot.channels.array()) {
-    //     console.log(`${channel.id} - ${channel.type} - ${channel.name}`)
+    //     logger.info(`${channel.id} - ${channel.type} - ${channel.name}`, { location: "Main" })
     // }
 
     // const fare_robe = bot.channels.get("224616803618390029")
@@ -118,11 +120,11 @@ bot.on("ready", () => {
 })
 
 bot.on("error", err => {
-    console.error(err)
+    logger.error(err, { location: "Main" })
     process.exit(-1)
 })
 
-bot.login(process.env.TOKEN).then(token => console.log("Ok"), err => {
-    console.error(err)
+bot.login(process.env.TOKEN).then(token => logger.info("Ok", { location: "Main" }), err => {
+    logger.error(err, { location: "Main" })
     process.exit(-1)
 })

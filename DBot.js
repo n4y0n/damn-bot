@@ -1,6 +1,8 @@
 const { Client } = require("discord.js")
 const Processor = require("./interfaces/Processor")
 const Component = require("./interfaces/Component")
+const logger = require("./utils/logging")
+
 
 class DBot extends Client {
 
@@ -24,17 +26,17 @@ class DBot extends Client {
     }
 
     addComponent(component) {
-        if (!(component instanceof Component)) return console.error(`[${this}] ❌ ${component} id not a componet`)
-        if (component === this.components[component.getID()]) return console.error(`[${this}] ❌ ${component} already installed`)
+        if (!(component instanceof Component)) return logger.warn(`❌ ${component} id not a componet`, { location: this })
+        if (component === this.components[component.getID()]) return logger.info(`❌ ${component} already installed`, { location: this })
         component.install(this)
         this.components[component.getID()] = component
-        console.log(`[${this}] ✔ Added Component >> ${component}`)
+        logger.info(`✔ Added Component >> ${component}`, { location: this })
     }
 
     removeComponent(component) {
-        if (!(component instanceof Component)) return console.error(`[${this}] ❌ ${component} is not a componet`)
+        if (!(component instanceof Component)) return logger.warn(`❌ ${component} is not a componet`, { location: this })
         const retrivedcomponent = this.components[component.getID()]
-        if (retrivedcomponent == null) return console.error(`[${this}] ❌ ${component} not installed in this bot`)
+        if (retrivedcomponent == null) return logger.warn(`❌ ${component} not installed in this bot`, { location: this })
         this.components[component.getID()] = null
         retrivedcomponent.uninstall(this)
     }
