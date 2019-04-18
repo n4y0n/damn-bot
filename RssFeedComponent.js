@@ -17,12 +17,12 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     _formatAricle(article) {
-        return "new element on nyaa | " + article
+        return "new element on nyaa"
     }
 
     async sendArticle(article) {
         if (!this.isInstalled()) return console.error("Component not installed (data loss)")
-        await this.bot.getChannel("538747728763682817").send(article)
+        await this.bot.getChannel("538747728763682817").send(this._formatAricle(article))
     }
 
     async _cleanUp() {
