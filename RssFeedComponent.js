@@ -11,7 +11,6 @@ module.exports = class RssFeedComponent extends Component {
         this._channelsToUpdate = []
 
         this._watcher.on('new article', async article => {
-            console.log(article)
             await this.sendArticle(article)
         })
 
@@ -31,11 +30,11 @@ module.exports = class RssFeedComponent extends Component {
 
     _formatAricle(article) {
         console.log(JSON.stringify(article, null, 2))
-        return `[${moment(article.date).format("dd/MM/YYYY HH:mm:ss")}] New episode of: ${article.title}`
+        return `[${moment(article.date).format("DD/MM/YYYY HH:mm:ss")}] New episode: ${article.title}\nLink: ${article.link}`
     }
 
     async sendArticle(article) {
-        if (!this.isInstalled()) return logger.warn("❌ Component not installed (data loss)")
+        if (!this.isInstalled()) return logger.warn("❌ Component not installed (data loss)", { location: this })
         for (const channel of this.getChannelsList())
             await this.bot.getChannel(channel).send(this._formatAricle(article))
     }

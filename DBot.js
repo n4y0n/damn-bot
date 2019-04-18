@@ -15,8 +15,9 @@ class DBot extends Client {
         this.components = {}
 
         this.on("message", async message => {
+            logger.verbose(`New Message from ${message.author.username}: ${message.content}`, { location: this })
             if (message.author.id == this.user.id || !(message.channel.id == "538747728763682817")) return
-            for(const key in this.components) {
+            for (const key in this.components) {
                 const component = this.components[key]
                 if (component instanceof Processor)
                     await component.process(message)
