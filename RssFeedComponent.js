@@ -17,7 +17,7 @@ module.exports = class RssFeedComponent extends Component {
         })
 
         this._watcher.run((err, articles) => {
-            if (err) return logger.error(err)
+            if (err) return logger.error(err, { location: this })
         })
     }
 
