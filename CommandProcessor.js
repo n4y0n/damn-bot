@@ -1,4 +1,5 @@
-
+const Command = require("./Command")
+const path = require("path")
 module.exports = class CommandProcessor {
     constructor(prefix = "", options = { hooks: { onFinishExecution: null, onStartExecution: null } }) {
         this.commands = []
@@ -7,7 +8,9 @@ module.exports = class CommandProcessor {
     }
 
     addCommand(command) {
+        if (!(command instanceof Command)) return console.error(`${__filename.split(path.sep).pop()}: ${command} is not a command`)
         this.commands.push(command)
+        console.log(`Added command >> ${command}`)
     }
 
     async process(message) {
