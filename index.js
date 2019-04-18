@@ -120,11 +120,11 @@ bot.on("ready", () => {
 })
 
 bot.on("error", err => {
-    logger.error(err, { location: "Main" })
+    logger.error(err.message, { location: "Main" })
     process.exit(-1)
 })
 
 bot.login(process.env.TOKEN).then(token => logger.info("Ok", { location: "Main" }), err => {
-    logger.error(err, { location: "Main" })
+    logger.error(err.message, { location: "Main" })
     process.exit(-1)
 })
