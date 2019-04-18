@@ -8,7 +8,7 @@ module.exports = class Command {
         } = options
 
         if (!listener || !(listener instanceof Function)) {
-            throw new Error("Listener must be declared and must be a function.")
+            throw Error("❌ Listener must be declared and must be a function.")
         }
 
         this.fullcommand = fullcommand
@@ -23,7 +23,7 @@ module.exports = class Command {
             if (this.listener && this.listener instanceof Function) {
                 await this.listener.call(thisobj, args)
             } else {
-                throw Error("No listener function declared!")
+                throw Error("❌ No listener function declared!")
             }
         } catch (e) {
             if (this.errorlistener && this.errorlistener instanceof Function) {

@@ -1,5 +1,7 @@
 const Command = require("./Command")
 const path = require("path")
+const logger = require("./utils/logging")
+
 module.exports = class CommandProcessor {
     constructor(prefix = "", options = { hooks: { onFinishExecution: null, onStartExecution: null } }) {
         this.commands = []
@@ -8,9 +10,9 @@ module.exports = class CommandProcessor {
     }
 
     addCommand(command) {
-        if (!(command instanceof Command)) return console.error(`${__filename.split(path.sep).pop()}: ${command} is not a command`)
+        if (!(command instanceof Command)) return logger.warn(`❌ ${__filename.split(path.sep).pop()}: ${command} is not a command`, { location: this })
         this.commands.push(command)
-        console.log(`Added command >> ${command}`)
+        logger.info(`✔ Added command >> ${command}`, { location: this })
     }
 
     async process(message) {
@@ -18,11 +20,11 @@ module.exports = class CommandProcessor {
         const args = message.content.split(" ")
 
         if (args <= 0) {
-            console.error("Message with no content")
+            logger.warn(`❌ Message with no content`, { location: this })
             return
         }
         if (!args[0].toUpperCase().startsWith(this.prefix)) {
-            console.log(`Not a command: ${message.content}`)
+            logger.info(`❌ Not a command: ${message.content}`, { location: this })
             return
         }
 
@@ -34,17 +36,17 @@ module.exports = class CommandProcessor {
                     this._startCommandExecutionHook(message, com)
                     await com.exec(message, args)
                 } catch (e) {
-                    console.error(`Error executing command: ${command}: ${e}`)
+                    logger.warn(`❌ Error executing command: ${command}: ${e}`, { location: this })
                     this._endCommandExecutionHook(message, false, com)
                 } finally {
-                    console.log(`Command took ${Date.now() - start}ms to execute`)
+                    logger.info(`✔ Command took ${Date.now() - start}ms to execute`, { location: this })
                     this._endCommandExecutionHook(message, true, com)
                     return
                 }
             }
         }
         this._endCommandExecutionHook(message, false, cmd)
-        console.error(`No command "${cmd}"`)
+        logger.warn(`❌ No command "${cmd}"`, { location: this })
     }
 
 

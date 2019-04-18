@@ -1,7 +1,17 @@
+const crypto = require("crypto")
+function genid() {
+    const sha1 = crypto.createHash("sha1")
+    sha1.update(Date.now().toString())
+    return sha1.digest("hex")
+}
+
+const logger = require("../utils/logging")
+
 module.exports = class Component {
     constructor() {
+        this._id = genid()
         this.installed = false
-        this.bot = null    
+        this.bot = null
     }
 
     install(bot) {
@@ -18,9 +28,19 @@ module.exports = class Component {
         return this.installed
     }
 
-    async _cleanUp() {console.warn("To implement (_cleanUp in Component superclass)")}
+    async _cleanUp() {
+        logger.warn("❌🔧To implement (_cleanUp in Component superclass)🔧❌", { location: this })
+    }
+
+    getID() {
+        return this._id
+    }
+
+    getShortID() {
+        return this._id.substr(0, 7)
+    }
 
     toString() {
-        return `-Component-`
+        return `-Component-@${this.getShortID()}`
     }
 }

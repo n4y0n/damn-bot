@@ -13,7 +13,9 @@
     "discord.js": "^11.4.2",
     "dotenv": "^7.0.0",
     "is-docker": "^1.1.0",
+    "moment": "^2.24.0",
     "nodemon": "^1.18.11",
-    "rss-watcher": "^1.4.0"
+    "rss-watcher": "^1.4.0",
+    "winston": "^3.2.1"
   }
 }
