@@ -29,7 +29,6 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     _formatAricle(article) {
-        console.log(JSON.stringify(article, null, 2))
         return `[${moment(article.date).format("DD/MM/YYYY HH:mm:ss")}] New episode: ${article.title}\nLink: ${article.link}`
     }
 
