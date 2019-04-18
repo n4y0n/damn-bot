@@ -32,7 +32,6 @@ const commander = new CommandProcessor("-", {
 })
 
 const CPC = new CommandProcessorComponent(commander)
-const CPC2 = new CommandProcessorComponent(new Object())
 
 bot.addComponent(CPC)
 

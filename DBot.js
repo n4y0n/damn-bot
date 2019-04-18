@@ -24,22 +24,27 @@ class DBot extends Client {
     }
 
     addComponent(component) {
-        if (!(component instanceof Component)) return console.error(`❌ ${component} id not a componet`)
+        if (!(component instanceof Component)) return console.error(`[${this}] ❌ ${component} id not a componet`)
+        if (component === this.components[component.getID()]) return console.error(`[${this}] ❌ ${component} already installed`)
         component.install(this)
         this.components[component.getID()] = component
-        console.log(`✔ Added Component >> ${component}`)
+        console.log(`[${this}] ✔ Added Component >> ${component}`)
     }
 
     removeComponent(component) {
-        if (!(component instanceof Component)) return console.error(`❌ ${component} is not a componet`)
+        if (!(component instanceof Component)) return console.error(`[${this}] ❌ ${component} is not a componet`)
         const retrivedcomponent = this.components[component.getID()]
-        if (retrivedcomponent == null) return console.error(`❌ ${component} not installed in this bot`)
+        if (retrivedcomponent == null) return console.error(`[${this}] ❌ ${component} not installed in this bot`)
         this.components[component.getID()] = null
         retrivedcomponent.uninstall(this)
     }
 
     getChannel(id) {
         return this.channels.get(id)
+    }
+
+    toString() {
+        return "MyBot"
     }
 }
 
