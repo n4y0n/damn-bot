@@ -37,9 +37,9 @@ module.exports = class RssFeedComponent extends Component {
 
     _formatAricle(article) {
         const embed = new RichEmbed()
-        embed.setTitle(`[${this.getFeedName()}] New episode`)
+        embed.setTitle(`[ NEW ${this.getFeedName()}]`)
         embed.setColor("#4DD0D9")
-        embed.addField("Date", `(${moment(article.date).format("DD/MM/YYYY HH:mm:ss")})`)
+        embed.addField("Date", moment(article.date).format("DD/MM/YYYY HH:mm:ss"))
         embed.addField("Title", article.title)
         embed.addField("Link", article.link)
         return embed
