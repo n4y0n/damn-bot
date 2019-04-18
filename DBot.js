@@ -15,8 +15,10 @@ class DBot extends Client {
         this.components = {}
 
         this.on("message", async message => {
+            const channelname = message.channel.name ? message.channel.name : "Private"
+            logger.verbose(`New Message from ${message.author.username} in ${channelname}: ${message.content}`, { location: this })
             if (message.author.id == this.user.id || !(message.channel.id == "538747728763682817")) return
-            for(const key in this.components) {
+            for (const key in this.components) {
                 const component = this.components[key]
                 if (component instanceof Processor)
                     await component.process(message)
@@ -26,7 +28,7 @@ class DBot extends Client {
     }
 
     addComponent(component) {
-        if (!(component instanceof Component)) return logger.warn(`❌ ${component} id not a componet`, { location: this })
+        if (!(component instanceof Component)) return logger.warn(`❌ ${component} is not a componet`, { location: this })
         if (component === this.components[component.getID()]) return logger.info(`❌ ${component} already installed`, { location: this })
         component.install(this)
         this.components[component.getID()] = component

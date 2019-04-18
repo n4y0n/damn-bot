@@ -4,12 +4,12 @@ const { printf } = format
 
 module.exports = winston.createLogger({
     format: printf((info) => {
-        if(info.location) return `[${info.location}]> [${info.level.toUpperCase()}]: ${info.message}`
-        return `[${info.level.toUpperCase()}]: ${info.message}`
+        if(info.location) return `[${info.level.toUpperCase()}] [${info.location}] > ${info.message}`
+        return `[${info.level.toUpperCase()}] > ${info.message}`
     }),
     transports: [
         new winston.transports.File({
-            level: 'info',
+            level: 'silly',
             filename: './logs/all-logs.log',
             handleExceptions: true,
             json: true,

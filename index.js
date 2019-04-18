@@ -23,7 +23,7 @@ let bot = new MyBot({
     messageSweepInterval: 120
 })
 
-bot.addComponent(new RssFeedComponent('https://nyaa.si/?page=rss').addChannel("538747728763682817"))
+bot.addComponent(new RssFeedComponent('https://nyaa.si/?f=0&c=1_2&q=&page=rss', "NyaaAnime {English-Translated}").addChannel("538747728763682817"))
 
 const commander = new CommandProcessor("-", {
     hooks: {
