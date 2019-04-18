@@ -11,7 +11,7 @@ const MyBot = require("./DBot")
 const Command = require("./Command")
 const Commander = require("./CommandProcessor")
 
-const NyaaRssFeedComponent = require("./NyaaRssFeedComponent")
+const RssFeedComponent = require("./RssFeedComponent")
 const CPCC = require("./CommandProcessorComponet")
 
 let bot = new MyBot({
@@ -21,7 +21,7 @@ let bot = new MyBot({
     messageSweepInterval: 120
 })
 
-bot.addComponent(new NyaaRssFeedComponent())
+bot.addComponent(new RssFeedComponent('https://nyaa.si/?page=rss'))
 
 const commander = new Commander("-", {
     hooks: {

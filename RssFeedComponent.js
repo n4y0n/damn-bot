@@ -1,15 +1,14 @@
 const Watcher = require("rss-watcher")
 const Component = require("./interfaces/Component")
 
-module.exports = class NyaaRssFeedComponent extends Component {
-    constructor() {
+module.exports = class RssFeedComponent extends Component {
+    constructor(feedurl) {
         super()
-        let feed = 'https://nyaa.si/?page=rss'
-        this._watcher = new Watcher(feed)
+        this._watcher = new Watcher(feedurl)
 
-        this._watcher.on('new article', (article) => {
+        this._watcher.on('new article', async article => {
             console.log(article)
-            this.sendArticle(article)
+            await this.sendArticle(article)
         })
 
         this._watcher.run((err, articles) => { 
@@ -21,9 +20,9 @@ module.exports = class NyaaRssFeedComponent extends Component {
         return "new element on nyaa | " + article
     }
 
-    sendArticle(article) {
+    async sendArticle(article) {
         if (!this.isInstalled()) return console.error("Component not installed (data loss)")
-        this.bot.getChannel("538747728763682817").send(article)
+        await this.bot.getChannel("538747728763682817").send(article)
     }
 
     async _cleanUp() {
@@ -31,6 +30,6 @@ module.exports = class NyaaRssFeedComponent extends Component {
     }
 
     toString() {
-        return `-NyaaRssFeedComponent-`
+        return `-RssFeedComponent-`
     }
 }
