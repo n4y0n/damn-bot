@@ -20,6 +20,6 @@ module.exports = class CommandProcessorComponet extends Processor {
     }
 
     toString() {
-        return `CommandProcessorComponet(${this.getID()})`
+        return `CommandProcessorComponet(${this.getShortID()})`
     }
 }

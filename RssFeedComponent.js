@@ -30,6 +30,6 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     toString() {
-        return `RssFeedComponent(${this.getID()})`
+        return `RssFeedComponent(${this.getShortID()})`
     }
 }

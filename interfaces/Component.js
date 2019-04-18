@@ -34,7 +34,11 @@ module.exports = class Component {
         return this._id
     }
 
+    getShortID() {
+        return this._id.substr(0, 7)
+    }
+
     toString() {
-        return `-Component-@${this.getID()}`
+        return `-Component-@${this.getShortID()}`
     }
 }
