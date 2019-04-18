@@ -24,7 +24,7 @@ module.exports = class CommandProcessor {
             return
         }
         if (!args[0].toUpperCase().startsWith(this.prefix)) {
-            logger.info(`❌ Not a command: ${message.content}`, { location: this })
+            logger.warn(`❌ Not a command: ${message.content}`, { location: this })
             return
         }
 
