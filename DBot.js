@@ -1,7 +1,7 @@
 const crypto = require("crypto")
 const { Client } = require("discord.js")
-const Commander = require("./CommandProcessor")
-const Component = require("./Component")
+const Processor = require("./interfaces/Processor")
+const Component = require("./interfaces/Component")
 
 function circular(object) {
     var i = 0;
@@ -31,31 +31,21 @@ class DBot extends Client {
 
     /**
      * 
-     * @param {string} commands_prefix prefix for all commands
      * @param {Object} options
      */
-    constructor(commands_prefix = "-", options) {
+    constructor(options) {
         super(options)
         this.components = {}
-        this.prefix = commands_prefix
-
-        this.commander = new Commander(commands_prefix, {
-            hooks: {
-                async onFinishExecution(ok, command) {
-                    if (!ok) await this.channel.send(`Error excecuting ${command}`)
-                }
-            }
-        })
 
         this.on("message", async message => {
             if (message.author.id == this.user.id || !(message.channel.id == "538747728763682817")) return
-            await this.commander.process(message)
+            for(const key in this.components) {
+                const component = this.components[key]
+                if (component instanceof Processor)
+                    await component.process(message)
+            }
             await message.delete()
         })
-    }
-
-    addCommand(command) {
-        this.commander.addCommand(command)
     }
 
     addComponent(component) {

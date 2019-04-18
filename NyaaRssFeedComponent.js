@@ -1,5 +1,5 @@
 const Watcher = require("rss-watcher")
-const Component = require("./Component")
+const Component = require("./interfaces/Component")
 
 module.exports = class NyaaRssFeedComponent extends Component {
     constructor() {
