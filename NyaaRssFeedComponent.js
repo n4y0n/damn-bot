@@ -22,11 +22,15 @@ module.exports = class NyaaRssFeedComponent extends Component {
     }
 
     sendArticle(article) {
-        if (!this.isInstalled()) return console.error("Component not installed (Possible data loss)")
+        if (!this.isInstalled()) return console.error("Component not installed (data loss)")
         this.bot.getChannel("538747728763682817").send(article)
     }
 
     async _cleanUp() {
         return this._watcher.close()
+    }
+
+    toString() {
+        return `-NyaaRssFeedComponent-`
     }
 }

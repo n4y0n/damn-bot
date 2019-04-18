@@ -55,4 +55,8 @@ module.exports = class CommandProcessor {
             this.hooks.onFinishExecution.call(thisarg, ...args)
         }
     }
+
+    toString() {
+        return `CommandProcessor(${this.prefix})`
+    }
 }

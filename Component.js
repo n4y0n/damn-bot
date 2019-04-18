@@ -15,8 +15,12 @@ module.exports = class Component {
     }
 
     isInstalled() {
-        return this.installed && this.bot
+        return this.installed
     }
 
     async _cleanUp() {console.warn("To implement (_cleanUp in Component superclass)")}
+
+    toString() {
+        return `-Component-`
+    }
 }
