@@ -4,6 +4,7 @@ const isDocker = require("is-docker")
 const readline = require("readline")
 const start = Date.now()
 const logger = require("./utils/logging")
+const { RichEmbed } = require("discord.js")
 
 
 //const delay = parseInt(process.env.DELAY) || 1
@@ -23,12 +24,14 @@ let bot = new MyBot({
     messageSweepInterval: 120
 })
 
-bot.addComponent(new RssFeedComponent('https://nyaa.si/?f=0&c=1_2&q=&page=rss', "NyaaAnime {English-Translated}").addChannel("538747728763682817"))
+const rssfeed = new RssFeedComponent('https://nyaa.si/?f=0&c=1_2&q=&page=rss', "NyaaAnime {English-Translated}").addChannel("538747728763682817")
+bot.addComponent(rssfeed)
 
 const commander = new CommandProcessor("-", {
     hooks: {
         async onFinishExecution(ok, command) {
-            if (!ok) await this.channel.send(`Error excecuting "${command}"`)
+            const channel = this.message.channel
+            if (!ok) await channel.send(`Error excecuting "${command}"`)
         }
     }
 })
@@ -37,16 +40,11 @@ const CPC = new CommandProcessorComponent(commander)
 
 bot.addComponent(CPC)
 
-CPC.addCommand(new Command("image", "img", {
-    listener: async function ([board = "a", thread = null]) {
-        let m = await this.channel.send("WIP")
-        setTimeout(() => m.delete(), 5000)
-    }
-}))
-
 CPC.addCommand(new Command("clean", "cln", {
     listener: async function ([num = 1]) {
-        const msgs = await this.channel.fetchMessages({ limit: num })
+        const channel = this.message.channel
+
+        const msgs = await channel.fetchMessages({ limit: num + 1 })
 
         let ms = msgs.filter(m => (m.author.id === bot.user.id) && m.deletable)
 
@@ -54,14 +52,26 @@ CPC.addCommand(new Command("clean", "cln", {
 
         if (ms.size < 1) return
 
-        await this.channel.bulkDelete(ms, true)
-    }
+        await channel.bulkDelete(ms, true)
+    },
+    description: "Deletes n messages send by this bot (default: 1)"
 }))
 
-CPC.addCommand(new Command("say", "s", {
-    listener: async function (message = []) {
-        await this.channel.send(message.join(" "))
-    }
+CPC.addCommand(new Command("help", "h", {
+    listener: async function () {
+        const channel = this.message.channel
+        const processor = this.proc
+
+        const commandlist = new RichEmbed()
+        commandlist.setTitle("[ Command List ]")
+
+        for (const command of processor.commands) {
+            commandlist.addField(command.toString(), command.getDescription())
+        }
+
+        channel.send(commandlist)
+    },
+    description: "Lists all available commands."
 }))
 
 let cliCommander
@@ -69,33 +79,35 @@ if (!isDocker()) {
     cliCommander = new CommandProcessor("!", {
         hooks: {
             async onFinishExecution(found) {
-                logger.info("Command found?: " + found ? "Yes" : "No", { location: cliCommander.toString()+" onFinishExecution()" })
+                logger.info("Command found?: " + found ? "Yes" : "No", { location: cliCommander.toString() + " onFinishExecution()" })
             }
         }
     })
 
-    cliCommander.addCommand(new Command("image", "img", {
-        listener: async function ([url, message]) {
-            let m = await this.channel.send("WIP")
-            setTimeout(async () => await m.delete(), 5000)
+    cliCommander.addCommand(new Command("testfeed", "tf", {
+        listener: async function () {
+            await rssfeed.test()
         }
     }))
 
     cliCommander.addCommand(new Command("clean", "cln", {
         listener: async function ([num = 1]) {
-            const ms = await this.channel.fetchMessages({ limit: num })
+            const channel = this.message.channel
+
+            const ms = await channel.fetchMessages({ limit: num })
 
             if (ms.size === 1) return await ms.first().delete()
 
             if (ms.size < 1) return
 
-            await this.channel.bulkDelete(ms, true)
+            await channel.bulkDelete(ms, true)
         }
     }))
 
     cliCommander.addCommand(new Command("say", "s", {
         listener: async function (message = []) {
-            await this.channel.send(message.join(" "))
+            const channel = this.message.channel
+            await channel.send(message.join(" "))
         }
     }))
 }
@@ -120,11 +132,11 @@ bot.on("ready", () => {
 })
 
 bot.on("error", err => {
-    logger.error(err, { location: "Main" })
+    logger.error(err.message, { location: "Main" })
     process.exit(-1)
 })
 
 bot.login(process.env.TOKEN).then(token => logger.info("Ok", { location: "Main" }), err => {
-    logger.error(err, { location: "Main" })
+    logger.error(err.message, { location: "Main" })
     process.exit(-1)
 })

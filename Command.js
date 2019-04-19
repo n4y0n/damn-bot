@@ -1,10 +1,11 @@
 
 module.exports = class Command {
-    constructor(fullcommand, alias = "", options = { caseSensitive: true, listener: null, errorlistener: null }) {
+    constructor(fullcommand, alias = "", options = { caseSensitive: true, listener: null, errorlistener: null, description: null }) {
         const {
             caseSensitive = true,
             listener = null,
-            errorlistener = null
+            errorlistener = null,
+            description
         } = options
 
         if (!listener || !(listener instanceof Function)) {
@@ -16,6 +17,7 @@ module.exports = class Command {
         this.caseSensitive = caseSensitive
         this.listener = listener
         this.errorlistener = errorlistener
+        this._description = description
     }
 
     async exec(thisobj, args = []) {
@@ -36,6 +38,11 @@ module.exports = class Command {
 
     toString() {
         return `${this.fullcommand}(${this.alias})`
+    }
+
+    getDescription() {
+        if (!!this._description) return this._description
+        return "Voluptatem minus nemo aut fugit ex repudiandae. Enim velit quia vel deleniti. Rerum voluptatum officiis sed ut alias placeat voluptate qui. Magni officia molestiae reprehenderit unde sequi voluptatem."
     }
 
     match(strcommand) {
