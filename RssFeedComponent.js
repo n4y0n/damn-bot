@@ -25,6 +25,8 @@ module.exports = class RssFeedComponent extends Component {
             if (!this.isInstalled() || !this.bot.readyTimestamp || Date.now() < this.readyTimestamp) return
             await this.sendArticle(item)
         })
+
+        setTimeout(() => logger.info("Ready", { location: this }), this.readyTimestamp - Date.now())
     }
 
     addChannel(channel) {
@@ -52,9 +54,9 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     async sendArticle(article) {
-        if (!this.isInstalled()) 
+        if (!this.isInstalled())
             return logger.warn("❌ Component not installed (🚽 data loss 🚽)", { location: this })
-        if (this.getChannelsList() <= 0 || !this.bot.readyTimestamp) 
+        if (this.getChannelsList() <= 0 || !this.bot.readyTimestamp)
             return logger.silly("Bot not ready and/or no channels in channel list", { location: this })
 
         for (const channel of this.getChannelsList()) {
