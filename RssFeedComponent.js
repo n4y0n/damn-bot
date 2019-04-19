@@ -14,9 +14,6 @@ module.exports = class RssFeedComponent extends Component {
         this._feedName = feedname
 
         this._watcher = new RssWatcher(feedurl)
-        this._watcher.set({
-            interval: 500
-        })
         this.readyTimestamp = Date.now() + 3000
 
         this._watcher.on('new article', async item => {
