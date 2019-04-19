@@ -9,7 +9,7 @@ const logger = require("../utils/logging")
 
 module.exports = class Component {
     constructor() {
-        this._id = genid()
+        this._id = null
         this.installed = false
         this.bot = null
     }
@@ -33,11 +33,15 @@ module.exports = class Component {
     }
 
     getID() {
+        if (!this._id) {
+            this._id = genid()
+            return this._id
+        }
         return this._id
     }
 
     getShortID() {
-        return this._id.substr(0, 7)
+        return this.getID().substr(0, 7)
     }
 
     toString() {
