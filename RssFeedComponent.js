@@ -1,26 +1,25 @@
-const Watcher = require("rss-watcher")
 const Component = require("./interfaces/Component")
 const moment = require("moment")
 const { RichEmbed } = require("discord.js")
 const logger = require("./utils/logging")
+const RssFeedEmitter = require('rss-feed-emitter');
+
 
 
 module.exports = class RssFeedComponent extends Component {
     constructor(feedurl, feedname = "") {
         super()
-        this._watcher = new Watcher(feedurl)
-        this._channelsToUpdate = []
-        this._feedName = feedname
-
-
-        this._watcher.set({ interval: 120 })
-        this._watcher.on('new article', async article => {
-            await this.sendArticle(article)
+        this._watcher = new RssFeedEmitter()
+        this._watcher.add({
+            url: feedurl,
+            refresh: 500
         })
 
-        this._watcher.run((err, articles) => {
-            if (err) return logger.error(err, { location: this })
-            logger.info("Connected to nyaa rss feed", { location: this })
+        this._channelsToUpdate = []
+        this._feedName = feedname
+        this._watcher.on('new-item', async item => {
+            if (!this.isInstalled() || !this.bot.readyTimestamp) return
+            await this.sendArticle(item)
         })
     }
 
@@ -49,13 +48,22 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     async sendArticle(article) {
-        if (!this.isInstalled()) return logger.warn("❌ Component not installed (data loss)", { location: this })
-        for (const channel of this.getChannelsList())
-            await this.bot.getChannel(channel).send(this._formatAricle(article))
+        if (!this.isInstalled()) 
+            return logger.warn("❌ Component not installed (🚽 data loss 🚽)", { location: this })
+        if (this.getChannelsList() <= 0 || !this.bot.readyTimestamp) 
+            return logger.silly("Bot not ready and/or no channels in channel list", { location: this })
+
+        for (const channel of this.getChannelsList()) {
+            const dchannel = this.bot.getChannel(channel)
+            if (!!dchannel)
+                dchannel.send(this._formatAricle(article))
+            else
+                logger.warn(`❌ No channel ${channel} found.`, { location: this })
+        }
     }
 
     async _cleanUp() {
-        return this._watcher.close()
+        return this._watcher.destroy()
     }
 
     async test() {
