@@ -44,9 +44,9 @@ CPC.addCommand(new Command("clean", "cln", {
     listener: async function ([num = 1]) {
         const channel = this.message.channel
 
-        const msgs = await channel.fetchMessages({ limit: num + 1 })
+        const msgs = await channel.fetchMessages({ limit: num })
 
-        let ms = msgs.filter(m => (m.author.id === bot.user.id) && m.deletable)
+        let ms = msgs.filter(m => m.author.id === bot.user.id)
 
         if (ms.size === 1) return await ms.first().delete()
 
