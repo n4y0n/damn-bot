@@ -29,7 +29,8 @@ bot.addComponent(rssfeed)
 const commander = new CommandProcessor("-", {
     hooks: {
         async onFinishExecution(ok, command) {
-            if (!ok) await this.channel.send(`Error excecuting "${command}"`)
+            const channel = this.message.channel
+            if (!ok) await channel.send(`Error excecuting "${command}"`)
         }
     }
 })
@@ -40,14 +41,17 @@ bot.addComponent(CPC)
 
 CPC.addCommand(new Command("image", "img", {
     listener: async function ([board = "a", thread = null]) {
-        let m = await this.channel.send("WIP")
+        const channel = this.message.channel
+        let m = await channel.send("WIP")
         setTimeout(() => m.delete(), 5000)
     }
 }))
 
 CPC.addCommand(new Command("clean", "cln", {
     listener: async function ([num = 1]) {
-        const msgs = await this.channel.fetchMessages({ limit: num })
+        const channel = this.message.channel
+
+        const msgs = await channel.fetchMessages({ limit: num })
 
         let ms = msgs.filter(m => (m.author.id === bot.user.id) && m.deletable)
 
@@ -55,13 +59,14 @@ CPC.addCommand(new Command("clean", "cln", {
 
         if (ms.size < 1) return
 
-        await this.channel.bulkDelete(ms, true)
+        await channel.bulkDelete(ms, true)
     }
 }))
 
 CPC.addCommand(new Command("say", "s", {
     listener: async function (message = []) {
-        await this.channel.send(message.join(" "))
+        const channel = this.message.channel
+        await channel.send(message.join(" "))
     }
 }))
 
@@ -83,19 +88,22 @@ if (!isDocker()) {
 
     cliCommander.addCommand(new Command("clean", "cln", {
         listener: async function ([num = 1]) {
-            const ms = await this.channel.fetchMessages({ limit: num })
+            const channel = this.message.channel
+
+            const ms = await channel.fetchMessages({ limit: num })
 
             if (ms.size === 1) return await ms.first().delete()
 
             if (ms.size < 1) return
 
-            await this.channel.bulkDelete(ms, true)
+            await channel.bulkDelete(ms, true)
         }
     }))
 
     cliCommander.addCommand(new Command("say", "s", {
         listener: async function (message = []) {
-            await this.channel.send(message.join(" "))
+            const channel = this.message.channel
+            await channel.send(message.join(" "))
         }
     }))
 }

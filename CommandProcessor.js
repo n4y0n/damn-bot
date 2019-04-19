@@ -33,19 +33,19 @@ module.exports = class CommandProcessor {
         for (const com of this.commands) {
             if (com.match(cmd)) {
                 try {
-                    this._startCommandExecutionHook(message, com)
-                    await com.exec(message, args)
+                    this._startCommandExecutionHook({ message, proc: this }, com)
+                    await com.exec({ message, proc: this }, args)
                 } catch (e) {
                     logger.warn(`❌ Error executing command: ${command}: ${e}`, { location: this })
-                    this._endCommandExecutionHook(message, false, com)
+                    this._endCommandExecutionHook({ message, proc: this }, false, com)
                 } finally {
                     logger.info(`✔ Command took ${Date.now() - start}ms to execute`, { location: this })
-                    this._endCommandExecutionHook(message, true, com)
+                    this._endCommandExecutionHook({ message, proc: this }, true, com)
                     return
                 }
             }
         }
-        this._endCommandExecutionHook(message, false, cmd)
+        this._endCommandExecutionHook({ message, proc: this }, false, cmd)
         logger.warn(`❌ No command "${cmd}"`, { location: this })
     }
 
