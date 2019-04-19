@@ -15,11 +15,17 @@ module.exports = class Component {
     }
 
     install(bot) {
+        if (this.isInstalled())
+            return logger.warn(`Component already installed in bot: ${this.bot}`, { location: this })
+
         this.bot = bot
         this.installed = true
     }
 
-    uninstall(bot) {
+    uninstall() {
+        if (!this.isInstalled())
+            return logger.warn("Cannot uninstall a not installed component", { location: this })
+
         this.bot = null
         this.installed = false
     }
