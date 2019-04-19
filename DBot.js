@@ -23,7 +23,6 @@ class DBot extends Client {
                 if (component instanceof Processor)
                     await component.process(message)
             }
-            await message.delete()
         })
     }
 
