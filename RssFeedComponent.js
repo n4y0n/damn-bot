@@ -9,16 +9,20 @@ const RssFeedEmitter = require('rss-feed-emitter');
 module.exports = class RssFeedComponent extends Component {
     constructor(feedurl, feedname = "") {
         super()
+
+        this._channelsToUpdate = []
+        this._feedName = feedname
+
         this._watcher = new RssFeedEmitter()
+        this.readyTimestamp = Date.now() + 3000
+
         this._watcher.add({
             url: feedurl,
             refresh: 500
         })
 
-        this._channelsToUpdate = []
-        this._feedName = feedname
         this._watcher.on('new-item', async item => {
-            if (!this.isInstalled() || !this.bot.readyTimestamp) return
+            if (!this.isInstalled() || !this.bot.readyTimestamp || Date.now() < this.readyTimestamp) return
             await this.sendArticle(item)
         })
     }
@@ -63,7 +67,8 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     async _cleanUp() {
-        return this._watcher.destroy()
+        this._watcher.destroy()
+        this.uninstall()
     }
 
     async test() {
