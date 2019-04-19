@@ -2,7 +2,7 @@ const Component = require("./interfaces/Component")
 const moment = require("moment")
 const { RichEmbed } = require("discord.js")
 const logger = require("./utils/logging")
-const RssFeedEmitter = require('rss-feed-emitter');
+const RssWatcher = require('rss-watcher');
 
 
 
@@ -13,17 +13,20 @@ module.exports = class RssFeedComponent extends Component {
         this._channelsToUpdate = []
         this._feedName = feedname
 
-        this._watcher = new RssFeedEmitter()
+        this._watcher = new RssWatcher(feedurl)
+        this._watcher.set({
+            interval: 500
+        })
         this.readyTimestamp = Date.now() + 3000
 
-        this._watcher.add({
-            url: feedurl,
-            refresh: 500
-        })
-
-        this._watcher.on('new-item', async item => {
+        this._watcher.on('new article', async item => {
             if (!this.isInstalled() || !this.bot.readyTimestamp || Date.now() < this.readyTimestamp) return
             await this.sendArticle(item)
+        })
+
+        this._watcher.run((err) => {
+            if (!!err) return logger.error(err, { location: this })
+            logger.debug("Watcher backend ready", { location: this })
         })
 
         setTimeout(() => logger.info("Ready", { location: this }), this.readyTimestamp - Date.now())
