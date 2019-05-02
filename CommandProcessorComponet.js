@@ -12,6 +12,7 @@ module.exports = class CommandProcessorComponet extends Processor {
     }
 
     async process(message) {
+        if(!(message.channel.id == "538747728763682817")) return;
         await this._cli.process(message)
     }
 

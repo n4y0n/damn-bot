@@ -51,6 +51,6 @@ module.exports = class Component {
     }
 
     toString() {
-        return `-Component-@${this.getShortID()}`
+        return `Component@${this.getShortID()}`
     }
 }

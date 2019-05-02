@@ -26,6 +26,10 @@ module.exports = class RssFeedComponent extends Component {
             logger.debug("Watcher backend ready", { location: this })
         })
 
+        this._watcher.on('error', err => {
+            logger.error(err, { location: this })
+        })
+
         setTimeout(() => logger.info("Ready", { location: this }), this.readyTimestamp - Date.now())
     }
 
