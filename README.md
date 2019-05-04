@@ -1,5 +1,4 @@
-## Damn Dellix Bot 
-Simple discord spam bot made to annoy a friend 😁
+## ..........
 
 ### Useful info
 
