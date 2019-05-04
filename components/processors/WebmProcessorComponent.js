@@ -1,9 +1,9 @@
-const Processor = require("./interfaces/Processor")
+const Processor = require("../../interfaces/Processor")
 const { Message, Client, TextChannel } = require("discord.js")
 const path = require("path")
 const fs = require("fs")
 const axios = require("axios").default
-const logger = require("./utils/logging")
+const logger = require("../../utils/logging")
 const ffmpeg = require("ffmpeg")
 
 

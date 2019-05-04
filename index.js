@@ -14,9 +14,9 @@ const MyBot = require("./DBot")
 const Command = require("./Command")
 const CommandProcessor = require("./CommandProcessor")
 
-const RssFeedComponent = require("./RssFeedComponent")
-const CommandProcessorComponent = require("./CommandProcessorComponet")
-const WebmProcessorComponent = require("./WebmProcessorComponent")
+const RssFeedComponent = require("./components/components/RssFeedComponent")
+const CommandProcessorComponent = require("./components/processors/CommandProcessorComponet")
+const WebmProcessorComponent = require("./components/processors/WebmProcessorComponent")
 
 
 let bot = new MyBot({
