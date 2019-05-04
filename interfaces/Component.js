@@ -34,6 +34,10 @@ module.exports = class Component {
         return this.installed
     }
 
+    botReady() {
+        return !!this.bot.readyTimestamp
+    }
+
     async _cleanUp() {
         logger.warn("❌🔧To implement (_cleanUp in Component superclass)🔧❌", { location: this })
     }

@@ -8,12 +8,17 @@ const ffmpeg = require("ffmpeg")
 
 
 module.exports = class WebmProcessorComponent extends Processor {
+
+    constructor(tmpFolder = "./") {
+        super()
+        this.tmp = tmpFolder
+    }
+
     /**
-     * 
      * @param {Message} message 
      */
     async process(message) {
-        await convertWebmAttachmentToMp4(message)
+        await convertWebmAttachmentToMp4(message, this.tmp)
     }
 
     /**
@@ -25,8 +30,22 @@ module.exports = class WebmProcessorComponent extends Processor {
         bot.on("ready", () => {
             bot.channels
                 .filter(c => c.type == "text")
-                .forEach(fetchWebm)
+                .forEach(this.fetchWebm.bind(this))
         })
+    }
+
+    /**
+     * @param {TextChannel} channel 
+     */
+    async fetchWebm(channel) {
+        let messages = (await channel.fetchMessages({ limit: 20 })).filter(message => message.attachments.array().length > 0)
+        for (let [id, message] of messages) {
+            try {
+                await convertWebmAttachmentToMp4(message, this.tmp)
+            } catch (e) {
+                logger.warn(e, { location: this })
+            }
+        }
     }
 
     toString() {
@@ -38,19 +57,17 @@ module.exports = class WebmProcessorComponent extends Processor {
  * 
  * @param {Message} message 
  */
-async function convertWebmAttachmentToMp4(message) {
+async function convertWebmAttachmentToMp4(message, tmpFolder) {
     let attachments = message.attachments.array()
     if (attachments.length > 1 || attachments.length <= 0) return
 
     const attachment = attachments.pop()
-    const ext = /\.([a-zA-Z]+)$/g.exec(attachment.filename)
-
-    if (!ext || ext[1] !== "webm") return
+    if (isNotA(attachment.filename, "webm")) return
 
     try {
 
-        const webmfilepath = path.join(__dirname, "tmp", attachment.filename)
-        const output = path.join(__dirname, "tmp", `${attachment.filename.substring(0, attachment.filename.length - 5)}.mp4`)
+        const webmfilepath = path.join(tmpFolder, attachment.filename)
+        const output = path.join(tmpFolder, `${attachment.filename.substring(0, attachment.filename.length - 5)}.mp4`)
 
         await downloadFile(attachment.url, webmfilepath)
         await convertToMp4(webmfilepath, output)
@@ -68,17 +85,10 @@ async function convertWebmAttachmentToMp4(message) {
     }
 } 
 
-
-/**
- * @param {TextChannel} channel 
- */
-async function fetchWebm(channel) {
-    let messages = (await channel.fetchMessages({ limit: 20 })).filter(message => message.attachments.array().length > 0)
-    for (let [id, message] of messages) {
-        await convertWebmAttachmentToMp4(message)
-    }
+function isNotA(filename, format) {
+    const ext = /\.[0-9a-z]+$/i.exec(filename)
+    return (!ext || ext[1] !== format)
 }
-
 function downloadFile(url, dest) {
     const writer = fs.createWriteStream(dest)
     
@@ -98,9 +108,8 @@ function downloadFile(url, dest) {
 }
 
 function convertToMp4(inFilePath, outFilePath) {
-    const pp = new ffmpeg(inFilePath)
     return new Promise((resolve, reject) => {
-        pp.then(video => {
+        new ffmpeg(inFilePath).then(video => {
             video.setVideoFormat("mp4").setVideoSize('640x480', true, false).save(outFilePath, function(err) {
                 if (err) return reject(err)
                 resolve()
