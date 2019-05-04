@@ -4,6 +4,7 @@ const isDocker = require("is-docker")
 const readline = require("readline")
 const start = Date.now()
 const logger = require("./utils/logging")
+const path = require("path")
 const { RichEmbed } = require("discord.js")
 
 
@@ -29,7 +30,7 @@ let bot = new MyBot({
 const rssfeed = new RssFeedComponent('https://nyaa.si/?f=0&c=1_2&q=&page=rss', "NyaaAnime {English-Translated}").addChannel("538747728763682817")
 bot.addComponent(rssfeed)
 
-bot.addComponent(new WebmProcessorComponent())
+bot.addComponent(new WebmProcessorComponent(path.join(__dirname, "tmp")))
 
 const commander = new CommandProcessor("-", {
     hooks: {

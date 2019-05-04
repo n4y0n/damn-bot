@@ -4,7 +4,7 @@ const Component = require("./interfaces/Component")
 const logger = require("./utils/logging")
 
 
-class DBot extends Client {
+module.exports = class DBot extends Client {
 
     /**
      * 
@@ -50,5 +50,3 @@ class DBot extends Client {
         return "MyBot"
     }
 }
-
-module.exports = DBot
