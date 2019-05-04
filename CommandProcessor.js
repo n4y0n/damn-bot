@@ -20,11 +20,10 @@ module.exports = class CommandProcessor {
         const args = message.content.split(" ")
 
         if (args <= 0) {
-            logger.warn(`❌ Message with no content`, { location: this })
             return
         }
         if (!args[0].toUpperCase().startsWith(this.prefix)) {
-            logger.warn(`❌ Not a command: ${message.content}`, { location: this })
+            logger.silly(`❌ Not a command: ${message.content}`, { location: this })
             return
         }
 

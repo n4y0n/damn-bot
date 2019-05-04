@@ -62,7 +62,8 @@ async function convertWebmAttachmentToMp4(message, tmpFolder) {
     if (attachments.length > 1 || attachments.length <= 0) return
 
     const attachment = attachments.pop()
-    if (isNotA(attachment.filename, "webm")) return
+    if (isNotA(attachment.filename, "webm")) 
+        return logger.silly(`${attachment.filename} is not a valid webm`,  { location: "WebmProcessorComponent(?????)" })
 
     try {
 
@@ -70,12 +71,16 @@ async function convertWebmAttachmentToMp4(message, tmpFolder) {
         const output = path.join(tmpFolder, `${attachment.filename.substring(0, attachment.filename.length - 5)}.mp4`)
 
         await downloadFile(attachment.url, webmfilepath)
+        logger.debug(`Downloaded ${attachment.filename}`, { location: "WebmProcessorComponent(?????)" })
+        logger.debug(`Converting to mp4...`, { location: "WebmProcessorComponent(?????)" })
         await convertToMp4(webmfilepath, output)
     
         const stats = fs.statSync(output)
         if (stats.size < 8388606) {
             await message.channel.send(`${message.author.username}'s -> ${attachment.filename}`, { file: output })
             await message.delete()
+        } else {
+            logger.debug(`File too large after conversion (${stats.size}bytes)`, { location: "WebmProcessorComponent(?????)" })
         }
 
         fs.unlinkSync(webmfilepath)
@@ -86,8 +91,8 @@ async function convertWebmAttachmentToMp4(message, tmpFolder) {
 } 
 
 function isNotA(filename, format) {
-    const ext = /\.[0-9a-z]+$/i.exec(filename)
-    return (!ext || ext[1] !== format)
+    const ext = /\.([0-9a-z]+)$/i.exec(filename)
+    return ext[1] !== format
 }
 function downloadFile(url, dest) {
     const writer = fs.createWriteStream(dest)
