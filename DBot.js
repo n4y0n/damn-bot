@@ -17,7 +17,7 @@ class DBot extends Client {
         this.on("message", async message => {
             const channelname = message.channel.name ? message.channel.name : "Private"
             logger.verbose(`New Message from ${message.author.username} in ${channelname}: ${message.content}`, { location: this })
-            if (message.author.id == this.user.id || !(message.channel.id == "538747728763682817")) return
+            if (message.author.id == this.user.id) return
             for (const key in this.components) {
                 const component = this.components[key]
                 if (component instanceof Processor)

@@ -14,8 +14,10 @@ const MyBot = require("./DBot")
 const Command = require("./Command")
 const CommandProcessor = require("./CommandProcessor")
 
-const RssFeedComponent = require("./RssFeedComponent")
-const CommandProcessorComponent = require("./CommandProcessorComponet")
+const RssFeedComponent = require("./components/components/RssFeedComponent")
+const CommandProcessorComponent = require("./components/processors/CommandProcessorComponet")
+const WebmProcessorComponent = require("./components/processors/WebmProcessorComponent")
+
 
 let bot = new MyBot({
     disabledEvents: ["TYPING_START"],
@@ -26,6 +28,8 @@ let bot = new MyBot({
 
 const rssfeed = new RssFeedComponent('https://nyaa.si/?f=0&c=1_2&q=&page=rss', "NyaaAnime {English-Translated}").addChannel("538747728763682817")
 bot.addComponent(rssfeed)
+
+bot.addComponent(new WebmProcessorComponent())
 
 const commander = new CommandProcessor("-", {
     hooks: {
@@ -114,13 +118,6 @@ if (!isDocker()) {
 
 bot.on("ready", () => {
     logger.info("Bot took: " + (Date.now() - start) + "ms", { location: "Main" })
-    // setInterval(async () => {await bot.channels.get("538747728763682817").send(await genMessage())}, delay * 1000 * 60)
-    // for(let channel of bot.channels.array()) {
-    //     logger.info(`${channel.id} - ${channel.type} - ${channel.name}`, { location: "Main" })
-    // }
-
-    // const fare_robe = bot.channels.get("224616803618390029")
-    // await fare_robe.join()
     if (!isDocker()) {
         readline.createInterface({
             input: process.stdin,

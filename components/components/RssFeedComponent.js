@@ -1,7 +1,7 @@
-const Component = require("./interfaces/Component")
+const Component = require("../../interfaces/Component")
 const moment = require("moment")
 const { RichEmbed } = require("discord.js")
-const logger = require("./utils/logging")
+const logger = require("../../utils/logging")
 const RssWatcher = require('rss-watcher');
 
 
@@ -24,6 +24,10 @@ module.exports = class RssFeedComponent extends Component {
         this._watcher.run((err) => {
             if (!!err) return logger.error(err, { location: this })
             logger.debug("Watcher backend ready", { location: this })
+        })
+
+        this._watcher.on('error', err => {
+            logger.error(err, { location: this })
         })
 
         setTimeout(() => logger.info("Ready", { location: this }), this.readyTimestamp - Date.now())

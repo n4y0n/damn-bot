@@ -1,5 +1,5 @@
-const Processor = require("./interfaces/Processor")
-const CommandProcessor = require("./CommandProcessor")
+const Processor = require("../../interfaces/Processor")
+const CommandProcessor = require("../../CommandProcessor")
 
 module.exports = class CommandProcessorComponet extends Processor {
     constructor(cli) {
@@ -12,6 +12,7 @@ module.exports = class CommandProcessorComponet extends Processor {
     }
 
     async process(message) {
+        if(!(message.channel.id == "538747728763682817")) return;
         await this._cli.process(message)
     }
 

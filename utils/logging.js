@@ -1,11 +1,12 @@
 const winston = require("winston")
 const { format } = winston
 const { printf } = format
+const moment = require("moment")
 
 module.exports = winston.createLogger({
     format: printf((info) => {
-        if(info.location) return `[${info.level.toUpperCase()}] [${info.location}] > ${info.message}`
-        return `[${info.level.toUpperCase()}] > ${info.message}`
+        if(info.location) return `[${moment().format("DD/MM/YYYY HH:mm:ss")}] [${info.level.toUpperCase()}] [${info.location}] > ${info.message}`
+        return `[${moment().format("DD/MM/YYYY HH:mm:ss")}] [${info.level.toUpperCase()}] > ${info.message}`
     }),
     transports: [
         new winston.transports.File({
