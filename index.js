@@ -12,7 +12,8 @@ const { RichEmbed } = require("discord.js")
 //const message = process.env.MESSAGE
 const MyBot = require("./DBot")
 
-const Command = require("./Command")
+const Command = require("./commands/base/Command")
+const CleanCommand = require("./commands/custom/CleanCommand")
 const CommandProcessor = require("./CommandProcessor")
 
 const RssFeedComponent = require("./components/components/RssFeedComponent")
@@ -45,22 +46,7 @@ const CPC = new CommandProcessorComponent(commander)
 
 bot.addComponent(CPC)
 
-CPC.addCommand(new Command("clean", "cln", {
-    listener: async function ([num = 1]) {
-        const channel = this.message.channel
-
-        const msgs = await channel.fetchMessages({ limit: num })
-
-        let ms = msgs.filter(m => m.author.id === bot.user.id)
-
-        if (ms.size === 1) return await ms.first().delete()
-
-        if (ms.size < 1) return
-
-        await channel.bulkDelete(ms, true)
-    },
-    description: "Deletes n messages send by this bot (default: 1)"
-}))
+CPC.addCommand(new CleanCommand())
 
 CPC.addCommand(new Command("help", "h", {
     listener: async function () {

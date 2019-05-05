@@ -42,7 +42,7 @@ module.exports = class Command {
 
     getDescription() {
         if (!!this._description) return this._description
-        return "Voluptatem minus nemo aut fugit ex repudiandae. Enim velit quia vel deleniti. Rerum voluptatum officiis sed ut alias placeat voluptate qui. Magni officia molestiae reprehenderit unde sequi voluptatem."
+        return "Voluptatem minus nemo aut fugit ex repudiandae. Enim velit quia vel deleniti. Rerum voluptatum officiis sed ut alias placeat voluptate qui."
     }
 
     match(strcommand) {

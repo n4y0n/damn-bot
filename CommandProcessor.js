@@ -1,4 +1,4 @@
-const Command = require("./Command")
+const Command = require("./commands/base/Command")
 const path = require("path")
 const logger = require("./utils/logging")
 
