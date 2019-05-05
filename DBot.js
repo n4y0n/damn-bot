@@ -1,10 +1,10 @@
-const { Client } = require("discord.js")
+const EnhancedClient = require("./interfaces/EnhancedClient")
 const Processor = require("./interfaces/Processor")
 const Component = require("./interfaces/Component")
 const logger = require("./utils/logging")
 
 
-module.exports = class DBot extends Client {
+module.exports = class DBot extends EnhancedClient {
 
     /**
      * 
@@ -14,7 +14,7 @@ module.exports = class DBot extends Client {
         super(options)
         this.components = {}
 
-        this.on("message", async message => {
+        this.onMessage(async message => {
             const channelname = message.channel.name ? message.channel.name : "Private"
             logger.verbose(`New Message from ${message.author.username} in ${channelname}: ${message.content}`, { location: this })
             if (message.author.id == this.user.id) return
@@ -40,10 +40,6 @@ module.exports = class DBot extends Client {
         if (retrivedcomponent == null) return logger.warn(`❌ ${component} not installed in this bot`, { location: this })
         this.components[component.getID()] = null
         retrivedcomponent.uninstall(this)
-    }
-
-    getChannel(id) {
-        return this.channels.get(id)
     }
 
     toString() {
