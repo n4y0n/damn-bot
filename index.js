@@ -33,7 +33,7 @@ bot.addComponent(rssfeed)
 
 bot.addComponent(new WebmProcessorComponent(path.join(__dirname, "tmp")))
 
-const commander = new CommandProcessor("-", {
+const commander = new CommandProcessor("!", {
     hooks: {
         async onFinishExecution(ok, command) {
             const channel = this.message.channel
