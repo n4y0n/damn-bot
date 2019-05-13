@@ -45,7 +45,6 @@ module.exports = class Component {
     getID() {
         if (!this._id) {
             this._id = genid()
-            return this._id
         }
         return this._id
     }
