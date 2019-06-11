@@ -71,12 +71,17 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     async sendTo(channel, article) {
+
         if (!this.botReady()) return
+
         const dchannel = this.bot.getChannel(channel)
-        if (!!dchannel)
-            dchannel.send(this._formatAricle(article))
-        else
+
+        if (!!!dchannel) {
             logger.warn(`❌ No channel ${channel} found.`, { location: this })
+            return
+        }
+
+            dchannel.send(this._formatAricle(article))
     }
 
     /**

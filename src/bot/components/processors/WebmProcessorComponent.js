@@ -57,13 +57,14 @@ module.exports = class WebmProcessorComponent extends Processor {
         if (attachments.length > 1 || attachments.length <= 0) return
 
         const attachment = attachments.pop()
+
         if (this.isNotA(attachment.filename, "webm"))
             return logger.silly(`${attachment.filename} is not a valid webm`, { location: this })
 
+        const webmfilepath = path.join(this.tmp, attachment.filename)
+        const output = path.join(this.tmp, `${attachment.filename.substring(0, attachment.filename.length - 5)}.mp4`)
+        
         try {
-
-            const webmfilepath = path.join(this.tmp, attachment.filename)
-            const output = path.join(this.tmp, `${attachment.filename.substring(0, attachment.filename.length - 5)}.mp4`)
 
             await this.downloadFile(attachment.url, webmfilepath)
             logger.debug(`Downloaded ${attachment.filename}`, { location: this })
@@ -71,17 +72,24 @@ module.exports = class WebmProcessorComponent extends Processor {
             await this.convertToMp4(webmfilepath, output)
 
             const stats = fs.statSync(output)
-            if (stats.size < 8388606) {
-                await message.channel.send(`${message.author.username}'s -> ${attachment.filename}`, { file: output })
-                await message.delete()
-            } else {
+
+            if (stats.size > 8388606) {
                 logger.debug(`File too large after conversion (${stats.size}bytes)`, { location: this })
+                return
             }
+
+            await message.channel.send(`${message.author.username}'s -> ${attachment.filename}`, { file: output })
+            await message.delete()
+
+        } catch (e) {
+
+            logger.error(e, { location: this })
+
+        } finally {
 
             fs.unlinkSync(webmfilepath)
             fs.unlinkSync(output)
-        } catch (e) {
-            logger.error(e, { location: this })
+
         }
     }
 

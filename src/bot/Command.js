@@ -22,17 +22,18 @@ module.exports = class Command {
 
     async exec(thisobj, args = []) {
         try {
-            if (this.listener && this.listener instanceof Function) {
-                await this.listener.call(thisobj, args)
-            } else {
+
+            if (!this.listener && !(this.listener instanceof Function))
                 throw Error("❌ No listener function declared!")
-            }
+
+            await this.listener.call(thisobj, args)
+
         } catch (e) {
-            if (this.errorlistener && this.errorlistener instanceof Function) {
-                await this.errorlistener.call(thisobj, e)
-            } else {
+
+            if (!this.errorlistener && !(this.errorlistener instanceof Function))
                 throw e
-            }
+
+            await this.errorlistener.call(thisobj, e)
         }
     }
 
