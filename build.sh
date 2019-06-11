@@ -2,7 +2,7 @@
 
 echo Building new image...
 
-winpty docker build -t prons/damn-bot . 
+winpty docker build -t prons/damn-bot ./src/bot/.
 
 echo Ok
 
