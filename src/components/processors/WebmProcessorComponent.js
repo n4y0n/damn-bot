@@ -97,6 +97,7 @@ module.exports = class WebmProcessorComponent extends Processor {
         const ext = /\.([0-9a-z]+)$/i.exec(filename)
         return ext[1] !== format
     }
+
     downloadFile(url, dest) {
         const writer = fs.createWriteStream(dest)
 
