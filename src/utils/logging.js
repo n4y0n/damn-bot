@@ -28,7 +28,7 @@ module.exports = (function () {
     if (!isDocker()) {
         logger.add(new winston.transports.File({
             level: level,
-            filename: path.join(__dirname, '..', 'logs', 'all-logs.log'),
+            filename: path.join(__dirname, '..', '..', 'logs', 'all-logs.log'),
             handleExceptions: true,
             json: true,
             maxsize: 5242880, //5MB

@@ -30,7 +30,7 @@ let bot = new MyBot({
 const rssfeed = new RssFeedComponent('https://nyaa.si/?f=0&c=1_2&q=&page=rss', "NyaaAnime {English-Translated}").addChannel("538747728763682817")
 bot.addComponent(rssfeed)
 
-bot.addComponent(new WebmProcessorComponent(path.join(__dirname, "tmp")))
+bot.addComponent(new WebmProcessorComponent(path.join(__dirname, "..", "tmp")))
 
 const commander = new CommandProcessor("-", {
     hooks: {

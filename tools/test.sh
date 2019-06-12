@@ -12,4 +12,4 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
 	fi
 done < "./.env"
 
-winpty docker run --rm -e TOKEN=$TOKEN -it prons/damn-bot node ./src/bot/node_modules/nodemon/bin/nodemon.js .
+winpty docker run --rm -e TOKEN=$TOKEN -it prons/damn-bot node ./node_modules/nodemon/bin/nodemon.js .
