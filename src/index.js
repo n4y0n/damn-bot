@@ -1,15 +1,10 @@
 require("dotenv").config()
 
-const isDocker = require("is-docker")
-const readline = require("readline")
-const start = Date.now()
 const logger = require("./utils/logging")
 const path = require("path")
+const { initCLI } = require("./utils/termial-cli")
 const { RichEmbed } = require("discord.js")
 
-
-//const delay = parseInt(process.env.DELAY) || 1
-//const message = process.env.MESSAGE
 const MyBot = require("./DBot")
 
 const Command = require("./Command")
@@ -20,6 +15,7 @@ const CommandProcessorComponent = require("./components/processors/CommandProces
 const WebmProcessorComponent = require("./components/processors/WebmProcessorComponent")
 
 
+const start = Date.now()
 let bot = new MyBot({
     disabledEvents: ["TYPING_START"],
     messageCacheMaxSize: 25,
@@ -79,54 +75,10 @@ CPC.addCommand(new Command("help", "h", {
     description: "Lists all available commands."
 }))
 
-let cliCommander
-if (!isDocker()) {
-    cliCommander = new CommandProcessor("!", {
-        hooks: {
-            async onFinishExecution(found) {
-                logger.info("Command found?: " + found ? "Yes" : "No", { location: cliCommander.toString() + " onFinishExecution()" })
-            }
-        }
-    })
-
-    cliCommander.addCommand(new Command("testfeed", "tf", {
-        listener: async function () {
-            await rssfeed.test()
-        }
-    }))
-
-    cliCommander.addCommand(new Command("clean", "cln", {
-        listener: async function ([num = 1]) {
-            const channel = this.message.channel
-
-            const ms = await channel.fetchMessages({ limit: num })
-
-            if (ms.size === 1) return await ms.first().delete()
-
-            if (ms.size < 1) return
-
-            await channel.bulkDelete(ms, true)
-        }
-    }))
-
-    cliCommander.addCommand(new Command("say", "s", {
-        listener: async function (message = []) {
-            const channel = this.message.channel
-            await channel.send(message.join(" "))
-        }
-    }))
-}
 
 bot.on("ready", () => {
     logger.info("Bot took: " + (Date.now() - start) + "ms", { location: "Main" })
-    if (!isDocker()) {
-        readline.createInterface({
-            input: process.stdin,
-            output: process.stdout
-        }).on("line", async line => {
-            await cliCommander.process({ content: line, channel: bot.channels.get("538747728763682817") })
-        })
-    }
+    initCLI(bot, "538747728763682817")
 })
 
 bot.on("error", err => {
