@@ -7,8 +7,8 @@ const { RichEmbed } = require("discord.js")
 
 const MyBot = require("./DBot")
 
-const Command = require("./Command")
-const CommandProcessor = require("./CommandProcessor")
+const Command = require("./commands/Command")
+const CommandProcessor = require("./commands/CommandProcessor")
 
 const RssFeedComponent = require("./components/components/RssFeedComponent")
 const CommandProcessorComponent = require("./components/processors/CommandProcessorComponet")

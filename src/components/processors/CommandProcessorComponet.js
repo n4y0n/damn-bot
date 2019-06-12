@@ -1,5 +1,5 @@
 const Processor = require("../../interfaces/Processor")
-const CommandProcessor = require("../../CommandProcessor")
+const CommandProcessor = require("../../commands/CommandProcessor")
 
 module.exports = class CommandProcessorComponet extends Processor {
     constructor(cli) {
