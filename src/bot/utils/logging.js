@@ -3,6 +3,7 @@ const { format } = winston
 const { printf } = format
 const moment = require("moment")
 const isDocker = require("is-docker")
+const path = require("path")
 
 module.exports = (function () {
 
@@ -27,7 +28,7 @@ module.exports = (function () {
     if (!isDocker()) {
         logger.add(new winston.transports.File({
             level: level,
-            filename: './logs/all-logs.log',
+            filename: path.join(__dirname, '..', 'logs', 'all-logs.log'),
             handleExceptions: true,
             json: true,
             maxsize: 5242880, //5MB
