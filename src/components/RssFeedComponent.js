@@ -1,7 +1,7 @@
-const Component = require("../../interfaces/Component")
+const Component = require("../interfaces/Component")
 const moment = require("moment")
 const { RichEmbed, Client } = require("discord.js")
-const logger = require("../../utils/logging")
+const logger = require("../utils/logging")
 const RssWatcher = require('rss-watcher');
 
 
