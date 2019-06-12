@@ -36,12 +36,12 @@ module.exports = (function () {
             colorize: false
         }))
     }
-    
+
     return logger
 })()
 
 module.exports.stream = {
     write: function (message, encoding) {
-        logger.info(message)
+        module.exports.info(message)
     }
 }
