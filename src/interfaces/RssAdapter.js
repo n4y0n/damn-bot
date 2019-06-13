@@ -1,6 +1,9 @@
 
 module.exports = class RssAdapter {
-    on(evnt, callback) {
+    onArticle(callback) {
+        throw new Error("Uninplemented")
+    }
+    onError(callback) {
         throw new Error("Uninplemented")
     }
     run(callback) {

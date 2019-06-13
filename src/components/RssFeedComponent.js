@@ -38,16 +38,16 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     _setupWatcher() {
-        this._watcher.on('new-item', async item => {
+        this._watcher.onArticle(async item => {
             if (!this.isInstalled() || !this.botReady() || Date.now() < this.coolDownTime) return
             await this.broadcastArticle(item)
         })
 
-        this._watcher.on('error', err => {
+        this._watcher.onError(err => {
             logger.error(err, { location: this })
         })
 
-        this._watcher.run((err) => {
+        this._watcher.run(err => {
             if (!!err) return logger.error(err, { location: this })
             logger.debug("Watcher backend ready", { location: this })
         })

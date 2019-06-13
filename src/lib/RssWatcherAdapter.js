@@ -7,12 +7,12 @@ module.exports = class RssWatcherAdapter extends RssAdapter {
         this._watcher = new RssWatcher(feedurl)
     }
 
-    on(evnt, listener) {
-        if (evnt === "new-item") {
-            this._watcher.on("new article", listener)
-            return
-        }
-        this._watcher.on(evnt, listener)
+    onArticle(listener) {
+        this._watcher.on("new article", listener)
+    }
+
+    onError(listener) {
+        this._watcher.on("error", listener)
     }
 
     run(errCallback) {
