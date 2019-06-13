@@ -2,33 +2,21 @@ const Component = require("../interfaces/Component")
 const moment = require("moment")
 const { RichEmbed, Client } = require("discord.js")
 const logger = require("../utils/logging")
-const RssWatcher = require('rss-watcher');
-
 
 
 module.exports = class RssFeedComponent extends Component {
-    constructor(feedurl, feedname = "") {
+
+    constructor(rssAdapter, feedname = "") {
         super()
 
         this.subscribedChannels = []
         this._feedName = feedname
 
-        this._watcher = new RssWatcher(feedurl)
         this.coolDownTime = Date.now() + 3000
 
-        this._watcher.on('new article', async item => {
-            if (!this.isInstalled() || !this.botReady() || Date.now() < this.coolDownTime) return
-            await this.broadcastArticle(item)
-        })
+        this._watcher = rssAdapter
 
-        this._watcher.run((err) => {
-            if (!!err) return logger.error(err, { location: this })
-            logger.debug("Watcher backend ready", { location: this })
-        })
-
-        this._watcher.on('error', err => {
-            logger.error(err, { location: this })
-        })
+        this._setupWatcher()
 
         setTimeout(() => logger.info("Ready", { location: this }), this.coolDownTime - Date.now())
     }
@@ -47,6 +35,22 @@ module.exports = class RssFeedComponent extends Component {
     getFeedName() {
         if (!this._feedName) return this.getShortID()
         return this._feedName
+    }
+
+    _setupWatcher() {
+        this._watcher.on('new-item', async item => {
+            if (!this.isInstalled() || !this.botReady() || Date.now() < this.coolDownTime) return
+            await this.broadcastArticle(item)
+        })
+
+        this._watcher.on('error', err => {
+            logger.error(err, { location: this })
+        })
+
+        this._watcher.run((err) => {
+            if (!!err) return logger.error(err, { location: this })
+            logger.debug("Watcher backend ready", { location: this })
+        })
     }
 
     _formatAricle(article) {
@@ -85,8 +89,8 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     /**
-     * 
-     * @param {Client} bot 
+     *
+     * @param {Client} bot
      */
     install(bot) {
         super.install(bot)
@@ -108,14 +112,6 @@ module.exports = class RssFeedComponent extends Component {
     async _cleanUp() {
         this._watcher.destroy()
         this.uninstall()
-    }
-
-    async test() {
-        await this.broadcastArticle({
-            date: Date.now(),
-            title: "Test",
-            link: "https://example.com"
-        })
     }
 
     toString() {

@@ -10,6 +10,7 @@ const MyBot = require("./DBot")
 const Command = require("./commands/Command")
 const CommandProcessor = require("./commands/CommandProcessor")
 
+const RssWatcherAdapter = require("./lib/RssWatcherAdapter")
 const RssFeedComponent = require("./components/components/RssFeedComponent")
 const CommandProcessorComponent = require("./components/processors/CommandProcessorComponet")
 const WebmProcessorComponent = require("./components/processors/WebmProcessorComponent")
@@ -23,7 +24,8 @@ let bot = new MyBot({
     messageSweepInterval: 120
 })
 
-const rssfeed = new RssFeedComponent('https://nyaa.si/?f=0&c=1_2&q=&page=rss', "NyaaAnime {English-Translated}").addChannel("538747728763682817")
+const rsswatcher = new RssWatcherAdapter('https://nyaa.si/?f=0&c=1_2&q=&page=rss')
+const rssfeed = new RssFeedComponent(rsswatcher, "NyaaAnime {English-Translated}").addChannel("538747728763682817")
 bot.addComponent(rssfeed)
 
 bot.addComponent(new WebmProcessorComponent(path.join(__dirname, "..", "tmp")))

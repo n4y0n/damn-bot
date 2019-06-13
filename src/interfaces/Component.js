@@ -39,7 +39,7 @@ module.exports = class Component {
     }
 
     async _cleanUp() {
-        logger.warn("❌🔧To implement (_cleanUp in Component superclass)🔧❌", { location: this })
+        logger.warn("❌🔧To implement🔧❌", { location: this })
     }
 
     getID() {
