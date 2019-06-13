@@ -3,7 +3,9 @@ class rss_adapter extends RssAdapter {
     constructor() {
         super()
     }
-    on(evnt, callback) {
+    onArticle(callback) {
+    }
+    onError(callback) {
     }
     run(callback) {
     }
