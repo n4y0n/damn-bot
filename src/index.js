@@ -39,7 +39,7 @@ const commander = new CommandProcessor("-", {
     }
 })
 
-const CPC = new CommandProcessorComponent(commander)
+const CPC = new CommandProcessorComponent(commander).addListenChannel("538747728763682817")
 
 bot.addComponent(CPC)
 
