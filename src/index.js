@@ -1,5 +1,6 @@
 require("dotenv").config()
 
+// Imports
 const logger = require("./utils/logging")
 const path = require("path")
 const { initCli } = require("./utils/termial-cli")
@@ -11,11 +12,20 @@ const Command = require("./commands/Command")
 const CommandProcessor = require("./commands/CommandProcessor")
 
 const RssWatcherAdapter = require("./lib/RssWatcherAdapter")
+
 const RssFeedComponent = require("./components/RssFeedComponent")
 const CommandProcessorComponent = require("./components/processors/CommandProcessorComponet")
-const WebmProcessorComponent = require("./components/processors/WebmProcessorComponent")
+// const WebmProcessorComponent = require("./components/processors/WebmProcessorComponent")
+
+// ***** Variables *****
+const rss = {
+    "NyaaAnime {English-Translated}": "https://nyaa.si/?f=0&c=1_2&q=&page=rss"
+}
+
+const botChannel = "538747728763682817"
 
 
+// ***** Setup *****
 const start = Date.now()
 let bot = new MyBot({
     disabledEvents: ["TYPING_START"],
@@ -24,25 +34,21 @@ let bot = new MyBot({
     messageSweepInterval: 120
 })
 
-const rsswatcher = new RssWatcherAdapter('https://nyaa.si/?f=0&c=1_2&q=&page=rss')
-const rssfeed = new RssFeedComponent(rsswatcher, "NyaaAnime {English-Translated}").addChannel("538747728763682817")
-bot.addComponent(rssfeed)
+// const webmTempFolder = path.join(__dirname, "..", "tmp")
+// const webmp = new WebmProcessorComponent(webmTempFolder)
+// bot.addComponent(webmp)
 
-bot.addComponent(new WebmProcessorComponent(path.join(__dirname, "..", "tmp")))
-
-const commander = new CommandProcessor("-", {
-    hooks: {
-        async onFinishExecution(ok, command) {
-            const channel = this.message.channel
-            if (!ok) await channel.send(`Error excecuting "${command}"`)
-        }
-    }
-})
-
-const CPC = new CommandProcessorComponent(commander).addListenChannel("538747728763682817")
-
+const commander = new CommandProcessor("-")
+const CPC = new CommandProcessorComponent(commander).addListenChannel(botChannel)
 bot.addComponent(CPC)
 
+for (let [name, url] of Object.entries(rss)) {
+    const rsswatcher = new RssWatcherAdapter(url)
+    const rssfeed = new RssFeedComponent(rsswatcher, name).addChannel(botChannel)
+    bot.addComponent(rssfeed)
+}
+
+// ***** Setup commands *****
 CPC.addCommand(new Command("clean", {
     alias: "cln",
     listener: async function ([num = 1]) {
@@ -79,10 +85,10 @@ CPC.addCommand(new Command("help", {
     description: "Lists all available commands."
 }))
 
-
+// ***** Bot hooks *****
 bot.on("ready", () => {
     logger.info("Bot took: " + (Date.now() - start) + "ms", { location: "Main" })
-    initCli(bot, "538747728763682817")
+    initCli(bot, botChannel)
 })
 
 bot.on("error", err => {
@@ -90,7 +96,10 @@ bot.on("error", err => {
     process.exit(-1)
 })
 
-bot.login(process.env.TOKEN).then(token => logger.info("Ok", { location: "Main" }), err => {
-    logger.error(err.message, { location: "Main" })
-    process.exit(-1)
-})
+// ***** Start bot *****
+bot.login(process.env.TOKEN)
+    .then(token => logger.info("Ok", { location: "Main" }))
+    .catch(err => {
+        logger.error(err.message, { location: "Main" })
+        process.exit(-1)
+    })
