@@ -4,6 +4,7 @@ const EnhancedClient = require("../interfaces/EnhancedClient")
 const CommandProcessor = require("../commands/CommandProcessor")
 const Command = require("../commands/Command")
 
+// TODO: use same interface for sending test to : screen - discord chat
 
 /**
  * Initializes terminal cli interface if not in a docker container
@@ -20,13 +21,6 @@ function initCli(bot, channel) {
             }
         }
     })
-
-    cliCommander.addCommand(new Command("testfeed", {
-        alias: "tf",
-        listener: async function () {
-            await rssfeed.test()
-        }
-    }))
 
     cliCommander.addCommand(new Command("clean", {
         alias: "cln",
