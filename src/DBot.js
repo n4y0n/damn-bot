@@ -24,7 +24,6 @@ module.exports = class DBot extends EnhancedClient {
             logger.verbose(`New Message from ${message.author.username} in ${channelname}: ${message.content}`, { location: this })
             if (message.author.id == this.user.id) return
             for (const [key, component] of Object.entries(this.components.processors)) {
-                logger.debug("Processing message... " + key, { location: this })
                 await component.process(message)
             }
         })
