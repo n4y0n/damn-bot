@@ -43,7 +43,8 @@ const CPC = new CommandProcessorComponent(commander).addListenChannel("538747728
 
 bot.addComponent(CPC)
 
-CPC.addCommand(new Command("clean", "cln", {
+CPC.addCommand(new Command("clean", {
+    alias: "cln",
     listener: async function ([num = 1]) {
         const channel = this.message.channel
 
@@ -60,7 +61,8 @@ CPC.addCommand(new Command("clean", "cln", {
     description: "Deletes n messages send by this bot (default: 1)"
 }))
 
-CPC.addCommand(new Command("help", "h", {
+CPC.addCommand(new Command("help", {
+    alias: "h",
     listener: async function () {
         const channel = this.message.channel
         const processor = this.proc

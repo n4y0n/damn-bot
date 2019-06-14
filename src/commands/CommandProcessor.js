@@ -1,6 +1,6 @@
 const Command = require("./Command")
 const path = require("path")
-const logger = require("./utils/logging")
+const logger = require("../utils/logging")
 
 module.exports = class CommandProcessor {
     constructor(prefix = "", options = { hooks: { onFinishExecution: null, onStartExecution: null } }) {
@@ -37,6 +37,7 @@ module.exports = class CommandProcessor {
                 } catch (e) {
                     logger.warn(`❌ Error executing command: ${command}: ${e}`, { location: this })
                     this._endCommandExecutionHook({ message, proc: this }, false, com)
+                    return
                 } finally {
                     logger.info(`✔ Command took ${Date.now() - start}ms to execute`, { location: this })
                     this._endCommandExecutionHook({ message, proc: this }, true, com)
@@ -58,6 +59,13 @@ module.exports = class CommandProcessor {
         if (this.hooks.onFinishExecution && this.hooks.onFinishExecution instanceof Function) {
             this.hooks.onFinishExecution.call(thisarg, ...args)
         }
+    }
+
+    /**
+     * Returns the number of commands registred to this processor
+     */
+    size() {
+        return this.commands.length
     }
 
     toString() {

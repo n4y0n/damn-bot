@@ -5,7 +5,7 @@ module.exports = class CommandProcessorComponet extends Processor {
     constructor(cli) {
         super()
 
-        this._allowedChannels = []
+        this.listeningChannels = []
 
         if (!(cli instanceof CommandProcessor))
             throw Error(`❌ ${this.toString()} : No command processor found`)
@@ -14,7 +14,7 @@ module.exports = class CommandProcessorComponet extends Processor {
     }
 
     async process(message) {
-        if(this._allowedChannels.indexOf(message.channel.id) === -1) return;
+        if(this.listeningChannels.indexOf(message.channel.id) === -1) return;
         await this._cli.process(message)
     }
 
@@ -24,7 +24,7 @@ module.exports = class CommandProcessorComponet extends Processor {
 
     addListenChannel(channel) {
         // TODO: Check that "channel" exists in the server and that the bot has access to it
-        this._allowedChannels.push(channel)
+        this.listeningChannels.push(channel)
         return this
     }
 

@@ -1,10 +1,11 @@
 
 module.exports = class Command {
-    constructor(fullcommand, alias = "", options = { caseSensitive: true, listener: null, errorlistener: null, description: null }) {
+    constructor(fullcommand, options = { alias: "", caseSensitive: true, listener: null, errorlistener: null, description: null }) {
         const {
             caseSensitive = true,
             listener = null,
             errorlistener = null,
+            alias = "",
             description
         } = options
 
@@ -13,7 +14,7 @@ module.exports = class Command {
         }
 
         this.fullcommand = fullcommand
-        this.alias = alias
+        this.alias = !!alias ? alias : fullcommand.substr(0, 1)
         this.caseSensitive = caseSensitive
         this.listener = listener
         this.errorlistener = errorlistener
@@ -43,7 +44,7 @@ module.exports = class Command {
 
     getDescription() {
         if (!!this._description) return this._description
-        return "Voluptatem minus nemo aut fugit ex repudiandae. Enim velit quia vel deleniti. Rerum voluptatum officiis sed ut alias placeat voluptate qui. Magni officia molestiae reprehenderit unde sequi voluptatem."
+        return "Command Desc"
     }
 
     match(strcommand) {

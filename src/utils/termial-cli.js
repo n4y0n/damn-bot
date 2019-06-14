@@ -4,8 +4,8 @@ const EnhancedClient = require("../interfaces/EnhancedClient")
 
 /**
  * Initializes terminal cli interface if not in a docker container
- * @param { EnhancedClient } bot 
- * @param { string } channel 
+ * @param { EnhancedClient } bot
+ * @param { string } channel
  */
 function initCli(bot, channel) {
     if (isDocker()) return
@@ -18,13 +18,15 @@ function initCli(bot, channel) {
         }
     })
 
-    cliCommander.addCommand(new Command("testfeed", "tf", {
+    cliCommander.addCommand(new Command("testfeed", {
+        alias: "tf",
         listener: async function () {
             await rssfeed.test()
         }
     }))
 
-    cliCommander.addCommand(new Command("clean", "cln", {
+    cliCommander.addCommand(new Command("clean", {
+        alias: "cln",
         listener: async function ([num = 1]) {
             const channel = this.message.channel
 
@@ -38,7 +40,8 @@ function initCli(bot, channel) {
         }
     }))
 
-    cliCommander.addCommand(new Command("say", "s", {
+    cliCommander.addCommand(new Command("say", {
+        alias: "s",
         listener: async function (message = []) {
             const channel = this.message.channel
             await channel.send(message.join(" "))
