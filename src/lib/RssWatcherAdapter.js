@@ -3,7 +3,7 @@ const RssAdapter = require("../interfaces/RSSAdapter")
 
 module.exports = class RssWatcherAdapter extends RssAdapter {
     constructor(feedurl) {
-        super()
+        super(feedurl)
         this._watcher = new RssWatcher(feedurl)
     }
 

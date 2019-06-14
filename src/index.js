@@ -15,7 +15,6 @@ const RssWatcherAdapter = require("./lib/RssWatcherAdapter")
 
 const RssFeedComponent = require("./components/RssFeedComponent")
 const CommandProcessorComponent = require("./components/processors/CommandProcessorComponet")
-// const WebmProcessorComponent = require("./components/processors/WebmProcessorComponent")
 
 // ***** Variables *****
 const rss = {
@@ -34,10 +33,6 @@ let bot = new MyBot({
     messageSweepInterval: 120
 })
 
-// const webmTempFolder = path.join(__dirname, "..", "tmp")
-// const webmp = new WebmProcessorComponent(webmTempFolder)
-// bot.addComponent(webmp)
-
 const commander = new CommandProcessor("-")
 const CPC = new CommandProcessorComponent(commander).addListenChannel(botChannel)
 bot.addComponent(CPC)
@@ -51,7 +46,7 @@ for (let [name, url] of Object.entries(rss)) {
 // ***** Setup commands *****
 CPC.addCommand(new Command("clean", {
     alias: "cln",
-    listener: async function ([num = 1]) {
+    async listener([num = 1]) {
         const channel = this.message.channel
 
         const msgs = await channel.fetchMessages({ limit: num })
@@ -69,7 +64,7 @@ CPC.addCommand(new Command("clean", {
 
 CPC.addCommand(new Command("help", {
     alias: "h",
-    listener: async function () {
+    async listener() {
         const channel = this.message.channel
         const processor = this.proc
 
@@ -83,6 +78,22 @@ CPC.addCommand(new Command("help", {
         channel.send(commandlist)
     },
     description: "Lists all available commands."
+}))
+
+CPC.addCommand(new Command("feeds", {
+    async listener() {
+        const channel = this.message.channel
+
+        const feeds = new RichEmbed()
+        feeds.setTitle("[ RssFeed List ]")
+
+        for(const [name, feed] of Object.entries(bot.components.normal)) {
+            if (!(feed instanceof RssFeedComponent)) continue
+            feeds.addField(feed.toString(), feed._watcher.url)
+
+        }
+        channel.send(feeds)
+    }
 }))
 
 // ***** Bot hooks *****

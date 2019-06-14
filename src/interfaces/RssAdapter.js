@@ -1,5 +1,9 @@
 
 module.exports = class RssAdapter {
+    constructor(url) {
+        this.url = url
+    }
+
     onArticle(callback) {
         throw new Error("Uninplemented")
     }

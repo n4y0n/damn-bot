@@ -6,7 +6,9 @@ const axios = require("axios").default
 const logger = require("../../utils/logging")
 const ffmpeg = require("ffmpeg")
 
-
+/**
+ * @deprecated
+ */
 module.exports = class WebmProcessorComponent extends Processor {
 
     constructor(tmpFolder = "./") {
@@ -15,15 +17,15 @@ module.exports = class WebmProcessorComponent extends Processor {
     }
 
     /**
-     * @param {Message} message 
+     * @param {Message} message
      */
     async process(message) {
         await this.convertWebmAttachmentToMp4(message)
     }
 
     /**
-     * 
-     * @param {Client} bot 
+     *
+     * @param {Client} bot
      */
     install(bot) {
         super.install(bot)
@@ -35,7 +37,7 @@ module.exports = class WebmProcessorComponent extends Processor {
     }
 
     /**
-     * @param {TextChannel} channel 
+     * @param {TextChannel} channel
      */
     async fetchWebm(channel) {
         let messages = (await channel.fetchMessages({ limit: 20 })).filter(message => message.attachments.array().length > 0)
@@ -49,8 +51,8 @@ module.exports = class WebmProcessorComponent extends Processor {
     }
 
     /**
-     * 
-     * @param {Message} message 
+     *
+     * @param {Message} message
      */
     async convertWebmAttachmentToMp4(message) {
         let attachments = message.attachments.array()
@@ -63,7 +65,7 @@ module.exports = class WebmProcessorComponent extends Processor {
 
         const webmfilepath = path.join(this.tmp, attachment.filename)
         const output = path.join(this.tmp, `${attachment.filename.substring(0, attachment.filename.length - 5)}.mp4`)
-        
+
         try {
 
             await this.downloadFile(attachment.url, webmfilepath)
