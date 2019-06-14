@@ -2,7 +2,7 @@ require("dotenv").config()
 
 const logger = require("./utils/logging")
 const path = require("path")
-const { initCLI } = require("./utils/termial-cli")
+const { initCli } = require("./utils/termial-cli")
 const { RichEmbed } = require("discord.js")
 
 const MyBot = require("./DBot")
@@ -11,7 +11,7 @@ const Command = require("./commands/Command")
 const CommandProcessor = require("./commands/CommandProcessor")
 
 const RssWatcherAdapter = require("./lib/RssWatcherAdapter")
-const RssFeedComponent = require("./components/components/RssFeedComponent")
+const RssFeedComponent = require("./components/RssFeedComponent")
 const CommandProcessorComponent = require("./components/processors/CommandProcessorComponet")
 const WebmProcessorComponent = require("./components/processors/WebmProcessorComponent")
 
@@ -82,7 +82,7 @@ CPC.addCommand(new Command("help", {
 
 bot.on("ready", () => {
     logger.info("Bot took: " + (Date.now() - start) + "ms", { location: "Main" })
-    initCLI(bot, "538747728763682817")
+    initCli(bot, "538747728763682817")
 })
 
 bot.on("error", err => {

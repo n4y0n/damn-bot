@@ -1,6 +1,9 @@
 const isDocker = require("is-docker")
 const readline = require("readline")
 const EnhancedClient = require("../interfaces/EnhancedClient")
+const CommandProcessor = require("../commands/CommandProcessor")
+const Command = require("../commands/Command")
+
 
 /**
  * Initializes terminal cli interface if not in a docker container
