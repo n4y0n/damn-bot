@@ -43,26 +43,23 @@ for (let [name, url] of Object.entries(rss)) {
 }
 
 // ***** Setup commands *****
-CPC.addCommand(new Command("clean", {
-    alias: "cln",
-    async listener([num = 1]) {
+CPC.addCommand(new Command("clear", {
+    alias: "clr",
+    async listener([num = 2]) {
         const channel = this.message.channel
 
-        const msgs = await channel.fetchMessages({ limit: num })
+        const msgs = await channel.fetchMessages({ limit: num, })
 
-        let ms = msgs.filter(m => m.author.id === bot.user.id)
+        if (msgs.size === 1) return await msgs.first().delete()
 
-        if (ms.size === 1) return await ms.first().delete()
+        if (msgs.size < 1) return
 
-        if (ms.size < 1) return
-
-        await channel.bulkDelete(ms, true)
+        await channel.bulkDelete(msgs, true)
     },
     description: "Deletes n messages send by this bot (default: 1)"
 }))
 
 CPC.addCommand(new Command("help", {
-    alias: "h",
     async listener() {
         const channel = this.message.channel
         const processor = this.proc
@@ -86,9 +83,9 @@ CPC.addCommand(new Command("feeds", {
         const feeds = new RichEmbed()
         feeds.setTitle("[ RssFeed List ]")
 
-        for(const [feedid, feed] of Object.entries(bot.components.normal)) {
+        for (const [feedid, feed] of Object.entries(bot.components.normal)) {
             if (!(feed instanceof RssFeedComponent)) continue
-            feeds.addField(feed.toString(), feed.getRssUrl())
+            feeds.addField(feed.getFeedName(), feed.getRssUrl())
 
         }
         channel.send(feeds)
