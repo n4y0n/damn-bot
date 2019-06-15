@@ -2,8 +2,8 @@ const RssAdapter = require("../../src/interfaces/RssAdapter")
 const CommandProcessor = require("../../src/commands/CommandProcessor")
 const Command = require("../../src/commands/Command")
 class rss_adapter extends RssAdapter {
-    constructor() {
-        super()
+    constructor(url) {
+        super(url)
     }
     onArticle(callback) {
     }
@@ -56,8 +56,8 @@ function MockMessage(options = { content: "", channel: "", respond: null }) {
 
 
 module.exports = {
-    MockRssAdapter() {
-        return new rss_adapter()
+    MockRssAdapter(options = { url: "" }) {
+        return new rss_adapter(options.url)
     },
     MockCli,
     MockMessage

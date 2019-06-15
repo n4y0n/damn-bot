@@ -30,4 +30,15 @@ describe("RssFeedComponent", () => {
         // Test
         assert(first_subscriber_channel === "538747728763682817")
     })
+
+    it("should get the right url", () => {
+        // Setup
+        const rssadapter = MockRssAdapter({
+            url: "https://4chan.com"
+        })
+        const rssFeedComponent = new RssFeedComponent(rssadapter)
+
+        // Test
+        assert(rssFeedComponent.getRssUrl() === "https://4chan.com")
+    })
 })

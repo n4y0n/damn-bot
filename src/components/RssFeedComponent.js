@@ -2,10 +2,15 @@ const Component = require("../interfaces/Component")
 const moment = require("moment")
 const { RichEmbed, Client } = require("discord.js")
 const logger = require("../utils/logging")
+const RssAdapter = require("../interfaces/RssAdapter")
 
 
 module.exports = class RssFeedComponent extends Component {
-
+    /**
+     *
+     * @param { RssAdapter } rssAdapter
+     * @param { string } feedname
+     */
     constructor(rssAdapter, feedname = "") {
         super()
 
@@ -35,6 +40,10 @@ module.exports = class RssFeedComponent extends Component {
     getFeedName() {
         if (!this._feedName) return this.getShortID()
         return this._feedName
+    }
+
+    getRssUrl() {
+        return this._watcher.url
     }
 
     _setupWatcher() {

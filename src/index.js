@@ -2,7 +2,6 @@ require("dotenv").config()
 
 // Imports
 const logger = require("./utils/logging")
-const path = require("path")
 const { initCli } = require("./utils/termial-cli")
 const { RichEmbed } = require("discord.js")
 
@@ -87,9 +86,9 @@ CPC.addCommand(new Command("feeds", {
         const feeds = new RichEmbed()
         feeds.setTitle("[ RssFeed List ]")
 
-        for(const [name, feed] of Object.entries(bot.components.normal)) {
+        for(const [feedid, feed] of Object.entries(bot.components.normal)) {
             if (!(feed instanceof RssFeedComponent)) continue
-            feeds.addField(feed.toString(), feed._watcher.url)
+            feeds.addField(feed.toString(), feed.getRssUrl())
 
         }
         channel.send(feeds)
