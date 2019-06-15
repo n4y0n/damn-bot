@@ -2,11 +2,11 @@ const { Client, Message } = require("discord.js")
 
 module.exports = class EnhancedClient extends Client {
     addComponent(component) {
-        throw new Error("Uninplemented")
+        throw new Error("Unimplemented")
     }
 
     removeComponent(component) {
-        throw new Error("Uninplemented")
+        throw new Error("Unimplemented")
     }
 
     getChannel(id) {
@@ -14,8 +14,8 @@ module.exports = class EnhancedClient extends Client {
     }
 
     /**
-     * 
-     * @param {(message: Message) => void} listener 
+     *
+     * @param {(message: Message) => void} listener
      */
     onMessage(listener) {
         this.on("message", listener)

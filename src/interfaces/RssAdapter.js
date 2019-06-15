@@ -5,15 +5,15 @@ module.exports = class RssAdapter {
     }
 
     onArticle(callback) {
-        throw new Error("Uninplemented")
+        throw new Error("Unimplemented")
     }
     onError(callback) {
-        throw new Error("Uninplemented")
+        throw new Error("Unimplemented")
     }
     run(callback) {
-        throw new Error("Uninplemented")
+        throw new Error("Unimplemented")
     }
     destroy() {
-        throw new Error("Uninplemented")
+        throw new Error("Unimplemented")
     }
 }
