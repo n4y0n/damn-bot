@@ -1,6 +1,6 @@
 const RssAdapter = require("../../src/interfaces/RssAdapter")
 const CommandProcessor = require("../../src/commands/CommandProcessor")
-const Command = require("../../src/commands/Command")
+const Command = require("../../src/interfaces/Command")
 class rss_adapter extends RssAdapter {
     constructor(url) {
         super(url)
@@ -28,7 +28,9 @@ function MockCli(options = { prefix: "-", commands: {} }) {
     const cli = new CommandProcessor(prefix)
 
     for (const [command, listener] of Object.entries(commands)) {
-        cli.addCommand(new Command(command, { listener }))
+        const c = new Command(command)
+        c.exec = listener
+        cli.addCommand(c)
     }
 
     return cli
