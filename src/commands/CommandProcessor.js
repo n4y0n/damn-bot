@@ -1,12 +1,11 @@
-const Command = require("./Command")
+const Command = require("../interfaces/Command")
 const path = require("path")
 const logger = require("../utils/logging")
 
 module.exports = class CommandProcessor {
-    constructor(prefix = "", options = { hooks: { onFinishExecution: null, onStartExecution: null } }) {
+    constructor(prefix = "") {
         this.commands = []
         this.prefix = prefix
-        this.hooks = options.hooks
     }
 
     addCommand(command) {
@@ -32,33 +31,26 @@ module.exports = class CommandProcessor {
         for (const com of this.commands) {
             if (com.match(cmd)) {
                 try {
-                    this._startCommandExecutionHook({ message, proc: this }, com)
-                    await com.exec({ message, proc: this }, args)
+
+                    // FIXME: Command Context creation
+
+                    const ctx = message.channel
+                    ctx["processor"] = this
+                    ctx["args"] = [...message.content.split(" ")]
+
+                    await com.exec(ctx)
+                    logger.info(`✔ Done executing ${com}`)
                 } catch (e) {
-                    logger.warn(`❌ Error executing command: ${command}: ${e}`, { location: this })
-                    this._endCommandExecutionHook({ message, proc: this }, false, com)
+                    logger.error(`❌ Error executing command: ${com}`, { location: this })
+                    logger.error(e.stack, { location: this })
                     return
                 } finally {
-                    logger.info(`✔ Command took ${Date.now() - start}ms to execute`, { location: this })
-                    this._endCommandExecutionHook({ message, proc: this }, true, com)
+                    logger.info(`   Command took ${Date.now() - start}ms to execute`, { location: this })
                     return
                 }
             }
         }
-        this._endCommandExecutionHook({ message, proc: this }, false, cmd)
         logger.warn(`❌ No command "${cmd}"`, { location: this })
-    }
-
-
-    _startCommandExecutionHook(thisarg, ...args) {
-        if (this.hooks.onStartExecution && this.hooks.onStartExecution instanceof Function) {
-            this.hooks.onStartExecution.call(thisarg, ...args)
-        }
-    }
-    _endCommandExecutionHook(thisarg, ...args) {
-        if (this.hooks.onFinishExecution && this.hooks.onFinishExecution instanceof Function) {
-            this.hooks.onFinishExecution.call(thisarg, ...args)
-        }
     }
 
     /**

@@ -2,7 +2,7 @@ const isDocker = require("is-docker")
 const readline = require("readline")
 const EnhancedClient = require("../interfaces/EnhancedClient")
 const CommandProcessor = require("../commands/CommandProcessor")
-const Command = require("../commands/Command")
+const Command = require("../interfaces/Command")
 
 // TODO: use same interface for sending test to : screen - discord chat
 
@@ -14,36 +14,31 @@ const Command = require("../commands/Command")
 function initCli(bot, channel) {
     if (isDocker()) return
 
-    let cliCommander = new CommandProcessor("!", {
-        hooks: {
-            async onFinishExecution(found) {
-                logger.info("Command found?: " + found ? "Yes" : "No", { location: cliCommander.toString() + " onFinishExecution()" })
-            }
-        }
+    let cliCommander = new CommandProcessor("!")
+
+    const clr = new Command("clr", {
+        alias: "c"
+    })
+    const say = new Command("say", {
+        alias: "s"
     })
 
-    cliCommander.addCommand(new Command("clean", {
-        alias: "cln",
-        listener: async function ([num = 1]) {
-            const channel = this.message.channel
+    clr.exec = async function (ctx) {
+        const { args } = ctx
+        const [command, num = 2] = args
 
-            const ms = await channel.fetchMessages({ limit: num })
+        const ms = await ctx.fetchMessages({ limit: num })
+        if (ms.size === 1) return await ms.first().delete()
+        if (ms.size < 1) return
+        await ctx.bulkDelete(ms, true)
+    }
+    say.exec = async function (ctx) {
+        ctx.args.shift()
+        await ctx.send(ctx.args.join(" "))
+    }
 
-            if (ms.size === 1) return await ms.first().delete()
-
-            if (ms.size < 1) return
-
-            await channel.bulkDelete(ms, true)
-        }
-    }))
-
-    cliCommander.addCommand(new Command("say", {
-        alias: "s",
-        listener: async function (message = []) {
-            const channel = this.message.channel
-            await channel.send(message.join(" "))
-        }
-    }))
+    cliCommander.addCommand(clr)
+    cliCommander.addCommand(say)
 
 
     readline.createInterface({

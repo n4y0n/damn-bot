@@ -7,7 +7,7 @@ const { RichEmbed } = require("discord.js")
 
 const MyBot = require("./DBot")
 
-const Command = require("./commands/Command")
+const Command = require("./interfaces/Command")
 const CommandProcessor = require("./commands/CommandProcessor")
 
 const RssWatcherAdapter = require("./lib/RssWatcherAdapter")
@@ -43,54 +43,47 @@ for (let [name, url] of Object.entries(rss)) {
 }
 
 // ***** Setup commands *****
-CPC.addCommand(new Command("clear", {
+const clear = new Command("clear", {
     alias: "clr",
-    async listener([num = 2]) {
-        const channel = this.message.channel
-
-        const msgs = await channel.fetchMessages({ limit: num, })
-
-        if (msgs.size === 1) return await msgs.first().delete()
-
-        if (msgs.size < 1) return
-
-        await channel.bulkDelete(msgs, true)
-    },
-    description: "Deletes n messages send by this bot (default: 1)"
-}))
-
-CPC.addCommand(new Command("help", {
-    async listener() {
-        const channel = this.message.channel
-        const processor = this.proc
-
-        const commandlist = new RichEmbed()
-        commandlist.setTitle("[ Command List ]")
-
-        for (const command of processor.commands) {
-            commandlist.addField(command.toString(), command.getDescription())
-        }
-
-        channel.send(commandlist)
-    },
+    description: "Deletes n messages send by this bot (default: 2)"
+})
+const help = new Command("help", {
     description: "Lists all available commands."
-}))
+})
+const feeds = new Command("feeds")
 
-CPC.addCommand(new Command("feeds", {
-    async listener() {
-        const channel = this.message.channel
+clear.exec = async function (ctx) {
+    const { args } = ctx
+    const [command, num = 2] = args
 
-        const feeds = new RichEmbed()
-        feeds.setTitle("[ RssFeed List ]")
-
-        for (const [feedid, feed] of Object.entries(bot.components.normal)) {
-            if (!(feed instanceof RssFeedComponent)) continue
-            feeds.addField(feed.getFeedName(), feed.getRssUrl())
-
-        }
-        channel.send(feeds)
+    const msgs = await ctx.fetchMessages({ limit: num, })
+    if (msgs.size === 1) return await msgs.first().delete()
+    if (msgs.size < 1) return
+    await ctx.bulkDelete(msgs, true)
+}
+help.exec = async function (ctx) {
+    const commandlist = new RichEmbed()
+    commandlist.setTitle("[ Command List ]")
+    for (const command of ctx.processor.commands) {
+        commandlist.addField(command.toString(), command.getDescription())
     }
-}))
+    ctx.send(commandlist)
+}
+feeds.exec = async function (ctx) {
+    const feeds = new RichEmbed()
+    feeds.setTitle("[ RssFeed List ]")
+
+    for (const [feedid, feed] of Object.entries(bot.components.normal)) {
+        if (!(feed instanceof RssFeedComponent)) continue
+        feeds.addField(feed.getFeedName(), feed.getRssUrl())
+    }
+    ctx.send(feeds)
+}
+
+CPC.addCommand(clear)
+CPC.addCommand(help)
+CPC.addCommand(feeds)
+
 
 // ***** Bot hooks *****
 bot.on("ready", () => {
