@@ -1,5 +1,5 @@
 const RssWatcher = require("rss-watcher")
-const RssAdapter = require("../interfaces/RSSAdapter")
+const RssAdapter = require("../interfaces/RssAdapter")
 
 module.exports = class RssWatcherAdapter extends RssAdapter {
     constructor(feedurl) {

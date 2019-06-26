@@ -4,7 +4,8 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "docker-build": "docker build -t prons/damn-bot -f tools/Dockerfile ."
   },
   "author": "",
   "license": "ISC",
