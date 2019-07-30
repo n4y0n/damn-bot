@@ -11,8 +11,8 @@ module.exports = (function () {
 
     const logger = winston.createLogger({
         format: printf((info) => {
-            if (info.location) return `[${moment().format("DD/MM/YYYY HH:mm:ss")}] [${info.level.toUpperCase()}] [${info.location}] > ${info.message}`
-            return `[${moment().format("DD/MM/YYYY HH:mm:ss")}] [${info.level.toUpperCase()}] > ${info.message}`
+            if (info.location) return `[${moment().format("DD/MM/YYYY HH:mm:ss")}] [${info.location}/${info.level.toUpperCase()}]: ${info.message}`
+            return `[${moment().format("DD/MM/YYYY HH:mm:ss")}] [${info.level.toUpperCase()}]: ${info.message}`
         }),
         transports: [
             new winston.transports.Console({
