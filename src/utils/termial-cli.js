@@ -4,6 +4,9 @@ const EnhancedClient = require("../interfaces/EnhancedClient")
 const CommandProcessor = require("../commands/CommandProcessor")
 const Command = require("../interfaces/Command")
 
+const logger = require("./logging")
+
+
 // TODO: use same interface for sending test to : screen - discord chat
 
 /**
@@ -11,8 +14,10 @@ const Command = require("../interfaces/Command")
  * @param { EnhancedClient } bot
  * @param { string } channel
  */
-function initCli(bot, channel) {
+function initCli (bot, channel) {
     if (isDocker()) return
+
+    let chan = channel
 
     let cliCommander = new CommandProcessor("!")
 
@@ -22,6 +27,17 @@ function initCli(bot, channel) {
     const say = new Command("say", {
         alias: "s"
     })
+    const cc = new Command("changeChannel", {
+        alias: "cc",
+        description: "Cambia il canale dove il bot invia i messaggi del commando 'say'"
+    })
+
+    cc.exec = async function (ctx) {
+        if (!(new RegExp("^\d{18}$", "ig").test(ctx.args[0]))) {
+            return logger.warn("Cannot set channel to " + ctx.args[0], { location: "CLI" })
+        }
+        chan = ctx.args[0]
+    }
 
     clr.exec = async function (ctx) {
         const { args } = ctx
@@ -39,13 +55,14 @@ function initCli(bot, channel) {
 
     cliCommander.addCommand(clr)
     cliCommander.addCommand(say)
+    cliCommander.addCommand(cc)
 
 
     readline.createInterface({
         input: process.stdin,
         output: process.stdout
     }).on("line", async line => {
-        await cliCommander.process({ content: line, channel: bot.channels.get(channel) })
+        await cliCommander.process({ content: line, channel: bot.channels.get(chan) })
     })
 }
 
