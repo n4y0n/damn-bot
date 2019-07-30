@@ -87,19 +87,19 @@ CPC.addCommand(feeds)
 
 // ***** Bot hooks *****
 bot.on("ready", () => {
-    logger.info("Bot took: " + (Date.now() - start) + "ms", { location: "Main" })
+    logger.info("Bot took: " + (Date.now() - start) + "ms", { location: "Index" })
     initCli(bot, botChannel)
 })
 
 bot.on("error", err => {
-    logger.error(err.message, { location: "Main" })
+    logger.error(err.message, { location: "Index" })
     process.exit(-1)
 })
 
 // ***** Start bot *****
 bot.login(process.env.TOKEN)
-    .then(token => logger.info("Ok", { location: "Main" }))
+    .then(token => logger.info("Ok", { location: "Index" }))
     .catch(err => {
-        logger.error(err.message, { location: "Main" })
+        logger.error(err.message, { location: "Index" })
         process.exit(-1)
     })
