@@ -34,7 +34,8 @@ module.exports = class CommandProcessor {
 
                     // FIXME: Command Context creation
 
-                    const ctx = message.channel
+                    const ctx = {}
+                    ctx[Symbol.for('channel')] = message.channel
                     ctx["processor"] = this
                     ctx["args"] = [...message.content.split(" ")]
 

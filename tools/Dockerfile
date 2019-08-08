@@ -1,7 +1,4 @@
-FROM jrottenberg/ffmpeg:3.3-alpine as ffmpeg-bins
-
 FROM node:alpine
-COPY --from=ffmpeg-bins / /
 
 ENV TINI_VERSION=v0.18.0 \
     NODE_ENV=production
@@ -17,6 +14,6 @@ COPY package*.json ./
 
 RUN npm install
 
-COPY . ./
+COPY . .
 
 CMD [ "node", "." ]
