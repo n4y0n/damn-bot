@@ -12,7 +12,7 @@ module.exports = class CiaoBoccProcessorComponent extends Processor {
    * @param {Message} message 
    */
   async process (message) {
-    if (!message.mentions.users.get(this.bot.user.id)) return
+    if (!message.mentions.users.get(this.bot.user.id) && !!message.channel.name) return
     if (message.author.id !== '224977582846640128') {
       return await message.channel.send('Fuck you '+message.author.username)
     }
