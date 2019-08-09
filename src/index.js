@@ -5,7 +5,7 @@ const winston = require('winston')
 const tlog = require("./utils/telegramNotifier")
 const logger = require('./utils/logging')
 logger.add(new winston.transports.Stream({
-    level: "error",
+    level: process.env.NODE_ENV === "production" ? "error" : "info",
     stream: new tlog.TelegramLoggerStream()
 }))
 
