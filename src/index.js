@@ -1,7 +1,14 @@
 require('dotenv').config()
 
 //#region Imports
+const winston = require('winston')
+const tlog = require("./utils/telegramNotifier")
 const logger = require('./utils/logging')
+logger.add(new winston.transports.Stream({
+    level: "error",
+    stream: new tlog.TelegramLoggerStream()
+}))
+
 const { initCli } = require('./utils/termial-cli')
 
 const MyBot = require('./DBot')

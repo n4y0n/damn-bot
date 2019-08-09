@@ -22,7 +22,7 @@ module.exports = (function () {
                 colorize: true
             })
         ],
-        exitOnError: true
+        exitOnError: false
     })
 
     if (!isDocker()) {
