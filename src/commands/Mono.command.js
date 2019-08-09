@@ -3,7 +3,7 @@ const Command = require('../interfaces/Command')
 
 module.exports = new Command('helpgatari', {
   alias: 'fffuckk',
-  description: 'Lists Monogatary watch order'
+  description: 'Lists Monogatari watch order'
 })
 module.exports.exec = async function (ctx) {
   const channel = ctx[Symbol.for('channel')]
