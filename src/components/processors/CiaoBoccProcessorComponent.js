@@ -27,6 +27,9 @@ module.exports = class CiaoBoccProcessorComponent extends Processor {
   async process (message) {
     if (!message.mentions.users.get(this.bot.user.id) && !!message.channel.name) return
     if (message.author.id !== '224977582846640128') {
+        if (message.author.id === '231747075094740992') {
+            return await message.channel.send('WIP! Just u wait (￣_,￣ )')
+        }
         return await message.channel.send(generaRispostaCattiva(message.author.username))
     }
     log.info('è bocc', { location: this })
