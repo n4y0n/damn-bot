@@ -5,6 +5,7 @@ module.exports = new Command('helpgatari', {
   alias: 'fffuckk',
   description: 'Lists Monogatari watch order'
 })
+
 module.exports.exec = async function (ctx) {
   const channel = ctx[Symbol.for('channel')]
   let rm = new RichEmbed()

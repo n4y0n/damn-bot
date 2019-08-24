@@ -7,7 +7,7 @@ const Command = require("../interfaces/Command")
 const logger = require("./logging")
 
 
-// TODO: use same interface for sending test to : screen - discord chat
+// TODO: use same interface for sending text to : screen - discord chat
 
 /**
  * Initializes terminal cli interface if not in a docker container
@@ -40,17 +40,20 @@ function initCli (bot, channel) {
     }
 
     clr.exec = async function (ctx) {
+        const channel = ctx[Symbol.for('channel')]
         const { args } = ctx
         const [command, num = 2] = args
 
-        const ms = await ctx.fetchMessages({ limit: num })
+        const ms = await channel.fetchMessages({ limit: num })
         if (ms.size === 1) return await ms.first().delete()
         if (ms.size < 1) return
-        await ctx.bulkDelete(ms, true)
+        await channel.bulkDelete(ms, true)
     }
+
     say.exec = async function (ctx) {
+        const channel = ctx[Symbol.for('channel')]
         ctx.args.shift()
-        await ctx.send(ctx.args.join(" "))
+        await channel.send(ctx.args.join(" "))
     }
 
     cliCommander.addCommand(clr)
