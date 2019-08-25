@@ -2,8 +2,8 @@ const Processor = require('../../interfaces/Processor')
 const log = require('../../utils/logging')
 const { Message } = require('discord.js')
 
-const coseBelle = ['Ciuao.', 'Hey', 'Sup', 'Felice di Bocc!']
-const coseBrutte = ['Fuck you', 'mmmhh', '(＃°Д°)']
+const coseBelle = ['Ciuao', 'Hey', 'Sup', 'Felice di Bocc']
+const coseBrutte = ['Fuck u', '(＃°Д°)']
 
 function generaRispostaCattiva (name) {
   const rngBrutto = Math.floor(Math.random() * coseBrutte.length)
@@ -33,7 +33,7 @@ module.exports = class CiaoBoccProcessorComponent extends Processor {
         return await message.channel.send(generaRispostaCattiva(message.author.username))
     }
     log.info('è bocc', { location: this })
-    await message.channel.send(generaRispostaBuona(message.author.username))
+    await message.channel.send(generaRispostaBuona('') + 'Bocc!!')
   }
 
   toString () {
