@@ -4,10 +4,6 @@ require('dotenv').config()
 const winston = require('winston')
 const tlog = require("./utils/telegramNotifier")
 const logger = require('./utils/logging')
-logger.add(new winston.transports.Stream({
-    level: process.env.NODE_ENV === "production" ? "error" : "info",
-    stream: new tlog.TelegramLoggerStream()
-}))
 
 const { initCli } = require('./utils/termial-cli')
 
@@ -30,6 +26,12 @@ const botChannel = '538747728763682817'
 //#endregion
 
 //#region ***** Setup *****
+
+logger.add(new winston.transports.Stream({
+    level: process.env.NODE_ENV === "production" ? "error" : "debug",
+    stream: new tlog.TelegramLoggerStream()
+}))
+
 const start = Date.now()
 let bot = new MyBot({
     disabledEvents: ['TYPING_START'],
