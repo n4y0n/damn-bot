@@ -33,8 +33,10 @@ module.exports = class RestClient {
         return this._client.get(path, p)
     }
 
-    async Post (path, data) {
-        return this._client.post(path, data)
+    async Post (path, data, params = null) {
+        return this._client.post(path, data, {
+            params
+        })
     }
 
     async Delete (path, params) {

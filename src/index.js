@@ -22,7 +22,7 @@ const botChannel = '538747728763682817'
 //#region ***** Setup *****
 
 logger.add(new winston.transports.Stream({
-    level: process.env.NODE_ENV === "production" ? "error" : "info",
+    level: process.env.NODE_ENV === "production" ? "error" : "silly",
     stream: new tlog.TelegramLoggerStream()
 }))
 
