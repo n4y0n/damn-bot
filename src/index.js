@@ -10,17 +10,11 @@ const { initCli } = require('./utils/termial-cli')
 const MyBot = require('./DBot')
 const CommandProcessor = require('./commands/CommandProcessor')
 
-// const RssWatcherAdapter = require('./lib/RssWatcherAdapter')
-// const RssFeedComponent = require('./components/RssFeedComponent')
-
 const CommandProcessorComponent = require('./components/processors/CommandProcessorComponet')
 const CiaoBoccProcessorComponent = require('./components/processors/CiaoBoccProcessorComponent')
 //#endregion
 
 //#region ***** Variables *****
-// const rss = {
-//     'NyaaAnime {English-Translated}': 'https://nyaa.si/?f=0&c=1_2&q=&page=rss'
-// }
 
 const botChannel = '538747728763682817'
 //#endregion
@@ -28,7 +22,7 @@ const botChannel = '538747728763682817'
 //#region ***** Setup *****
 
 logger.add(new winston.transports.Stream({
-    level: process.env.NODE_ENV === "production" ? "error" : "debug",
+    level: process.env.NODE_ENV === "production" ? "error" : "info",
     stream: new tlog.TelegramLoggerStream()
 }))
 
@@ -45,14 +39,6 @@ const CPC = new CommandProcessorComponent(commander).addListenChannel(botChannel
 const ciaoBocc = new CiaoBoccProcessorComponent()
 bot.addComponent(CPC)
 bot.addComponent(ciaoBocc)
-
-//#region ***** RSSWatcher Setup *****
-// for (let [name, url] of Object.entries(rss)) {
-//     const rsswatcher = new RssWatcherAdapter(url)
-//     const rssfeed = new RssFeedComponent(rsswatcher, name).addChannel(botChannel)
-//     bot.addComponent(rssfeed)
-// }
-//#endregion
 
 //#region ***** Setup commands *****
 const clear = require('./commands/Clear.command')
