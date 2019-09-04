@@ -16,35 +16,36 @@ module.exports.exec = async function (ctx) {
     args.shift()
     let server = args.shift() || 'nayon.club'
 
+    const serverStatus = new RichEmbed()
+
+    serverStatus.setTitle('[ Server Status: ' + server + ' ]')
+    serverStatus.setURL('https://mcsrvstat.us/server/' + server)
+
+    serverStatus.setColor("#0cff05")
+
     try {
         let response = await rc.Get(server)
-        let data = response.data || {
-            online: false,
-            players: {
-                online: 0,
-                max: 0
-            }
-        }
-        const serverStatus = new RichEmbed()
+        let data = response.data
 
-        serverStatus.setTitle('[ Server Status: ' + server + ' ]')
-        serverStatus.setURL('https://mcsrvstat.us/server/' + server)
-
-        serverStatus.setColor("#0cff05")
         if (!data.online) {
-            serverStatus.setColor("#FF0c05")
+            throw Error("OFFLINE")
         }
 
         serverStatus.addField('Status', data.online ? "ONLINE" : "OFFLINE")
-        serverStatus.addField('Players', `${data.players.online}/${data.players.max}`)
+        if (data.players) {
+            serverStatus.addField('Players', `${data.players.online}/${data.players.max}`)
+        }
         if (data.players.online > 0 && data.players.list) {
             let op = data.players.list.reduce((a, c) => {
-                return a + ' ' + c
+                return a + '\n' + c
             })
             serverStatus.addField('Players Online', op)
         }
-        await chn.send(serverStatus)
     } catch (e) {
+        serverStatus.setColor("#FF0c05")
+        serverStatus.addField('Status', "OFFLINE")
+        serverStatus.addField('Players', '0/0')
         logger.warn(e, { location: module.exports })
     }
+    await chn.send(serverStatus)
 }
