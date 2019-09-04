@@ -18,11 +18,17 @@ module.exports.exec = async function (ctx) {
 
     try {
         let response = await rc.Get(server)
-        let data = response.data || response.response.data
+        let data = response.data || {
+            online: false,
+            players: {
+                online: 0,
+                max: 0
+            }
+        }
         const serverStatus = new RichEmbed()
 
         serverStatus.setTitle('[ Server Status: ' + server + ' ]')
-        serverStatus.setURL('https://mcsrvstat.us/server/'+server)
+        serverStatus.setURL('https://mcsrvstat.us/server/' + server)
 
         serverStatus.setColor("#0cff05")
         if (!data.online) {
@@ -31,7 +37,7 @@ module.exports.exec = async function (ctx) {
 
         serverStatus.addField('Status', data.online ? "ONLINE" : "OFFLINE")
         serverStatus.addField('Players', `${data.players.online}/${data.players.max}`)
-        if(data.players.online > 0 && data.players.list) {
+        if (data.players.online > 0 && data.players.list) {
             let op = data.players.list.reduce((a, c) => {
                 return a + ' ' + c
             })
