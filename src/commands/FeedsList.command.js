@@ -3,8 +3,11 @@ const Command = require('../interfaces/Command')
 const RssFeedComponent = require('../components/RssFeedComponent')
 
 module.exports = new Command('feeds')
+
+// FIXME: Doesn't work
+
 module.exports.exec = async function (ctx) {
-  const channel = ctx[Symbol.for('channel')]
+  const channel = ctx['chn']
   const feeds = new RichEmbed()
   feeds.setTitle('[ RssFeed List ]')
 
@@ -12,5 +15,5 @@ module.exports.exec = async function (ctx) {
     if (!(feed instanceof RssFeedComponent)) continue
     feeds.addField(feed.getFeedName(), feed.getRssUrl())
   }
-  channel.send(feeds)
+  await channel.send(feeds)
 }

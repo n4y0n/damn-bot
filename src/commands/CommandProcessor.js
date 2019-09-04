@@ -14,7 +14,7 @@ module.exports = class CommandProcessor {
         logger.info(`✔ Added command >> ${command}`, { location: this })
     }
 
-    async process(message) {
+    async process(message, ctx) {
         const start = Date.now()
         const args = message.content.split(" ")
 
@@ -31,14 +31,6 @@ module.exports = class CommandProcessor {
         for (const com of this.commands) {
             if (com.match(cmd)) {
                 try {
-
-                    // FIXME: Command Context creation
-
-                    const ctx = {}
-                    ctx[Symbol.for('channel')] = message.channel
-                    ctx["processor"] = this
-                    ctx["args"] = [...message.content.split(" ")]
-
                     await com.exec(ctx)
                     logger.info(`✔ Done executing ${com}`)
                 } catch (e) {

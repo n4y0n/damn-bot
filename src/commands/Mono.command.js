@@ -7,7 +7,7 @@ module.exports = new Command('helpgatari', {
 })
 
 module.exports.exec = async function (ctx) {
-  const channel = ctx[Symbol.for('channel')]
+  const channel = ctx['chn']
   let rm = new RichEmbed()
   rm.setTitle('[ Hey don\'t panic! ]')
   rm.addField("1)", "Bakemonogatari\n---")

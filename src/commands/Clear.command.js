@@ -7,7 +7,7 @@ module.exports = new Command('clear', {
 module.exports.exec = async function (ctx) {
   const { args } = ctx
   const [command, num = 2] = args
-  const channel = ctx[Symbol.for('channel')]
+  const channel = ctx['chn']
 
   const msgs = await channel.fetchMessages({ limit: num, })
   if (msgs.size === 1) return await msgs.first().delete()

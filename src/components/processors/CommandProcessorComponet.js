@@ -2,7 +2,7 @@ const Processor = require("../../interfaces/Processor")
 const CommandProcessor = require("../../commands/CommandProcessor")
 
 module.exports = class CommandProcessorComponet extends Processor {
-    constructor(cli) {
+    constructor(cli, extra) {
         super()
 
         this.listeningChannels = []
@@ -11,11 +11,22 @@ module.exports = class CommandProcessorComponet extends Processor {
             throw Error(`❌ ${this.toString()} : No command processor found`)
 
         this._cli = cli
+        this._ctxextra = extra || {}
     }
 
     async process(message) {
         if(this.listeningChannels.indexOf(message.channel.id) === -1) return;
-        await this._cli.process(message)
+        const context = this.CreateContext(message)
+        await this._cli.process(message, context)
+    }
+
+    CreateContext(message) {
+        let ctx = {}
+        ctx["chn"] = message.channel
+        ctx["proc"] = this._cli
+        ctx["ext"] = this._ctxextra
+        ctx["args"] = [...message.content.split(" ")]
+        return ctx
     }
 
     addCommand(command) {
