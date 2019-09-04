@@ -44,9 +44,11 @@ bot.addComponent(ciaoBocc)
 const clear = require('./commands/Clear.command')
 const help = require('./commands/Help.command')
 const mono = require('./commands/Mono.command')
+const mct = require('./commands/Mc.command')
 CPC.addCommand(clear)
 CPC.addCommand(help)
 CPC.addCommand(mono)
+CPC.addCommand(mct)
 //#endregion
 
 //#region ***** Bot hooks *****
