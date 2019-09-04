@@ -35,7 +35,7 @@ let bot = new MyBot({
 })
 
 const commander = new CommandProcessor('-')
-const CPC = new CommandProcessorComponent(commander).addListenChannel(botChannel)
+const CPC = new CommandProcessorComponent(commander)
 const ciaoBocc = new CiaoBoccProcessorComponent()
 bot.addComponent(CPC)
 bot.addComponent(ciaoBocc)

@@ -15,7 +15,7 @@ module.exports = class CommandProcessorComponet extends Processor {
     }
 
     async process(message) {
-        if(this.listeningChannels.indexOf(message.channel.id) === -1) return;
+        if(this.listeningChannels.indexOf(message.channel.id) === -1 && this.listeningChannels.length > 0) return;
         const context = this.CreateContext(message)
         await this._cli.process(message, context)
     }
