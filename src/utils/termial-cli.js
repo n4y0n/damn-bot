@@ -15,7 +15,7 @@ const logger = require("./logging")
  * @param { EnhancedClient } bot
  * @param { string } channel
  */
-function initCli (bot, channel) {
+module.exports = function (bot, channel) {
     if (isDocker()) return
 
     let chan = channel
@@ -79,8 +79,4 @@ function initCli (bot, channel) {
     }).on("line", async line => {
         await cliCommander.process({ content: line }, { args: [...line.split(" ")], proc: cliCommander, channel: bot.channels.get(chan), chn: { send: console.log } })
     })
-}
-
-module.exports = {
-    initCli
 }

@@ -6,7 +6,7 @@ const winston = require('winston')
 const tlog = require("./utils/telegramNotifier")
 const logger = require('./utils/logging')
 
-const { initCli } = require('./utils/termial-cli')
+const initCli = require('./utils/termial-cli')
 
 const MyBot = require('./DBot')
 const CommandProcessor = require('./commands/CommandProcessor')
@@ -23,7 +23,7 @@ const botChannel = '538747728763682817'
 //#region ***** Setup *****
 
 logger.add(new winston.transports.Stream({
-    level: process.env.NODE_ENV === "production" ? "warn" : "info",
+    level: process.env.NODE_ENV === "production" ? "warn" : "debug",
     stream: new tlog.TelegramLoggerStream()
 }))
 
