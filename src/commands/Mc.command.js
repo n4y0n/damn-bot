@@ -29,7 +29,7 @@ module.exports.exec = async function (ctx) {
         let data = response.data
 
         if (!data.online) {
-            throw Error("OFFLINE")
+            throw Error(`Server: "${server}" Offline.`)
         }
 
         serverStatus.addField('Status', data.online ? "ONLINE" : "OFFLINE")
