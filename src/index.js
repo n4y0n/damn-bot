@@ -3,8 +3,8 @@ require('dotenv').config()
 
 //#region Imports
 const winston = require('winston')
-const tlog = require("./utils/telegramNotifier")
 const logger = require('./utils/logging')
+const tlog = require("./utils/telegramNotifier")
 
 const initCli = require('./utils/termial-cli')
 
@@ -16,15 +16,16 @@ const CiaoBoccProcessorComponent = require('./components/processors/CiaoBoccProc
 //#endregion
 
 //#region ***** Variables *****
-
 const botChannel = '538747728763682817'
+// Telegram logger
+const NOTIFY_ID = process.env.TG_CID;
+const BOT_TOKEN = process.env.TG_TOKEN;
 //#endregion
 
 //#region ***** Setup *****
-
 logger.add(new winston.transports.Stream({
     level: process.env.NODE_ENV === "production" ? "warn" : "debug",
-    stream: new tlog.TelegramLoggerStream()
+    stream: new tlog.TelegramLoggerStream(BOT_TOKEN, NOTIFY_ID)
 }))
 
 const start = Date.now()
