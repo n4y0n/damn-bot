@@ -45,8 +45,10 @@ module.exports = class RestClient {
         return this._client.delete(path, p)
     }
 
-    async Put (path, data) {
-        return this._client.put(path, data)
+    async Put (path, data, params) {
+        return this._client.put(path, data, {
+            params
+        })
     }
 
     SetDefaultHeader (name, value, method) {
