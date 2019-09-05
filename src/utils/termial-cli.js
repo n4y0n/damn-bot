@@ -1,3 +1,4 @@
+//@ts-check
 const isDocker = require("is-docker")
 const readline = require("readline")
 const EnhancedClient = require("../interfaces/EnhancedClient")
@@ -35,7 +36,7 @@ function initCli (bot, channel) {
 
     h.exec = async function (ctx) {
         const channel = ctx['chn']
-        commandlist = ' [ Command List ]\n'
+        let commandlist = ' [ Command List ]\n'
         for (const command of ctx.proc.commands) {
             commandlist += "  " + command.toString() + "\n"
             commandlist += "     " + command.getDescription() + "\n\n"

@@ -1,3 +1,4 @@
+//@ts-check
 const winston = require("winston")
 const { format } = winston
 const { printf } = format
@@ -18,8 +19,6 @@ module.exports = (function () {
             new winston.transports.Console({
                 level: level,
                 handleExceptions: true,
-                json: false,
-                colorize: true
             })
         ],
         exitOnError: false
@@ -30,10 +29,8 @@ module.exports = (function () {
             level: level,
             filename: path.join(__dirname, '..', '..', 'logs', 'all-logs.log'),
             handleExceptions: true,
-            json: true,
             maxsize: 5242880, //5MB
             maxFiles: 5,
-            colorize: false
         }))
     }
 

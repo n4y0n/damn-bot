@@ -1,3 +1,4 @@
+//@ts-check
 const axios = require('axios').default
 const url = require('url')
 
@@ -70,7 +71,7 @@ module.exports = class RestClient {
 
     RemoveDefaultHeader (name, method) {
         if (method) {
-            if(this._headers[method.toLowerCase()]) {
+            if (this._headers[method.toLowerCase()]) {
                 delete this._headers[method.toLowerCase()][name]
             }
         } else {

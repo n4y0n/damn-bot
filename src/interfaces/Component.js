@@ -1,5 +1,6 @@
+//@ts-check
 const crypto = require("crypto")
-function genid() {
+function genid () {
     const sha1 = crypto.createHash("sha1")
     sha1.update(Date.now().toString())
     return sha1.digest("hex")
@@ -8,52 +9,56 @@ function genid() {
 const logger = require("../utils/logging")
 
 module.exports = class Component {
-    constructor() {
+    constructor () {
         this._id = null
         this.installed = false
         this.bot = null
     }
 
-    install(bot) {
-        if (this.isInstalled())
-            return logger.warn(`Component already installed in bot: ${this.bot}`, { location: this })
+    install (bot) {
+        if (this.isInstalled()) {
+            logger.warn(`Component already installed in bot: ${this.bot}`, { location: this })
+            return
+        }
 
         this.bot = bot
         this.installed = true
     }
 
-    uninstall() {
-        if (!this.isInstalled())
-            return logger.warn("Cannot uninstall a not installed component", { location: this })
+    uninstall () {
+        if (!this.isInstalled()) {
+            logger.warn("Cannot uninstall a not installed component", { location: this })
+            return
+        }
 
         this.bot = null
         this.installed = false
     }
 
-    isInstalled() {
+    isInstalled () {
         return this.installed
     }
 
-    botReady() {
+    botReady () {
         return !!this.bot.readyTimestamp
     }
 
-    async _cleanUp() {
+    async _cleanUp () {
         logger.warn("❌🔧To implement🔧❌", { location: this })
     }
 
-    getID() {
+    getID () {
         if (!this._id) {
             this._id = genid()
         }
         return this._id
     }
 
-    getShortID() {
+    getShortID () {
         return this.getID().substr(0, 7)
     }
 
-    toString() {
+    toString () {
         return `Component@${this.getShortID()}`
     }
 }

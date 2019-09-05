@@ -1,6 +1,7 @@
+//@ts-check
 const Component = require("../interfaces/Component")
 const moment = require("moment")
-const { RichEmbed, Client } = require("discord.js")
+const { RichEmbed } = require("discord.js")
 const logger = require("../utils/logging")
 const RssAdapter = require("../interfaces/RssAdapter")
 
@@ -11,7 +12,7 @@ module.exports = class RssFeedComponent extends Component {
      * @param { RssAdapter } rssAdapter
      * @param { string } feedname
      */
-    constructor(rssAdapter, feedname = "") {
+    constructor (rssAdapter, feedname = "") {
         super()
 
         this.subscribedChannels = []
@@ -26,27 +27,31 @@ module.exports = class RssFeedComponent extends Component {
         setTimeout(() => logger.info("Ready", { location: this }), this.coolDownTime - Date.now())
     }
 
-    addChannel(channel) {
-        if (this.installed && !bot.channels.exists("id", id))
+    addChannel (channel) {
+        if (this.installed && !this.bot.channels.exists("id", channel))
             return this;
-        this.getChannelsList().push(channel)
+        this.Channels.push(channel)
         return this
     }
 
-    getChannelsList() {
+    getChannelsList () {
         return this.subscribedChannels
     }
 
-    getFeedName() {
+    getFeedName () {
         if (!this._feedName) return this.getShortID()
         return this._feedName
     }
 
-    getRssUrl() {
+    getRssUrl () {
         return this._watcher.url
     }
 
-    _setupWatcher() {
+    get Channels () {
+        return this.getChannelsList()
+    }
+
+    _setupWatcher () {
         this._watcher.onArticle(async item => {
             if (!this.isInstalled() || !this.botReady() || Date.now() < this.coolDownTime) return
             await this.broadcastArticle(item)
@@ -62,7 +67,7 @@ module.exports = class RssFeedComponent extends Component {
         })
     }
 
-    _formatAricle(article) {
+    _formatAricle (article) {
         const embed = new RichEmbed()
         embed.setTitle(`[ NEW ${this.getFeedName()}]`)
         embed.setColor("#4DD0D9")
@@ -73,7 +78,7 @@ module.exports = class RssFeedComponent extends Component {
         return embed
     }
 
-    async broadcastArticle(article) {
+    async broadcastArticle (article) {
         if (!this.isInstalled()) return
         if (this.getChannelsList() <= 0 || !this.botReady())
             return logger.silly("Bot not ready and/or no channels in channel list", { location: this })
@@ -83,7 +88,7 @@ module.exports = class RssFeedComponent extends Component {
         }
     }
 
-    async sendTo(channel, article) {
+    async sendTo (channel, article) {
 
         if (!this.botReady()) return
 
@@ -94,20 +99,16 @@ module.exports = class RssFeedComponent extends Component {
             return
         }
 
-            dchannel.send(this._formatAricle(article))
+        dchannel.send(this._formatAricle(article))
     }
 
-    /**
-     *
-     * @param {Client} bot
-     */
-    install(bot) {
+    install (bot) {
         super.install(bot)
         bot.on("ready", () => {
             // TODO: find a better way
             // On bot ready remove invalid channels from subscribers list
             let itemRemovedFlag = false
-            for(let i = this.subscribedChannels.length - 1; i >= 0; --i) {
+            for (let i = this.subscribedChannels.length - 1; i >= 0; --i) {
                 const id = this.subscribedChannels[i]
                 if (!bot.channels.exists("id", id)) {
                     this.subscribedChannels[i] = null
@@ -118,12 +119,12 @@ module.exports = class RssFeedComponent extends Component {
         })
     }
 
-    async _cleanUp() {
+    async _cleanUp () {
         this._watcher.destroy()
         this.uninstall()
     }
 
-    toString() {
+    toString () {
         return `RssFeedComponent(${this.getFeedName()})`
     }
 }

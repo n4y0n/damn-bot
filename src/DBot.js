@@ -1,3 +1,4 @@
+//@ts-check
 const EnhancedClient = require("./interfaces/EnhancedClient")
 const Processor = require("./interfaces/Processor")
 const Component = require("./interfaces/Component")
@@ -12,7 +13,7 @@ module.exports = class DBot extends EnhancedClient {
      *
      * @param {Object} options
      */
-    constructor(options) {
+    constructor (options) {
         super(options)
         this.components = {
             processors: {},
@@ -20,6 +21,7 @@ module.exports = class DBot extends EnhancedClient {
         }
 
         this.onMessage(async message => {
+            // @ts-ignore
             const channelname = message.channel.name ? message.channel.name : "Private"
             logger.verbose(`New Message from ${message.author.username}(${message.author.id}) in ${channelname}: ${message.content}`, { location: this })
             if (message.author.id == this.user.id) return
@@ -29,14 +31,14 @@ module.exports = class DBot extends EnhancedClient {
         })
     }
 
-    addComponent(component) {
+    addComponent (component) {
         if (!(component instanceof Component)) return logger.warn(`❌ ${component} is not a componet`, { location: this })
         if (component instanceof Processor) return this._addProcessorComponent(component)
 
         this._addNormalComponent(component)
     }
 
-    removeComponent(component) {
+    removeComponent (component) {
         if (!(component instanceof Component)) return logger.warn(`❌ ${component} is not a componet`, { location: this })
 
         if (component instanceof Processor) return this._removeProcessorComponent(component)
@@ -44,28 +46,28 @@ module.exports = class DBot extends EnhancedClient {
         this._removeNormalComponent(component)
     }
 
-    _addNormalComponent(component) {
+    _addNormalComponent (component) {
         if (component === this.components.normal[component.getID()]) return logger.info(`❌ ${component} already installed`, { location: this })
         component.install(this)
         this.components.normal[component.getID()] = component
         logger.info(`✔ Added Component >> ${component}`, { location: this })
     }
 
-    _addProcessorComponent(component) {
+    _addProcessorComponent (component) {
         if (component === this.components.processors[component.getID()]) return logger.info(`❌ ${component} already installed`, { location: this })
         component.install(this)
         this.components.processors[component.getID()] = component
         logger.info(`✔ Added Processor >> ${component}`, { location: this })
     }
 
-    _removeNormalComponent(component) {
+    _removeNormalComponent (component) {
         const retrivedcomponent = this.components.normal[component.getID()]
         if (retrivedcomponent == null) return logger.warn(`❌ ${component} not installed in this bot`, { location: this })
         this.components.normal[component.getID()] = null
         retrivedcomponent.uninstall(this)
     }
 
-    _removeProcessorComponent(component) {
+    _removeProcessorComponent (component) {
         const retrivedcomponent = this.components.processors[component.getID()]
         if (retrivedcomponent == null) return logger.warn(`❌ ${component} not installed in this bot`, { location: this })
         this.components.processors[component.getID()] = null
@@ -73,7 +75,7 @@ module.exports = class DBot extends EnhancedClient {
     }
 
 
-    toString() {
+    toString () {
         return "MyBot"
     }
 }

@@ -1,3 +1,4 @@
+//@ts-check
 const stream = require('stream');
 const log = require('./logging')
 const RestClient = require('../lib/RestClient')

@@ -1,20 +1,21 @@
+//@ts-check
 const Command = require("../interfaces/Command")
 const path = require("path")
 const logger = require("../utils/logging")
 
 module.exports = class CommandProcessor {
-    constructor(prefix = "") {
+    constructor (prefix = "") {
         this.commands = []
         this.prefix = prefix
     }
 
-    addCommand(command) {
+    addCommand (command) {
         if (!(command instanceof Command)) return logger.warn(`❌ ${__filename.split(path.sep).pop()}: ${command} is not a command`, { location: this })
         this.commands.push(command)
         logger.info(`✔ Added command >> ${command}`, { location: this })
     }
 
-    async process(message, ctx) {
+    async process (message, ctx) {
         const start = Date.now()
         const args = message.content.split(" ")
 
@@ -49,11 +50,15 @@ module.exports = class CommandProcessor {
     /**
      * Returns the number of commands registred to this processor
      */
-    size() {
+    size () {
         return this.commands.length
     }
 
-    toString() {
+    get length () {
+        return this.size()
+    }
+
+    toString () {
         return `CommandProcessor(${this.prefix})`
     }
 }

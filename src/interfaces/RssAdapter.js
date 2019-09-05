@@ -1,19 +1,19 @@
-
+//@ts-check
 module.exports = class RssAdapter {
-    constructor(url) {
+    constructor (url) {
         this.url = url
     }
 
-    onArticle(callback) {
+    onArticle (callback) {
         throw new Error("Unimplemented")
     }
-    onError(callback) {
+    onError (callback) {
         throw new Error("Unimplemented")
     }
-    run(callback) {
+    run (callback) {
         throw new Error("Unimplemented")
     }
-    destroy() {
+    destroy () {
         throw new Error("Unimplemented")
     }
 }

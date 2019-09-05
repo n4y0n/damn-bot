@@ -1,15 +1,16 @@
+//@ts-check
 const { Client, Message } = require("discord.js")
 
 module.exports = class EnhancedClient extends Client {
-    addComponent(component) {
+    addComponent (component) {
         throw new Error("Unimplemented")
     }
 
-    removeComponent(component) {
+    removeComponent (component) {
         throw new Error("Unimplemented")
     }
 
-    getChannel(id) {
+    getChannel (id) {
         return this.channels.get(id)
     }
 
@@ -17,11 +18,11 @@ module.exports = class EnhancedClient extends Client {
      *
      * @param {(message: Message) => void} listener
      */
-    onMessage(listener) {
+    onMessage (listener) {
         this.on("message", listener)
     }
 
-    toString() {
+    toString () {
         return "Enhanced Discord.js Client"
     }
 }

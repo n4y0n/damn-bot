@@ -1,3 +1,4 @@
+//@ts-check
 const Command = require('../interfaces/Command')
 const RestClient = require('../lib/RestClient')
 const logger = require('../utils/logging')
