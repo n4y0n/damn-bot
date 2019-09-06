@@ -39,20 +39,15 @@ let bot = new MyBot({
     messageSweepInterval: 120
 })
 
-bot.addComponent(new CommandProcessorComponent('-'))
+bot.addComponent(
+    new CommandProcessorComponent('-').
+        addCommand(require('./commands/Clear.command')).
+        addCommand(require('./commands/Help.command')).
+        addCommand(require('./commands/Mono.command')).
+        addCommand(require('./commands/Mc.command'))
+)
 bot.addComponent(new LogMessageProcessorComponent())
 bot.addComponent(new CiaoBoccProcessorComponent())
-
-//#region ***** Setup commands *****
-const clear = require('./commands/Clear.command')
-const help = require('./commands/Help.command')
-const mono = require('./commands/Mono.command')
-const mct = require('./commands/Mc.command')
-CPC.addCommand(clear)
-CPC.addCommand(help)
-CPC.addCommand(mono)
-CPC.addCommand(mct)
-//#endregion
 
 //#region ***** Bot hooks *****
 bot.on('ready', () => {

@@ -1,24 +1,30 @@
 //@ts-check
 const Processor = require("../../interfaces/Processor")
 const CommandProcessor = require("../../commands/CommandProcessor")
+const logger = require('../../utils/logging')
 
 module.exports = class CommandProcessorComponet extends Processor {
-    constructor (cli, extra) {
+    constructor (prefix = "", cli = null, extra) {
         super()
 
         this.listeningChannels = []
 
-        if (!(cli instanceof CommandProcessor))
-            throw Error(`❌ ${this.toString()} : No command processor found`)
+        if (!(cli instanceof CommandProcessor) || !cli) {
+            this._cli = new CommandProcessor(prefix)
+        } else {
+            this._cli = cli
+        }
 
-        this._cli = cli
+        this._prefix = prefix
         this._ctxextra = extra || {}
     }
 
     async process (message) {
         if (this.listeningChannels.indexOf(message.channel.id) === -1 && this.listeningChannels.length > 0) return;
-        const context = this.CreateContext(message)
-        await this._cli.process(message, context)
+        if (message.content.substr(0, this._prefix.length) === this._prefix || !this._prefix) {
+            const context = this.CreateContext(message)
+            await this._cli.process(message, context)
+        }
     }
 
     CreateContext (message) {
@@ -32,6 +38,7 @@ module.exports = class CommandProcessorComponet extends Processor {
 
     addCommand (command) {
         this._cli.addCommand(command)
+        return this
     }
 
     addListenChannel (channel) {
@@ -41,6 +48,6 @@ module.exports = class CommandProcessorComponet extends Processor {
     }
 
     toString () {
-        return `CommandProcessorComponet(${this.getShortID()})`
+        return `CommandProcessorComponet(${!!this._prefix ? this._prefix : this.getShortID()})`
     }
 }

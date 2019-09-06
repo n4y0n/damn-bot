@@ -10,9 +10,13 @@ module.exports = class CommandProcessor {
     }
 
     addCommand (command) {
-        if (!(command instanceof Command)) return logger.warn(`❌ ${__filename.split(path.sep).pop()}: ${command} is not a command`, { location: this })
+        if (!(command instanceof Command)) {
+            logger.warn(`❌ ${__filename.split(path.sep).pop()}: ${command} is not a command`, { location: this })
+            return this
+        }
         this.commands.push(command)
         logger.info(`✔ Added command >> ${command}`, { location: this })
+        return this
     }
 
     async process (message, ctx) {

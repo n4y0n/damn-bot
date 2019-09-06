@@ -1,6 +1,6 @@
 //@ts-check
 module.exports = class Command {
-    constructor (fullcommand, options) {
+    constructor (fullcommand, options = {}) {
         const { alias = "", caseSensitive = false, description = null } = options
 
         this.fullcommand = fullcommand
