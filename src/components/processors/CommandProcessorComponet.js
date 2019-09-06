@@ -9,7 +9,7 @@ module.exports = class CommandProcessorComponet extends Processor {
 
         this.listeningChannels = []
 
-        if (!(cli instanceof CommandProcessor) || !cli) {
+        if (!(cli instanceof CommandProcessor)) {
             this._cli = new CommandProcessor(prefix)
         } else {
             this._cli = cli
