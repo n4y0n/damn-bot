@@ -11,7 +11,7 @@ module.exports = class RestClient {
      * @param {string} baseUrl
      * @throws Invalid url
      */
-    constructor (baseUrl) {
+    constructor (baseUrl, timeout = 1000) {
         /**
          * @type {url.URL}
          */
@@ -24,7 +24,7 @@ module.exports = class RestClient {
 
         this._client = axios.create({
             baseURL: this.BaseUrl,
-            timeout: 1000,
+            timeout,
             headers: this._headers
         })
     }

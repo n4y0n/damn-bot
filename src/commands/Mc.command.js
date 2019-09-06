@@ -4,7 +4,7 @@ const RestClient = require('../lib/RestClient')
 const logger = require('../utils/logging')
 const RichEmbed = require('discord.js').RichEmbed
 
-const rc = new RestClient('https://api.mcsrvstat.us/2/')
+const rc = new RestClient('https://api.mcsrvstat.us/2/', 2000)
 
 module.exports = new Command('mctest', {
     alias: 'mct',
