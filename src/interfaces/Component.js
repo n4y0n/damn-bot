@@ -27,7 +27,7 @@ module.exports = class Component {
 
     uninstall () {
         if (!this.isInstalled()) {
-            logger.warn("Cannot uninstall a not installed component", { location: this })
+            logger.warn("Cannot uninstall component", { location: this })
             return
         }
 
@@ -45,6 +45,14 @@ module.exports = class Component {
 
     async _cleanUp () {
         logger.warn("❌🔧To implement🔧❌", { location: this })
+    }
+
+    get ID () {
+        return this.getID()
+    }
+
+    get ShortID () {
+        return this.getShortID()
     }
 
     getID () {

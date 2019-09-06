@@ -12,6 +12,7 @@ const MyBot = require('./DBot')
 const CommandProcessor = require('./commands/CommandProcessor')
 
 const CommandProcessorComponent = require('./components/processors/CommandProcessorComponet')
+const LogMessageProcessorComponent = require('./components/processors/LogMessageProcessorComponent')
 const CiaoBoccProcessorComponent = require('./components/processors/CiaoBoccProcessorComponent')
 //#endregion
 
@@ -38,11 +39,9 @@ let bot = new MyBot({
     messageSweepInterval: 120
 })
 
-const commander = new CommandProcessor('-')
-const CPC = new CommandProcessorComponent(commander)
-const ciaoBocc = new CiaoBoccProcessorComponent()
-bot.addComponent(CPC)
-bot.addComponent(ciaoBocc)
+bot.addComponent(new CommandProcessorComponent('-'))
+bot.addComponent(new LogMessageProcessorComponent())
+bot.addComponent(new CiaoBoccProcessorComponent())
 
 //#region ***** Setup commands *****
 const clear = require('./commands/Clear.command')
