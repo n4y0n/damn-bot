@@ -23,10 +23,12 @@ const BOT_TOKEN = process.env.TG_TOKEN;
 //#endregion
 
 //#region ***** Setup *****
-logger.add(new winston.transports.Stream({
-    level: process.env.NODE_ENV === "production" ? "warn" : "debug",
-    stream: new tlog.TelegramLoggerStream(BOT_TOKEN, NOTIFY_ID)
-}))
+if (NOTIFY_ID && BOT_TOKEN) {
+    logger.add(new winston.transports.Stream({
+        level: process.env.NODE_ENV === "production" ? "warn" : "debug",
+        stream: new tlog.TelegramLoggerStream(BOT_TOKEN, NOTIFY_ID)
+    }))
+}
 
 const start = Date.now()
 let bot = new MyBot({
