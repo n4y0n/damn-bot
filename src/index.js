@@ -39,6 +39,14 @@ let bot = new MyBot({
     messageSweepInterval: 120
 })
 
+// Order is important in adding processor-components for handling of messages
+// if a component declare that it has already handled a message
+// other components will not see the after-mentioned message
+
+// Logging never handle
+// bot.addComponent(new LogMessageProcessorComponent())
+
+// Command handle only if it is a command
 bot.addComponent(
     new CommandProcessorComponent('-').
         addCommand(require('./commands/Clear.command')).
@@ -46,7 +54,8 @@ bot.addComponent(
         addCommand(require('./commands/Mono.command')).
         addCommand(require('./commands/Mc.command'))
 )
-bot.addComponent(new LogMessageProcessorComponent())
+
+// Ciao Bocc handles everything
 bot.addComponent(new CiaoBoccProcessorComponent())
 
 //#region ***** Bot hooks *****

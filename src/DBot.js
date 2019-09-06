@@ -23,7 +23,10 @@ module.exports = class DBot extends EnhancedClient {
         this.onMessage(async message => {
             if (message.author.id == this.user.id) return
             for (const [key, component] of Object.entries(this.components.processors)) {
-                await component.process(message)
+                const handled = await component.process(message)
+                if (handled) {
+                    break
+                }
             }
         })
     }

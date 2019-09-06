@@ -24,7 +24,9 @@ module.exports = class CommandProcessorComponet extends Processor {
         if (message.content.substr(0, this._prefix.length) === this._prefix || !this._prefix) {
             const context = this.CreateContext(message)
             await this._cli.process(message, context)
+            return true
         }
+        return false
     }
 
     CreateContext (message) {

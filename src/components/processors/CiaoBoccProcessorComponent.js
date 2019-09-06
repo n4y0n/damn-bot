@@ -31,13 +31,14 @@ module.exports = class CiaoBoccProcessorComponent extends Processor {
         if (message.author.id !== '224977582846640128') {
             if (message.author.id === '231747075094740992') {
                 await message.channel.send('WIP! Just u wait (￣_,￣ )')
-                return
+                return false
             }
             await message.channel.send(generaRispostaCattiva(message.author.username))
-            return
+            return false
         }
         log.info('è bocc', { location: this })
         await message.channel.send(generaRispostaBuona('') + 'Bocc!!')
+        return false
     }
 
     toString () {
