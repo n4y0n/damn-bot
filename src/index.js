@@ -9,7 +9,6 @@ const tlog = require("./utils/telegramNotifier")
 const initCli = require('./utils/termial-cli')
 
 const MyBot = require('./DBot')
-const CommandProcessor = require('./commands/CommandProcessor')
 
 const CommandProcessorComponent = require('./components/processors/CommandProcessorComponet')
 const LogMessageProcessorComponent = require('./components/processors/LogMessageProcessorComponent')
