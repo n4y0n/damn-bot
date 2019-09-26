@@ -1,5 +1,7 @@
 //@ts-check
-const crypto = require("crypto")
+const crypto = require('crypto')
+const EventEmitter = require('events').EventEmitter
+
 function genid () {
     const sha1 = crypto.createHash("sha1")
     sha1.update(Date.now().toString())
@@ -8,39 +10,9 @@ function genid () {
 
 const logger = require("../utils/logging")
 
-module.exports = class Component {
+module.exports = class Module {
     constructor () {
         this._id = null
-        this.installed = false
-        this.bot = null
-    }
-
-    install (bot) {
-        if (this.isInstalled()) {
-            logger.warn(`Component already installed in bot: ${this.bot}`, { location: this })
-            return
-        }
-
-        this.bot = bot
-        this.installed = true
-    }
-
-    uninstall () {
-        if (!this.isInstalled()) {
-            logger.warn("Cannot uninstall component", { location: this })
-            return
-        }
-
-        this.bot = null
-        this.installed = false
-    }
-
-    isInstalled () {
-        return this.installed
-    }
-
-    botReady () {
-        return !!this.bot.readyTimestamp
     }
 
     async _cleanUp () {
@@ -53,6 +25,15 @@ module.exports = class Component {
 
     get ShortID () {
         return this.getShortID()
+    }
+
+    /**
+     * @param {EventEmitter} bus 
+     */
+    register(bus) {
+        if (!(bus instanceof EventEmitter)) throw new Error('Bus is not an EventEmitter')
+        this.bus = bus
+        return this
     }
 
     getID () {

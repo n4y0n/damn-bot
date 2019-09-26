@@ -4,15 +4,16 @@ require('dotenv').config()
 //#region Imports
 const winston = require('winston')
 const logger = require('./utils/logging')
+const MainBus = require('./lib/MainEventsBus')
 const tlog = require("./utils/telegramNotifier")
 
 const initCli = require('./utils/termial-cli')
 
-const MyBot = require('./DBot')
+const MyBot = require('./BotClass')
 
-const CommandProcessorComponent = require('./components/processors/CommandProcessorComponet')
-const LogMessageProcessorComponent = require('./components/processors/LogMessageProcessorComponent')
-const CiaoBoccProcessorComponent = require('./components/processors/CiaoBoccProcessorComponent')
+const CommandProcessorModule = require('./modules/CommandProcessorModule')
+const CiaoBoccModule = require('./modules/CiaoBoccModule')
+const DispatcherModuleBuilder = require('./modules/DispatcherModuleBuilder')()
 //#endregion
 
 //#region ***** Variables *****
@@ -37,33 +38,40 @@ let bot = new MyBot({
     messageCacheLifetime: 120,
     messageSweepInterval: 120
 })
+    .register(MainBus)
+
+
+DispatcherModuleBuilder
+    .commandsPrefix('-')
+    .build()
+    .register(MainBus)
+
 
 // Order is important in adding processor-components for handling of messages
 // if a component declare that it has already handled a message
 // other components will not see the after-mentioned message
 
 // Logging never handle
-// bot.addComponent(new LogMessageProcessorComponent())
+// new LogMessageModulet().
+//  register(MainBus)
 
 // Command handle only if it is a command
-bot.addComponent(
-    new CommandProcessorComponent('-').
-        addCommand(require('./commands/Clear.command')).
-        addCommand(require('./commands/Help.command')).
-        addCommand(require('./commands/Mono.command')).
-        addCommand(require('./commands/Mc.command'))
-)
+
+new CommandProcessorModule('-')
+    .register(MainBus)
+    .autoload(__dirname + '/commands')
 
 // Ciao Bocc handles everything
-bot.addComponent(new CiaoBoccProcessorComponent())
+new CiaoBoccModule().
+    register(MainBus)
 
 //#region ***** Bot hooks *****
-bot.on('ready', () => {
+MainBus.on('bot-ready', (bot) => {
     logger.info('Bot took: ' + (Date.now() - start) + 'ms', { location: 'Index' })
     initCli(bot, botChannel)
 })
 
-bot.on('error', err => {
+MainBus.on('bot-error', err => {
     logger.error(err.message, { location: 'Index' })
     process.exit(-1)
 })
@@ -72,9 +80,4 @@ bot.on('error', err => {
 //#endregion
 
 // ***** Start bot *****
-bot.login(process.env.TOKEN)
-    .then(token => logger.info('Ok', { location: 'Index' }))
-    .catch(err => {
-        logger.error(err.message, { location: 'Index' })
-        process.exit(-1)
-    })
+bot.start(process.env.TOKEN)

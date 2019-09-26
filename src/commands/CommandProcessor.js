@@ -11,7 +11,7 @@ module.exports = class CommandProcessor {
 
     addCommand (command) {
         if (!(command instanceof Command)) {
-            logger.warn(`❌ ${__filename.split(path.sep).pop()}: ${command} is not a command`, { location: this })
+            logger.warn(`❌ trying to add a non valid command`, { location: this })
             return this
         }
         this.commands.push(command)

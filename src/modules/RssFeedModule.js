@@ -1,12 +1,12 @@
 //@ts-check
-const Component = require("../interfaces/Component")
+const Module = require("../interfaces/Module")
 const moment = require("moment")
 const { RichEmbed } = require("discord.js")
 const logger = require("../utils/logging")
 const RssAdapter = require("../interfaces/RssAdapter")
 
 
-module.exports = class RssFeedComponent extends Component {
+module.exports = class RssFeedModule extends Module {
     /**
      *
      * @param { RssAdapter } rssAdapter
@@ -28,8 +28,6 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     addChannel (channel) {
-        if (this.installed && !this.bot.channels.exists("id", channel))
-            return this;
         this.Channels.push(channel)
         return this
     }
@@ -53,7 +51,7 @@ module.exports = class RssFeedComponent extends Component {
 
     _setupWatcher () {
         this._watcher.onArticle(async item => {
-            if (!this.isInstalled() || !this.botReady() || Date.now() < this.coolDownTime) return
+            if (Date.now() < this.coolDownTime) return
             await this.broadcastArticle(item)
         })
 
@@ -79,8 +77,7 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     async broadcastArticle (article) {
-        if (!this.isInstalled()) return
-        if (this.getChannelsList() <= 0 || !this.botReady())
+        if (this.getChannelsList() <= 0)
             return logger.silly("Bot not ready and/or no channels in channel list", { location: this })
 
         for (const channel of this.getChannelsList()) {
@@ -88,9 +85,9 @@ module.exports = class RssFeedComponent extends Component {
         }
     }
 
+    // FIXME: All the things
     async sendTo (channel, article) {
 
-        if (!this.botReady()) return
 
         const dchannel = this.bot.getChannel(channel)
 

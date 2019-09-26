@@ -1,8 +1,8 @@
 //@ts-check
-const Processor = require('../../interfaces/Processor')
-const logger = require('../../utils/logging')
+const Module = require('../interfaces/Module')
+const logger = require('../utils/logging')
 
-module.exports = class LogMessageProcessorComponent extends Processor {
+module.exports = class LogMessageModule extends Module {
     constructor () {
         super()
     }
@@ -15,6 +15,6 @@ module.exports = class LogMessageProcessorComponent extends Processor {
     }
 
     toString () {
-        return `LogMessageProcessorComponent(${this.getShortID()})`
+        return `LogMessageModule(${this.getShortID()})`
     }
 }
