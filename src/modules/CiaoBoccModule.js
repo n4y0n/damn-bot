@@ -1,7 +1,6 @@
 //@ts-check
 const Module = require('../interfaces/Module')
 const log = require('../utils/logging')
-const { Message } = require('discord.js')
 
 const coseBelle = ['Ciuao', 'Hey', 'Sup', 'Felice di Bocc']
 const coseBrutte = ['Sup']
