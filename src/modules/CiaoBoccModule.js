@@ -20,21 +20,21 @@ module.exports = class CiaoBoccModule extends Module {
 
     register(bus) {
         super.register(bus)
+        bus.on('bot-message',
+            async message => {
+                if (message.author.bot) return
+                // FIXME: PLZ FIX ME
+                if (!message.mentions.users.find(e => e.username === 'Seylum' && e.discriminator === '9356') && message.channel.name) return
 
-        bus.on('bot-mentioned', async message => {
-            // @ts-ignore
-            if (message.author.id !== '224977582846640128') {
+                if (message.author.id === '224977582846640128') {
+                    log.info('è bocc', { location: this })
+                    await message.channel.send(generaRispostaBuona('') + 'Bocc!!')
+                }
                 if (message.author.id === '231747075094740992') {
                     await message.channel.send('WIP! Just u wait (￣_,￣ )')
-                    return false
                 }
                 await message.channel.send(generaRispostaCattiva(message.author.username))
-                return false
-            }
-            log.info('è bocc', { location: this })
-            await message.channel.send(generaRispostaBuona('') + 'Bocc!!')
-        })
-
+            })
         return this
     }
 

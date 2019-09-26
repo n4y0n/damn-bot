@@ -8,6 +8,8 @@ class DispatcherModule extends Module {
         super()
         this.usesCommands = dispatcherBuilder.UseCommands
         this.commandsPrefix = dispatcherBuilder.CommandsPrefix
+        this.listenForMentions = dispatcherBuilder.ListenForMentions
+        this.mentionID = dispatcherBuilder.MentionID
     }
 
     register(bus) {

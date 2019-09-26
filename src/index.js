@@ -16,12 +16,9 @@ const CiaoBoccModule = require('./modules/CiaoBoccModule')
 const DispatcherModuleBuilder = require('./modules/DispatcherModuleBuilder')()
 //#endregion
 
-//#region ***** Variables *****
-const botChannel = '538747728763682817'
 // Telegram logger
 const NOTIFY_ID = process.env.TG_CID;
 const BOT_TOKEN = process.env.TG_TOKEN;
-//#endregion
 
 //#region ***** Setup *****
 if (NOTIFY_ID && BOT_TOKEN) {
@@ -52,7 +49,7 @@ DispatcherModuleBuilder
 // other components will not see the after-mentioned message
 
 // Logging never handle
-// new LogMessageModulet().
+// new LogMessageModule().
 //  register(MainBus)
 
 // Command handle only if it is a command
@@ -68,7 +65,7 @@ new CiaoBoccModule().
 //#region ***** Bot hooks *****
 MainBus.on('bot-ready', (bot) => {
     logger.info('Bot took: ' + (Date.now() - start) + 'ms', { location: 'Index' })
-    initCli(bot, botChannel)
+    initCli(bot, '538747728763682817')
 })
 
 MainBus.on('bot-error', err => {
