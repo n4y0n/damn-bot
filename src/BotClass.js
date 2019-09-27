@@ -18,7 +18,12 @@ module.exports = class BotClass extends EnhancedClient {
     start(token) {
         return super.start(token)
             .then(() => { logger.info('Bot started.', { location: this }) })
-            .catch(e => this.bus.emit('bot-error', e))
+            .catch(e => {
+                if (!this.bus || !('emit' in this.bus)) {
+                    throw e
+                }
+                this.bus.emit('bot-error', e)
+            })
     }
 
     toString() {

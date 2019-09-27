@@ -13,7 +13,9 @@ module.exports = class EnhancedClient extends Client {
     }
 
     start(token) {
-        this.on('ready', () => this.bus.emit('bot-ready'))
+        if (this.bus && 'emit' in this.bus) {
+            this.on('ready', () => this.bus.emit('bot-ready'))
+        }
         return this.login(token).then(() => undefined)
     }
 
@@ -24,6 +26,14 @@ module.exports = class EnhancedClient extends Client {
         if (!(bus instanceof EventEmitter)) throw new Error('Bus is not an EventEmitter')
         this.bus = bus
         this.on('message', message => this.bus.emit('bot-message', message))
+        return this
+    }
+
+    registerOnReady(bus) {
+        this.on('ready', () => {
+            this.register(bus)
+            this.bus.emit('bot-ready')
+        })
         return this
     }
 
