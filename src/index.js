@@ -38,29 +38,20 @@ let bot = new MyBot({
     .registerOnReady(MainBus)
 
 
-DispatcherModuleBuilder
+let dispatcher = DispatcherModuleBuilder
     .commandsPrefix('-')
+    .withCommandBus()
+    .withMessagesBus()
     .build()
     .register(MainBus)
 
 
-// Order is important in adding processor-components for handling of messages
-// if a component declare that it has already handled a message
-// other components will not see the after-mentioned message
-
-// Logging never handle
-// new LogMessageModule().
-//  register(MainBus)
-
-// Command handle only if it is a command
-
 new CommandProcessorModule('-')
-    .register(MainBus)
+    .register(dispatcher.getCommandBus())
     .autoload(__dirname + '/commands')
 
-// Ciao Bocc handles everything
 new CiaoBoccModule()
-    .register(MainBus)
+    .register(dispatcher.getMessagesBus())
 
 //#region ***** Bot hooks *****
 MainBus.on('bot-ready', (bot) => {
