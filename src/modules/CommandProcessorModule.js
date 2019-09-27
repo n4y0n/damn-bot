@@ -51,7 +51,7 @@ module.exports = class CommandProcessorModule extends Module {
             logger.error('Autoload commands needs a directory!', { location: this })
             return
         }
-        
+
         let files = fs.readdirSync(path)
 
         for (let f of files) {

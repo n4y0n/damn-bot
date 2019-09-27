@@ -35,7 +35,7 @@ let bot = new MyBot({
     messageCacheLifetime: 120,
     messageSweepInterval: 120
 })
-    .register(MainBus)
+    .registerOnReady(MainBus)
 
 
 DispatcherModuleBuilder
@@ -59,8 +59,8 @@ new CommandProcessorModule('-')
     .autoload(__dirname + '/commands')
 
 // Ciao Bocc handles everything
-new CiaoBoccModule().
-    register(MainBus)
+new CiaoBoccModule()
+    .register(MainBus)
 
 //#region ***** Bot hooks *****
 MainBus.on('bot-ready', (bot) => {
@@ -69,6 +69,11 @@ MainBus.on('bot-ready', (bot) => {
 })
 
 MainBus.on('bot-error', err => {
+    logger.error(err.message, { location: 'Index' })
+    process.exit(-1)
+})
+
+bot.on('error', err => {
     logger.error(err.message, { location: 'Index' })
     process.exit(-1)
 })
