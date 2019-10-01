@@ -46,11 +46,13 @@ let dispatcher = DispatcherModuleBuilder
     .register(MainBus)
 
 
-new CommandProcessorModule('-')
+CommandProcessorModule
+    .MakeProcessor('-')
     .register(dispatcher.getCommandBus())
     .autoload(__dirname + '/commands')
 
-new CiaoBoccModule()
+CiaoBoccModule
+    .MakeCiaoBocc()
     .register(dispatcher.getMessagesBus())
 
 //#region ***** Bot hooks *****

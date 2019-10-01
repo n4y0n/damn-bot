@@ -7,7 +7,7 @@ const fs = require('fs')
 const p = require('path')
 
 module.exports = class CommandProcessorModule extends Module {
-    constructor(prefix = "", cli = null, extra) {
+    constructor (prefix = "", cli = null, extra) {
         super()
 
         if (!(cli instanceof CommandProcessor)) {
@@ -20,7 +20,11 @@ module.exports = class CommandProcessorModule extends Module {
         this._ctxextra = extra || {}
     }
 
-    CreateContext(message) {
+    static MakeProcessor (prefix, cli, extra) {
+        return new CommandProcessorModule(prefix, cli, extra)
+    }
+
+    CreateContext (message) {
         let ctx = {}
         ctx["chn"] = message.channel
         ctx["proc"] = this._cli
@@ -29,7 +33,7 @@ module.exports = class CommandProcessorModule extends Module {
         return ctx
     }
 
-    register(bus) {
+    register (bus) {
         super.register(bus)
         bus.on('command', async message => {
             const context = this.CreateContext(message)
@@ -38,7 +42,7 @@ module.exports = class CommandProcessorModule extends Module {
         return this
     }
 
-    autoload(path) {
+    autoload (path) {
         let dir = false
         try {
             dir = fs.lstatSync(path).isDirectory()
@@ -66,12 +70,12 @@ module.exports = class CommandProcessorModule extends Module {
         }
     }
 
-    addCommand(command) {
+    addCommand (command) {
         this._cli.addCommand(command)
         return this
     }
 
-    toString() {
+    toString () {
         return `CommandProcessorModule(${!!this._prefix ? this._prefix : this.getShortID()})`
     }
 }

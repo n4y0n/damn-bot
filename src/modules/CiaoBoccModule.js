@@ -5,19 +5,23 @@ const log = require('../utils/logging')
 const coseBelle = ['Ciuao', 'Hey', 'Sup', 'Felice di Bocc']
 const coseBrutte = ['Sup']
 
-function generaRispostaCattiva(name) {
+function generaRispostaCattiva (name) {
     const rngBrutto = Math.floor(Math.random() * coseBrutte.length)
     return `${coseBrutte[rngBrutto]} ${name}`
 }
 
-function generaRispostaBuona(name) {
+function generaRispostaBuona (name) {
     const rngBello = Math.floor(Math.random() * coseBelle.length)
     return `${coseBelle[rngBello]} ${name}`
 }
 
 module.exports = class CiaoBoccModule extends Module {
 
-    register(bus) {
+    static MakeCiaoBocc () {
+        return new CiaoBoccModule()
+    }
+
+    register (bus) {
         super.register(bus)
         bus.on('bot-message',
             async message => {
@@ -37,7 +41,7 @@ module.exports = class CiaoBoccModule extends Module {
         return this
     }
 
-    toString() {
+    toString () {
         return 'CiaoBoccModule(' + this.getShortID() + ')'
     }
 }
