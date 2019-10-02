@@ -29,13 +29,16 @@ if (NOTIFY_ID && BOT_TOKEN) {
 }
 
 const start = Date.now()
-let bot = new MyBot({
+new MyBot({
     disabledEvents: ['TYPING_START'],
     messageCacheMaxSize: 25,
     messageCacheLifetime: 120,
     messageSweepInterval: 120
-})
-    .registerOnReady(MainBus)
+}).on('error', err => {
+    logger.error(err.message, { location: 'Index' })
+    process.exit(-1)
+}).registerOnReady(MainBus)
+    .start(process.env.TOKEN)
 
 
 let dispatcher = DispatcherModuleBuilder
@@ -66,13 +69,6 @@ MainBus.on('bot-error', err => {
     process.exit(-1)
 })
 
-bot.on('error', err => {
-    logger.error(err.message, { location: 'Index' })
-    process.exit(-1)
-})
 //#endregion
 
 //#endregion
-
-// ***** Start bot *****
-bot.start(process.env.TOKEN)

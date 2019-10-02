@@ -2,7 +2,7 @@
 const Module = require('../interfaces/Module')
 const log = require('../utils/logging')
 
-const coseBelle = ['Ciuao', 'Hey', 'Sup', 'Felice di Bocc']
+const coseBelle = ['Ciuao', 'Hey', 'Felice di Bocc']
 const coseBrutte = ['Sup']
 
 function generaRispostaCattiva (name) {
