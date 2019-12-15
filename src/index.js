@@ -2,17 +2,17 @@
 require('dotenv').config()
 
 //#region Imports
-const winston = require('winston')
+// const winston = require('winston')
 const logger = require('./utils/logging')
-const tlog = require("./utils/telegramNotifier")
+// const tlog = require("./utils/telegramNotifier")
 
 const initCli = require('./utils/termial-cli')
 
 const MyBot = require('./DBot')
-const CommandProcessor = require('./commands/CommandProcessor')
+// const CommandProcessor = require('./commands/CommandProcessor')
 
 const CommandProcessorComponent = require('./components/processors/CommandProcessorComponet')
-const LogMessageProcessorComponent = require('./components/processors/LogMessageProcessorComponent')
+// const LogMessageProcessorComponent = require('./components/processors/LogMessageProcessorComponent')
 const CiaoBoccProcessorComponent = require('./components/processors/CiaoBoccProcessorComponent')
 //#endregion
 
@@ -24,12 +24,12 @@ const BOT_TOKEN = process.env.TG_TOKEN;
 //#endregion
 
 //#region ***** Setup *****
-if (NOTIFY_ID && BOT_TOKEN) {
-    logger.add(new winston.transports.Stream({
-        level: process.env.NODE_ENV === "production" ? "warn" : "debug",
-        stream: new tlog.TelegramLoggerStream(BOT_TOKEN, NOTIFY_ID)
-    }))
-}
+// if (NOTIFY_ID && BOT_TOKEN) {
+//     logger.add(new winston.transports.Stream({
+//         level: process.env.NODE_ENV === "production" ? "warn" : "debug",
+//         stream: new tlog.TelegramLoggerStream(BOT_TOKEN, NOTIFY_ID)
+//     }))
+// }
 
 const start = Date.now()
 let bot = new MyBot({
