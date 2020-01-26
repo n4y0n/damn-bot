@@ -6,7 +6,7 @@ const logger = require("../utils/logging")
 const RssAdapter = require("../interfaces/RssAdapter")
 
 
-module.exports = class RssFeedComponent extends Component {
+class RssFeedComponent extends Component {
     /**
      *
      * @param { RssAdapter } rssAdapter
@@ -118,3 +118,5 @@ module.exports = class RssFeedComponent extends Component {
         return `RssFeedReader#${this.getFeedName()}`
     }
 }
+
+module.exports = (adapter, feedname) => new RssFeedComponent(adapter, feedname)
