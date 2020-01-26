@@ -28,13 +28,11 @@ bot.addComponent(
         addCommand(require('./commands/Mc.command'))
 )
 
-bot.addComponent(
-    new (require('./components/processors/log-manager'))
-)
-
 bot.on('ready', () => {
-    logger.info('Bot took: ' + (Date.now() - start) + 'ms', { location: filename(__dirname, __filename) })
+    bot.addComponent(require('./components/processors/log-manager'))
     initCli(bot, botChannel)
+    
+    logger.info('Bot took: ' + (Date.now() - start) + 'ms', { location: filename(__dirname, __filename) })
 })
 
 bot.on('error', err => {
