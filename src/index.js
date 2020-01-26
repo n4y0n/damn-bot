@@ -8,7 +8,7 @@ const initCli = require('./utils/termial-cli')
 
 const MyBot = require('./DBot')
 
-const CommandManager = require('./components/processors/command-manager')
+const CommandManager = require('./components/listeners/command-manager')
 
 const botChannel = '670943087807299607'//'538747728763682817'
 
@@ -29,7 +29,7 @@ bot.addComponent(
 )
 
 bot.on('ready', () => {
-    bot.addComponent(require('./components/processors/log-manager'))
+    bot.addComponent(require('./components/listeners/log-manager'))
     initCli(bot, botChannel)
     
     logger.info('Bot took: ' + (Date.now() - start) + 'ms', { location: filename(__dirname, __filename) })
