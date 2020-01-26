@@ -105,17 +105,7 @@ module.exports = class RssFeedComponent extends Component {
     install (bot) {
         super.install(bot)
         bot.on("ready", () => {
-            // TODO: find a better way
-            // On bot ready remove invalid channels from subscribers list
-            let itemRemovedFlag = false
-            for (let i = this.subscribedChannels.length - 1; i >= 0; --i) {
-                const id = this.subscribedChannels[i]
-                if (!bot.channels.exists("id", id)) {
-                    this.subscribedChannels[i] = null
-                    itemRemovedFlag = true;
-                }
-            }
-            if (itemRemovedFlag) this.subscribedChannels = this.subscribedChannels.filter(val => val !== null)
+            this.subscribedChannels = this.subscribedChannels.filter(id => bot.channels.exists("id", id))
         })
     }
 
@@ -125,6 +115,6 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     toString () {
-        return `RssFeedComponent(${this.getFeedName()})`
+        return `RssFeedReader#${this.getFeedName()}`
     }
 }
