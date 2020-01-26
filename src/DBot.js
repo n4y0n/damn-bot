@@ -13,13 +13,13 @@ module.exports = class DBot extends EnhancedClient {
     constructor (options) {
         super(options)
         this.components = {
-            processors: {},
+            listeners: {},
             normal: {}
         }
 
         this.onMessage(async message => {
             if (message.author.id == this.user.id) return
-            for (const component of Object.values(this.components.processors)) {
+            for (const component of Object.values(this.components.listeners)) {
                 if (await component.process(message)) {
                     break
                 }
@@ -55,12 +55,12 @@ module.exports = class DBot extends EnhancedClient {
     }
 
     _addProcessorComponent (component) {
-        if (component === this.components.processors[component.getID()]) {
+        if (component === this.components.listeners[component.getID()]) {
             logger.info(`❌ ${component} already installed`, { location: this })
             return
         }
         component.install(this)
-        this.components.processors[component.getID()] = component
+        this.components.listeners[component.getID()] = component
         logger.info(`✔ Added Processor >> ${component}`, { location: this })
     }
 
@@ -75,12 +75,12 @@ module.exports = class DBot extends EnhancedClient {
     }
 
     _removeProcessorComponent (component) {
-        const retrivedcomponent = this.components.processors[component.getID()]
+        const retrivedcomponent = this.components.listeners[component.getID()]
         if (retrivedcomponent == null) {
             logger.warn(`❌ ${component} not installed in this bot`, { location: this })
             return
         }
-        this.components.processors[component.getID()] = null
+        this.components.listeners[component.getID()] = null
         retrivedcomponent.uninstall(this)
     }
 
