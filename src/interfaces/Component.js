@@ -11,32 +11,23 @@ const logger = require("../utils/logging")
 module.exports = class Component {
     constructor () {
         this._id = null
-        this.installed = false
         this.bot = null
     }
 
     install (bot) {
-        if (this.isInstalled()) {
+        if (this.bot) {
             logger.warn(`Component already installed in bot: ${this.bot}`, { location: this })
             return
         }
-
         this.bot = bot
-        this.installed = true
     }
 
     uninstall () {
-        if (!this.isInstalled()) {
+        if (!this.bot) {
             logger.warn("Cannot uninstall component", { location: this })
             return
         }
-
         this.bot = null
-        this.installed = false
-    }
-
-    isInstalled () {
-        return this.installed
     }
 
     botReady () {

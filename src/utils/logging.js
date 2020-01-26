@@ -6,7 +6,7 @@ const moment = require("moment")
 const isDocker = require("is-docker")
 const path = require("path")
 
-module.exports = (function () {
+const init = () => {
 
     const level = process.env.NODE_ENV !== "production" ? "silly" : "info"
 
@@ -35,10 +35,16 @@ module.exports = (function () {
     }
 
     return logger
-})()
+}
+
+module.exports = init()
 
 module.exports.stream = {
     write: function (message, encoding) {
         module.exports.info(message)
     }
+}
+
+module.exports.filename = (__dirname, __filename) => {
+    return __filename.replace(__dirname, "").substr(1)
 }

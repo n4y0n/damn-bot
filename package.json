@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "jest",
+    "dev": "nodemon .",
     "docker-build": "docker build -t prons/damn-bot -f tools/Dockerfile ."
   },
   "author": "",

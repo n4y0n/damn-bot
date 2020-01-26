@@ -2,7 +2,7 @@
 const Processor = require('../../interfaces/Processor')
 const logger = require('../../utils/logging')
 
-module.exports = class LogMessageProcessorComponent extends Processor {
+module.exports = class MessageLogManager extends Processor {
     constructor () {
         super()
     }
@@ -15,6 +15,6 @@ module.exports = class LogMessageProcessorComponent extends Processor {
     }
 
     toString () {
-        return `LogMessageProcessorComponent(${this.getShortID()})`
+        return `MessagesLog#${this.getShortID()}`
     }
 }

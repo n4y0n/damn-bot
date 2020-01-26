@@ -1,35 +1,16 @@
 //@ts-check
 require('dotenv').config()
 
-//#region Imports
-const winston = require('winston')
 const logger = require('./utils/logging')
-const tlog = require("./utils/telegramNotifier")
+const { filename } = require('./utils/logging')
 
 const initCli = require('./utils/termial-cli')
 
 const MyBot = require('./DBot')
-const CommandProcessor = require('./commands/CommandProcessor')
 
-const CommandProcessorComponent = require('./components/processors/CommandProcessorComponet')
-const LogMessageProcessorComponent = require('./components/processors/LogMessageProcessorComponent')
-const CiaoBoccProcessorComponent = require('./components/processors/CiaoBoccProcessorComponent')
-//#endregion
+const CommandManager = require('./components/processors/command-manager')
 
-//#region ***** Variables *****
-const botChannel = '538747728763682817'
-// Telegram logger
-const NOTIFY_ID = process.env.TG_CID;
-const BOT_TOKEN = process.env.TG_TOKEN;
-//#endregion
-
-//#region ***** Setup *****
-if (NOTIFY_ID && BOT_TOKEN) {
-    logger.add(new winston.transports.Stream({
-        level: process.env.NODE_ENV === "production" ? "warn" : "debug",
-        stream: new tlog.TelegramLoggerStream(BOT_TOKEN, NOTIFY_ID)
-    }))
-}
+const botChannel = '670943087807299607'//'538747728763682817'
 
 const start = Date.now()
 let bot = new MyBot({
@@ -39,43 +20,31 @@ let bot = new MyBot({
     messageSweepInterval: 120
 })
 
-// Order is important in adding processor-components for handling of messages
-// if a component declare that it has already handled a message
-// other components will not see the after-mentioned message
-
-// Logging never handle
-// bot.addComponent(new LogMessageProcessorComponent())
-
-// Command handle only if it is a command
 bot.addComponent(
-    new CommandProcessorComponent('-').
+    new CommandManager('-').
         addCommand(require('./commands/Clear.command')).
         addCommand(require('./commands/Help.command')).
         addCommand(require('./commands/Mono.command')).
         addCommand(require('./commands/Mc.command'))
 )
 
-// Ciao Bocc handles everything
-bot.addComponent(new CiaoBoccProcessorComponent())
+bot.addComponent(
+    new (require('./components/processors/log-manager'))
+)
 
-//#region ***** Bot hooks *****
 bot.on('ready', () => {
-    logger.info('Bot took: ' + (Date.now() - start) + 'ms', { location: 'Index' })
+    logger.info('Bot took: ' + (Date.now() - start) + 'ms', { location: filename(__dirname, __filename) })
     initCli(bot, botChannel)
 })
 
 bot.on('error', err => {
-    logger.error(err.message, { location: 'Index' })
+    logger.error(err.message, { location: filename(__dirname, __filename) })
     process.exit(-1)
 })
-//#endregion
 
-//#endregion
-
-// ***** Start bot *****
 bot.login(process.env.TOKEN)
-    .then(token => logger.info('Ok', { location: 'Index' }))
+    .then(token => logger.info('Ok', { location: filename(__dirname, __filename) }))
     .catch(err => {
-        logger.error(err.message, { location: 'Index' })
+        logger.error(err.message, { location: filename(__dirname, __filename) })
         process.exit(-1)
     })

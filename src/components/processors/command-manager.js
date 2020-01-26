@@ -3,7 +3,7 @@ const Processor = require("../../interfaces/Processor")
 const CommandProcessor = require("../../commands/CommandProcessor")
 const logger = require('../../utils/logging')
 
-module.exports = class CommandProcessorComponet extends Processor {
+module.exports = class CommandManager extends Processor {
     constructor (prefix = "", cli = null, extra) {
         super()
 
@@ -50,6 +50,6 @@ module.exports = class CommandProcessorComponet extends Processor {
     }
 
     toString () {
-        return `CommandProcessorComponet(${!!this._prefix ? this._prefix : this.getShortID()})`
+        return `CommandManager#${this.getShortID()}(prefix="${this._prefix}")`
     }
 }

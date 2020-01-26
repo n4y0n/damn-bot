@@ -28,7 +28,7 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     addChannel (channel) {
-        if (this.installed && !this.bot.channels.exists("id", channel))
+        if (this.bot && !this.bot.channels.exists("id", channel))
             return this;
         this.Channels.push(channel)
         return this
@@ -53,7 +53,7 @@ module.exports = class RssFeedComponent extends Component {
 
     _setupWatcher () {
         this._watcher.onArticle(async item => {
-            if (!this.isInstalled() || !this.botReady() || Date.now() < this.coolDownTime) return
+            if (!this.bot || !this.botReady() || Date.now() < this.coolDownTime) return
             await this.broadcastArticle(item)
         })
 
@@ -79,7 +79,7 @@ module.exports = class RssFeedComponent extends Component {
     }
 
     async broadcastArticle (article) {
-        if (!this.isInstalled()) return
+        if (!this.bot) return
         if (this.getChannelsList() <= 0 || !this.botReady())
             return logger.silly("Bot not ready and/or no channels in channel list", { location: this })
 

@@ -27,7 +27,6 @@ module.exports = class CommandProcessor {
             return
         }
         if (!args[0].toUpperCase().startsWith(this.prefix)) {
-            logger.silly(`❌ Not a command: ${message.content}`, { location: this })
             return
         }
 
@@ -41,10 +40,8 @@ module.exports = class CommandProcessor {
                 } catch (e) {
                     logger.error(`❌ Error executing command: ${com}`, { location: this })
                     logger.error(e.stack, { location: this })
-                    return
                 } finally {
-                    logger.info(`   Command took ${Date.now() - start}ms to execute`, { location: this })
-                    return
+                    return logger.info(`   Command took ${Date.now() - start}ms to execute`, { location: this })
                 }
             }
         }
