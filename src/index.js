@@ -33,7 +33,7 @@ bot.addComponent(
     ((new Date(Date.now() + 1000 * 2)).valueOf(),
      (new Date(Date.now() + 1000 * 30)).valueOf(),
      (60 * 60 * 4),
-     () => {
+     function() {
         logger.info("Interval", {location:this})
      })
 )
