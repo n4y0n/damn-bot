@@ -28,6 +28,16 @@ bot.addComponent(
         addCommand(require('./commands/Mc.command'))
 )
 
+bot.addComponent(
+    require('./components/auguri-bocc')
+    ((new Date(Date.now() + 1000 * 2)).valueOf(),
+     (new Date(Date.now() + 1000 * 30)).valueOf(),
+     (60 * 60 * 4),
+     () => {
+        logger.info("Interval", {location:this})
+     })
+)
+
 bot.on('ready', () => {
     bot.addComponent(require('./components/listeners/log-manager'))
     initCli(bot, botChannel)

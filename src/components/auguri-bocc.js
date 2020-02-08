@@ -7,7 +7,8 @@ class AuguriBocc extends Component {
         this._timeToStart = startDate - Date.now()
         this._timeToEnd = endDate - startDate;
         if (this._timeToStart < 0) {
-            throw Error('Cannot start in the past.')
+            // throw Error('Cannot start in the past.')
+            this._timeToStart = 0;
         }
         if (this._timeToEnd < 0) {
             throw Error('Cannot end before start')
@@ -60,4 +61,4 @@ class AuguriBocc extends Component {
     }
 }
 
-module.exports = new AuguriBocc();
+module.exports = (startDate, endDate, intervalSeconds, eventFn) => new AuguriBocc(startDate, endDate, intervalSeconds, eventFn);
