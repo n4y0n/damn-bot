@@ -5,6 +5,7 @@ const logger = require('../utils/logging');
 class AuguriBocc extends Component {
     constructor(startDate, endDate, intervalSeconds, eventFn) {
         super();
+        this.discordjs = { RichEmbed }
         logger.info('Setting up timers...', {location:this})
         this._timeToStart = startDate - Date.now();
         this._timeToEnd = endDate - startDate;
