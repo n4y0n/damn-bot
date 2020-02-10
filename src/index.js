@@ -33,15 +33,19 @@ bot.addComponent(
     temporizatore((new Date(Date.now() + 1000 * 2)).valueOf(),
      (new Date(Date.now() + 1000 * 30)).valueOf(),
      (3),
-     function() {
-        logger.info("Interval", {location:this})
+     async function() {
+        await bot.getChannel(botChannel).sendMessage('🎉🎉🎈 Auguri Bocc!!! 🎈🎉🎉')
+        if (this.targetBocc) {
+            logger.debug('Sending pm to bocc.')
+            await this.targetBocc.send('🎉🎉🎈 Auguri Bocc!!! 🎈🎉🎉')
+        }
      })
 )
 
-bot.on('ready', () => {
+bot.on('ready', async () => {
     bot.addComponent(require('./components/listeners/log-manager'))
     initCli(bot, botChannel)
-    
+
     logger.info('Bot took: ' + (Date.now() - start) + 'ms', { location: filename(__dirname, __filename) })
 })
 

@@ -16,7 +16,8 @@ class AuguriBocc extends Component {
         if (this._timeToEnd < 0) {
             throw Error('Cannot end before start');
         }
-
+        
+        this.targetBocc = null;
         this._intervalTime = intervalSeconds * 1000;
         this._eventFn =
             eventFn ||
@@ -57,9 +58,14 @@ class AuguriBocc extends Component {
         clearInterval(this._intervalHandler);
     }
 
+    async onReady() {
+        this.targetBocc = await this.bot.fetchUser('224977582846640128') // Change me
+        this.initTimeout();
+    }
+
     install(bot) {
         super.install(bot);
-        this.initTimeout();
+        this.bot.on('ready', this.onReady.bind(this))
     }
 
     uninstall() {
