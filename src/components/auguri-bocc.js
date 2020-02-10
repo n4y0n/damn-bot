@@ -5,6 +5,7 @@ const logger = require('../utils/logging');
 class AuguriBocc extends Component {
     constructor(startDate, endDate, intervalSeconds, eventFn) {
         super();
+        logger.info('Setting up timers...', {location:this})
         this._timeToStart = startDate - Date.now();
         this._timeToEnd = endDate - startDate;
         if (this._timeToStart < 0) {
@@ -23,6 +24,8 @@ class AuguriBocc extends Component {
             };
         this._intervalHandler = null;
         this._timeoutHandler = null;
+        logger.info(`👌 Starting in ${this._timeToStart/1000} seconds ending after ${this._timeToEnd/1000} seconds`, {location:this})
+        logger.info(`👌 Sending message every ${this._intervalTime/1000} seconds`, {location:this})
     }
 
     initTimeout() {
