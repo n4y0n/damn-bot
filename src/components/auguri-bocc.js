@@ -26,8 +26,8 @@ class AuguriBocc extends Component {
             };
         this._intervalHandler = null;
         this._timeoutHandler = null;
-        logger.info(`👌 Starting in ${this._timeToStart/1000} seconds ending after ${this._timeToEnd/1000} seconds`, {location:this})
-        logger.info(`👌 Sending message every ${this._intervalTime/1000} seconds`, {location:this})
+        logger.info(`👌 Starting ${new Date(Date.now() + this._timeToStart).toString()} seconds ending after ${new Date(Date.now() + this._timeToStart + this._timeToEnd).toString()} seconds`, {location:this})
+        logger.info(`👌 Sending message every ${(this._intervalTime/1000) / 60} minutes`, {location:this})
     }
 
     initTimeout() {
