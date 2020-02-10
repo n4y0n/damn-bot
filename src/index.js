@@ -30,8 +30,8 @@ bot.addComponent(
 
 const temporizatore = require('./components/auguri-bocc');
 bot.addComponent(
-    temporizatore((new Date(Date.now() + 1000 * 2)).valueOf(),
-     (new Date(Date.now() + 1000 * 30)).valueOf(),
+    temporizatore((new Date('2020-3-1')).valueOf(),
+     (new Date('2020-3-31')).valueOf(),
      (3),
      async function() {
         await bot.getChannel(botChannel).sendMessage('🎉🎉🎈 Auguri Bocc!!! 🎈🎉🎉')
