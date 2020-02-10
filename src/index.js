@@ -10,7 +10,7 @@ const MyBot = require('./DBot')
 
 const CommandManager = require('./components/listeners/command-manager')
 
-const botChannel = '670943087807299607'//'538747728763682817'
+const botChannel = '538747728763682817'//'670943087807299607'//
 
 const start = Date.now()
 let bot = new MyBot({
@@ -28,11 +28,11 @@ bot.addComponent(
         addCommand(require('./commands/Mc.command'))
 )
 
+const temporizatore = require('./components/auguri-bocc');
 bot.addComponent(
-    require('./components/auguri-bocc')
-    ((new Date(Date.now() + 1000 * 2)).valueOf(),
+    temporizatore((new Date(Date.now() + 1000 * 2)).valueOf(),
      (new Date(Date.now() + 1000 * 30)).valueOf(),
-     (60 * 60 * 4),
+     (3),
      function() {
         logger.info("Interval", {location:this})
      })

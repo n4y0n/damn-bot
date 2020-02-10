@@ -4,18 +4,23 @@ const logger = require('../utils/logging');
 
 class AuguriBocc extends Component {
     constructor(startDate, endDate, intervalSeconds, eventFn) {
-        this._timeToStart = startDate - Date.now()
+        super();
+        this._timeToStart = startDate - Date.now();
         this._timeToEnd = endDate - startDate;
         if (this._timeToStart < 0) {
             // throw Error('Cannot start in the past.')
             this._timeToStart = 0;
         }
         if (this._timeToEnd < 0) {
-            throw Error('Cannot end before start')
+            throw Error('Cannot end before start');
         }
 
         this._intervalTime = intervalSeconds * 1000;
-        this._eventFn = eventFn
+        this._eventFn =
+            eventFn ||
+            function() {
+                logger.debug('Do nothing', { location: this });
+            };
         this._intervalHandler = null;
         this._timeoutHandler = null;
     }
@@ -37,12 +42,15 @@ class AuguriBocc extends Component {
     }
 
     initInterval() {
-        this._intervalHandler = setInterval(eventFn.bind(this), this._interval)
-        setTimeout(this.endInterval.bind(this), this._timeToEnd)
+        this._intervalHandler = setInterval(
+            this._eventFn.bind(this),
+            this._intervalTime
+        );
+        setTimeout(this.endInterval.bind(this), this._timeToEnd);
     }
 
     endInterval() {
-        clearInterval(this._intervalHandler)
+        clearInterval(this._intervalHandler);
     }
 
     install(bot) {
@@ -61,4 +69,5 @@ class AuguriBocc extends Component {
     }
 }
 
-module.exports = (startDate, endDate, intervalSeconds, eventFn) => new AuguriBocc(startDate, endDate, intervalSeconds, eventFn);
+module.exports = (startDate, endDate, intervalSeconds, eventFn) =>
+    new AuguriBocc(startDate, endDate, intervalSeconds, eventFn);
