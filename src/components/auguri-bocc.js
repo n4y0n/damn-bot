@@ -59,7 +59,7 @@ class AuguriBocc extends Component {
     }
 
     async onReady() {
-        this.targetBocc = await this.bot.fetchUser('224977582846640128') // Change me
+        this.targetBocc = await this.bot.fetchUser('224977582846640128') // Change me, hardcodded bocc fetch
         this.initTimeout();
     }
 
@@ -72,6 +72,10 @@ class AuguriBocc extends Component {
         this.endTimeout();
         this.endInterval();
         super.uninstall();
+    }
+
+    status() {
+        return `[${this.toString()}(${this.bot ? "Installed" : "Not Installed"})] Send every ${this._intervalTime}ms`
     }
 
     toString() {
