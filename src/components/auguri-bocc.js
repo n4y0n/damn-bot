@@ -2,39 +2,39 @@ const { RichEmbed } = require('discord.js');
 const Component = require('../interfaces/Component');
 const logger = require('../utils/logging');
 
+const messagi = ['🎉🎉🎈 Auguri Bocc!!! 🎈🎉🎉', '🎉 Buon Compleanno!!', "🎈🎈 Felice aniversario di nascita' 🎈🎈", "Hey Bocc... indovina. AUGURI!🎉"];
+
+const randomMessage = () => {
+    let rnd = Math.floor(Math.random() * messagi.length);
+    return messagi[rnd]; 
+}
+
 class AuguriBocc extends Component {
-    constructor(startDate, endDate, intervalSeconds, eventFn) {
+    constructor() {
         super();
         this.discordjs = { RichEmbed }
-        logger.info('Setting up timers...', {location:this})
-        this._timeToStart = startDate - Date.now();
-        this._timeToEnd = endDate - startDate;
-        if (this._timeToStart < 0) {
+        logger.info('Setting up timers...', { location: this })
+        this._timeToStart = 0;
+        this._timeToEnd = (new Date('2020-3-31')).valueOf() - Date.now();
+        if (this._timeToStart <= 0) {
             // throw Error('Cannot start in the past.')
-            this._timeToStart = 0;
+            this._timeToStart = 1;
         }
         if (this._timeToEnd < 0) {
             throw Error('Cannot end before start');
         }
-        
+
         this.targetBocc = null;
-        this._intervalTime = intervalSeconds * 1000;
-        this._eventFn =
-            eventFn ||
-            function() {
-                logger.debug('Do nothing', { location: this });
-            };
+        this._intervalTime = 4 * 60 * 60 * 1000;
         this._intervalHandler = null;
         this._timeoutHandler = null;
-        logger.info(`👌 Starting ${new Date(Date.now() + this._timeToStart).toString()}, ending ${new Date(Date.now() + this._timeToStart + this._timeToEnd).toString()}`, {location:this})
-        logger.info(`👌 Sending message every ${((this._intervalTime/1000) / 60) / 24} hours`, {location:this})
     }
 
     initTimeout() {
         if (this._timeoutHandler) {
             throw Error('Timeout already started ticking.');
         }
-
+        logger.debug("Time to start " + this._timeToStart)
         this._timeoutHandler = setTimeout(
             this.initInterval.bind(this),
             this._timeToStart
@@ -46,12 +46,8 @@ class AuguriBocc extends Component {
         this._timeoutHandler = null;
     }
 
-    initInterval() {
-        this._intervalHandler = setInterval(
-            this._eventFn.bind(this),
-            this._intervalTime
-        );
-        setTimeout(this.endInterval.bind(this), this._timeToEnd);
+    async initInterval() {
+
     }
 
     endInterval() {
@@ -60,7 +56,20 @@ class AuguriBocc extends Component {
 
     async onReady() {
         this.targetBocc = await this.bot.fetchUser('224977582846640128') // Change me, hardcodded bocc fetch
-        this.initTimeout();
+        // this.initTimeout();
+        const channel = await this.bot.getChannel('538747728763682817')
+        this._intervalHandler = setInterval(
+            async () => {
+                let msg = randomMessage();
+                await channel.sendMessage(msg)
+                if (this.targetBocc) {
+                    logger.debug('Sending pm to bocc.')
+                    await this.targetBocc.send(msg)
+                }
+            },
+            this._intervalTime
+        );
+        // setTimeout(this.endInterval.bind(this), this._timeToEnd);
     }
 
     install(bot) {

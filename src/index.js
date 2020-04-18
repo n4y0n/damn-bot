@@ -28,20 +28,6 @@ bot.addComponent(
         addCommand(require('./commands/Mc.command'))
 )
 
-const temporizatore = require('./components/auguri-bocc');
-bot.addComponent(
-    temporizatore((new Date('2020-3-1')).valueOf(),
-     (new Date('2020-3-31')).valueOf(),
-     (60 * 60 * 4),
-     async function() {
-        await bot.getChannel(botChannel).sendMessage('🎉🎉🎈 Auguri Bocc!!! 🎈🎉🎉')
-        if (this.targetBocc) {
-            logger.debug('Sending pm to bocc.')
-            await this.targetBocc.send('🎉🎉🎈 Auguri Bocc!!! 🎈🎉🎉')
-        }
-     })
-)
-
 bot.on('ready', async () => {
     bot.addComponent(require('./components/listeners/log-manager'))
     initCli(bot, botChannel)
