@@ -13,7 +13,7 @@ class DBot extends Client {
         this.on("message", async message => {
             if (message.author.id == this.user.id) return
             for(let layer of this.layers) {
-                if (layer.onMessage(message)) break;
+                if (await layer.onMessage(message)) break;
             }
         })
     }
