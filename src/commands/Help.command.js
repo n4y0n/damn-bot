@@ -8,15 +8,16 @@ module.exports = bot => {
         description: 'Lists all available commands.'
     });
 
-    command.exec = async function ({channel}) {
+    command.exec = async function (message) {
         const commandlist = new RichEmbed()
         commandlist.setTitle('[ Command List ]')
         const commands = bot.commands;
+        await message.react("👌");
     
         for (const [key, command] of commands.entries()) {
             commandlist.addField(key, command.getDescription())
         }
-        await channel.send(commandlist)
+        await message.channel.send(commandlist)
     }
 
     return command;

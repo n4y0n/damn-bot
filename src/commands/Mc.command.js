@@ -17,6 +17,7 @@ module.exports.exec = async function(message, serverAddrs) {
     let server = serverAddrs || '207.180.211.96';
 
     const serverStatus = new RichEmbed();
+    await message.react("👌");
 
     serverStatus.setTitle('[ Server Status: ' + server + ' ]');
     serverStatus.setURL('https://mcsrvstat.us/server/' + server);

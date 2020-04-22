@@ -6,7 +6,8 @@ module.exports = new DiscordCommand('helpgatari', {
     description: 'Lists Monogatari watch order'
 })
 
-module.exports.exec = async function ({ channel }) {
+module.exports.exec = async function (message) {
+    await message.react("👌");
     let rm = new RichEmbed()
     rm.setTitle('[ Hey don\'t panic! ]')
     rm.addField("1)", "Bakemonogatari\n---")
@@ -24,5 +25,5 @@ module.exports.exec = async function ({ channel }) {
     rm.addField("8)", "Koyomimonogatari\n---")
     rm.addField("9)", "Owarimonogatari S2\n---")
     rm.addField("10)", "Zoku Owarimonogatari\n---")
-    await channel.send(rm)
+    await message.channel.send(rm)
 }
