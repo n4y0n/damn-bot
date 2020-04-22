@@ -1,11 +1,9 @@
 //@ts-check
 module.exports = class Command {
-    constructor (fullcommand, options = {}) {
-        const { alias = "", caseSensitive = false, description = null } = options
+    constructor (name, options = {}) {
+        const { description = null } = options
 
-        this.fullcommand = fullcommand
-        this.alias = !!alias ? alias : fullcommand.substr(0, 1)
-        this.caseSensitive = caseSensitive
+        this.name = name;
         this._description = description
     }
 
@@ -18,16 +16,11 @@ module.exports = class Command {
     }
 
     toString () {
-        return `${this.fullcommand}(${this.alias})`
+        return `Command(name="${this.name}")`
     }
 
     getDescription () {
         if (!!this._description) return this._description
         return "Command Desc"
-    }
-
-    match (strcommand) {
-        if (!this.caseSensitive) return (strcommand.toUpperCase() === this.fullcommand.toUpperCase() || strcommand.toUpperCase() === this.alias.toUpperCase())
-        return (strcommand === this.fullcommand || strcommand === this.alias)
     }
 }

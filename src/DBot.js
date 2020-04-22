@@ -1,6 +1,6 @@
 //@ts-check
 const { Client } = require("discord.js")
-const logger = require("./utils/logging")
+const log = require("./utils/logging").getLogger("LayeredBotCore");
 
 module.exports = class DBot extends Client {
 
@@ -17,7 +17,9 @@ module.exports = class DBot extends Client {
     }
 
     addLayer(layer, index = null) {
+        log.d("Added layer - " + layer + " ✔");
         if(index) {
+            if (index >= this.layers.length) index = this.layers.length - 1;
             this.layers.splice(index, 0, this.layers);
         } else {
             this.layers.push(layer);
