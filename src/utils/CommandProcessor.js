@@ -1,7 +1,7 @@
 //@ts-check
-const Command = require("../interfaces/Command")
+const DiscordCommand = require("../interfaces/discord-command")
 const path = require("path")
-const log = require("../utils/logging").getLogger("CommandProcessor")
+const log = require("./logging").getLogger("CommandProcessor")
 
 module.exports = class CommandProcessor {
     constructor (prefix = "") {
@@ -10,7 +10,7 @@ module.exports = class CommandProcessor {
     }
 
     addCommand (command) {
-        if (!(command instanceof Command)) {
+        if (!(command instanceof DiscordCommand)) {
             log.w(`❌ ${__filename.split(path.sep).pop()}: ${command} is not a command`)
             return this
         }

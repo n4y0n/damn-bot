@@ -1,7 +1,4 @@
 //@ts-check
-const winston = require("winston")
-const { format } = winston
-const { printf } = format
 const moment = require("moment")
 // @ts-ignore
 const isDocker = require("is-docker")
@@ -9,37 +6,22 @@ const path = require("path")
 
 // @ts-ignore
 const init = () => {
+    const logger = {
+        info: (message, options) => console.info(printf({ ...options, level: "info" }), message),
+        warn: (message, options) => console.warn(printf({ ...options, level: "warn" }), message),
+        error: (message, options) => console.error(printf({ ...options, level: "error" }), message),
+        verbose: (message, options) => console.info(printf({ ...options, level: "verbose" }), message),
+        debug: (message, options) => console.debug(printf({ ...options, level: "debug" }), message),
+    }
 
-    const level = process.env.NODE_ENV !== "production" ? "silly" : "info"
-
-    const logger = winston.createLogger({
-        format: printf((info) => {
-            if (info.location) return `[${moment().format("DD/MM/YYYY HH:mm:ss")}] [${info.location}/${info.level.toUpperCase()}]: ${info.message}`
-            return `[${moment().format("DD/MM/YYYY HH:mm:ss")}] [${info.level.toUpperCase()}]: ${info.message}`
-        }),
-        transports: [
-            new winston.transports.Console({
-                level: level,
-                handleExceptions: true,
-            })
-        ],
-        exitOnError: false
-    })
-
-    if (!isDocker()) {
-        logger.add(new winston.transports.File({
-            level: level,
-            filename: path.join(__dirname, '..', '..', 'logs', 'all-logs.log'),
-            handleExceptions: true,
-            maxsize: 5242880, //5MB
-            maxFiles: 5,
-        }))
+    function printf({ location, level }) {
+        return `[${moment().format("DD/MM/YYYY HH:mm:ss")}] [${location}/${level.toUpperCase()}]:`
     }
 
     logger.stream = {
         // @ts-ignore
         write: function (message, encoding) {
-            module.exports.info(message)
+            logger.info(message)
         }
     }
 

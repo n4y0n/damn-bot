@@ -1,5 +1,5 @@
 //@ts-check
-module.exports = class Command {
+module.exports = class DiscordCommand {
     constructor (name, options = {}) {
         const { description = null } = options
 

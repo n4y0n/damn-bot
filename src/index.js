@@ -8,7 +8,7 @@ const CommandManager = require('./layers/command-manager')
 const LayeredBot = require('./DBot')
 
 const start = Date.now()
-let bot = new LayeredBot({
+let bot = LayeredBot.getInstance({
     disabledEvents: ['TYPING_START'],
     messageCacheMaxSize: 25,
     messageCacheLifetime: 120,
@@ -17,10 +17,10 @@ let bot = new LayeredBot({
 
 const commands = [require('./commands/Clear.command'), ]
 
-bot.addLayer(CommandManager.create({ prefix: '-', commands }))
+bot.addLayer(CommandManager.create({ prefix: '-', commands }), "commands");
 
 bot.on('ready', async () => {
-    bot.addLayer(require('./layers/log-manager'), 999)
+    bot.addLayer(require('./layers/log-manager'), 0)
     log.i('Bot took: ' + (Date.now() - start) + 'ms ✔')
 })
 
