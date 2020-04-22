@@ -1,7 +1,6 @@
 //@ts-check
 const isDocker = require("is-docker")
 const readline = require("readline")
-const EnhancedClient = require("../interfaces/EnhancedClient")
 const CommandProcessor = require("../commands/CommandProcessor")
 const Command = require("../interfaces/Command")
 
@@ -12,7 +11,6 @@ const logger = require("./logging")
 
 /**
  * Initializes terminal cli interface if not in a docker container
- * @param { EnhancedClient } bot
  * @param { string } channel
  */
 module.exports = class CliManager {
@@ -92,6 +90,6 @@ module.exports = class CliManager {
         })
 
 
-        return new CliManager(bot, {}, { write: chan.send })
+        return new CliManager(bot, process.stdin, process.stdout);
     }
 }

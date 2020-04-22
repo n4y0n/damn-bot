@@ -1,7 +1,7 @@
 //@ts-check
 require('dotenv').config()
 
-const logger = require('./utils/logging')
+const log = require('./utils/logging').getLogger("EntryPoint")
 const { filename } = require('./utils/logging')
 
 const CliManager = require('./utils/termial-cli')
@@ -27,17 +27,17 @@ bot.addLayer(new CommandManager('-').
 bot.on('ready', async () => {
     bot.addLayer(require('./components/listeners/log-manager'), 0)
     CliManager.create(bot);
-    logger.info('Bot took: ' + (Date.now() - start) + 'ms', { location: filename(__dirname, __filename) })
+    log.i('Bot took: ' + (Date.now() - start) + 'ms')
 })
 
 bot.on('error', err => {
-    logger.error(err.message, { location: filename(__dirname, __filename) })
+    log.error(err.message)
     process.exit(-1)
 })
 
 bot.login(process.env.TOKEN)
-    .then(token => logger.info('Ok', { location: filename(__dirname, __filename) }))
+    .then(token => log.i('Ok'))
     .catch(err => {
-        logger.error(err.message, { location: filename(__dirname, __filename) })
+        log.e(err.message)
         process.exit(-1)
     })

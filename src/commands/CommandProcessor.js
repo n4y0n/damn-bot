@@ -1,7 +1,7 @@
 //@ts-check
 const Command = require("../interfaces/Command")
 const path = require("path")
-const logger = require("../utils/logging")
+const log = require("../utils/logging").getLogger("CommandProcessor")
 
 module.exports = class CommandProcessor {
     constructor (prefix = "") {
@@ -11,11 +11,11 @@ module.exports = class CommandProcessor {
 
     addCommand (command) {
         if (!(command instanceof Command)) {
-            logger.warn(`❌ ${__filename.split(path.sep).pop()}: ${command} is not a command`, { location: this })
+            log.w(`❌ ${__filename.split(path.sep).pop()}: ${command} is not a command`)
             return this
         }
         this.commands.push(command)
-        logger.info(`✔ Added command >> ${command}`, { location: this })
+        log.i(`✔ Added command >> ${command}`)
         return this
     }
 
@@ -36,16 +36,16 @@ module.exports = class CommandProcessor {
             if (com.match(cmd)) {
                 try {
                     await com.exec(ctx)
-                    logger.info(`✔ Done executing ${com}`)
+                    log.i(`✔ Done executing ${com}`)
                 } catch (e) {
-                    logger.error(`❌ Error executing command: ${com}`, { location: this })
-                    logger.error(e.stack, { location: this })
+                    log.e(`❌ Error executing command: ${com}`)
+                    log.e(e.stack)
                 } finally {
-                    return logger.info(`   Command took ${Date.now() - start}ms to execute`, { location: this })
+                    return log.i(`   Command took ${Date.now() - start}ms to execute`)
                 }
             }
         }
-        logger.warn(`❌ No command "${cmd}"`, { location: this })
+        log.w(`❌ No command "${cmd}"`)
     }
 
     /**
