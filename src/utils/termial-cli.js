@@ -1,9 +1,6 @@
 //@ts-check
 const isDocker = require("is-docker")
 const readline = require("readline")
-const CommandProcessor = require("../commands/CommandProcessor")
-const Command = require("../interfaces/Command")
-
 const logger = require("./logging")
 
 
@@ -28,20 +25,6 @@ module.exports = class CliManager {
         if (isDocker()) return
 
         let chan = await bot.channels.get('538747728763682817')//'670943087807299607'//
-
-        let cliCommander = new CommandProcessor("!")
-
-        const h = new Command("help")
-        const clr = new Command("clr", {
-            alias: "c"
-        })
-        const say = new Command("say", {
-            alias: "s"
-        })
-        const cc = new Command("changeChannel", {
-            alias: "cc",
-            description: "Cambia il canale dove il bot invia i messaggi del commando 'say'"
-        })
 
         h.exec = async function (ctx) {
             const channel = ctx['chn']

@@ -3,6 +3,7 @@ const Layer = require("../interfaces/Layer")
 const log = require('../utils/logging').getLogger("CommandManager")
 
 module.exports = class CommandManager extends Layer {
+    middlewares = [];
     commands = new Map();
     prefix = "";
 
@@ -20,13 +21,21 @@ module.exports = class CommandManager extends Layer {
             if (this.commands.has(command)) {
                 log.d("Recieved comand.");
                 log.d(content);
-                await this.commands.get(command).exec(message, ...argumentList);
+
+                // TODO MIDDLEWARES
+                this.commands.get(command).exec(message, ...argumentList);
+
                 log.d("-".repeat(20));
                 return true;
             }
         }
         
         return false;
+    }
+
+    use(middleware) {
+        this.middlewares.push(middleware);
+        return this;
     }
 
     entries() { return this.commands.entries(); }

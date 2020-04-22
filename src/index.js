@@ -5,6 +5,7 @@ require('dotenv').config()
 const log = require('./utils/logging').getLogger("EntryPoint")
 
 const CommandManager = require('./layers/command-manager')
+const restrict = require('./commands/middleware/restrict')
 
 const LayeredBot = require('./DBot')
 
@@ -16,16 +17,21 @@ let bot = LayeredBot.getInstance({
 });
 
 const commands = [
-    require('./commands/Clear.command'), 
-    require('./commands/Help.command')(bot), 
-    require('./commands/Mono.command'), 
-    require('./commands/Mc.command')
+    require('./commands/clear'), 
+    require('./commands/help')(bot),
+    require('./commands/helpgatari'), 
+    require('./commands/mctest'),
+    require('./commands/info')
 ]
 
-bot.addLayer(CommandManager.create({ prefix: '-', commands }), "commands");
+bot.addLayer(CommandManager.create({ prefix: '-', commands })
+    .use(restrict)
+    .use((next, message, ...args) => { log.i("After restrict"); next(message, ...args) }),
+    "commands"
+);
 
 bot.on('ready', async () => {
-    bot.addLayer(require('./layers/log-manager'), 0);
+    bot.addLayer(require('./layers/log-manager'));
     log.i('Bot took: ' + (Date.now() - start) + 'ms ✔');
 })
 
