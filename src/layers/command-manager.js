@@ -14,15 +14,15 @@ module.exports = class CommandManager extends Layer {
         const { content } = message;
 
         if (content.substr(0, this.prefix.length) === this.prefix || !this.prefix) {
-            const argumentList = content.split(" ");            
-            const command = argumentList[0].replace(this.prefix, "");
+            const [commandString, ...argumentList] = content.split(" ");            
+            const command = commandString.replace(this.prefix, "");
 
             if (this.commands.has(command)) {
                 log.d("Recieved comand.");
                 log.d(content);
                 log.d("-".repeat(20));
 
-                this.commands.get(command).exec({ message }, ...argumentList);
+                await this.commands.get(command).exec(message, ...argumentList);
                 return true;
             }
         }
