@@ -8,26 +8,24 @@ const CliManager = require('./utils/termial-cli')
 const CommandManager = require('./components/listeners/command-manager')
 
 
-const MyBot = require('./DBot')
+const LayeredBot = require('./DBot')
 
 const start = Date.now()
-let bot = new MyBot({
+let bot = new LayeredBot({
     disabledEvents: ['TYPING_START'],
     messageCacheMaxSize: 25,
     messageCacheLifetime: 120,
     messageSweepInterval: 120
 })
 
-bot.addComponent(
-    new CommandManager('-').
+bot.addLayer(new CommandManager('-').
         addCommand(require('./commands/Clear.command')).
         addCommand(require('./commands/Help.command')).
         addCommand(require('./commands/Mono.command')).
-        addCommand(require('./commands/Mc.command'))
-)
+        addCommand(require('./commands/Mc.command')))
 
 bot.on('ready', async () => {
-    bot.addComponent(require('./components/listeners/log-manager'))
+    bot.addLayer(require('./components/listeners/log-manager'), 0)
     CliManager.create(bot);
     logger.info('Bot took: ' + (Date.now() - start) + 'ms', { location: filename(__dirname, __filename) })
 })

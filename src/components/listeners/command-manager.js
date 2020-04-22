@@ -1,9 +1,9 @@
 //@ts-check
-const Processor = require("../../interfaces/Processor")
+const Layer = require("../../interfaces/Layer")
 const CommandProcessor = require("../../commands/CommandProcessor")
-const logger = require('../../utils/logging')
+const log = require('../../utils/logging').getLogger("CommandManager")
 
-module.exports = class CommandManager extends Processor {
+module.exports = class CommandManager extends Layer {
     constructor (prefix = "", cli = null, extra) {
         super()
 
@@ -19,7 +19,7 @@ module.exports = class CommandManager extends Processor {
         this._ctxextra = extra || {}
     }
 
-    async process (message) {
+    async onMessage (message) {
         if (this.listeningChannels.indexOf(message.channel.id) === -1 && this.listeningChannels.length > 0) return;
         if (message.content.substr(0, this._prefix.length) === this._prefix || !this._prefix) {
             const context = this.CreateContext(message)
@@ -50,6 +50,6 @@ module.exports = class CommandManager extends Processor {
     }
 
     toString () {
-        return `CommandManager#${this.getShortID()}(prefix="${this._prefix}")`
+        return `CommandManager(prefix="${this._prefix}")`
     }
 }

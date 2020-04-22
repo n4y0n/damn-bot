@@ -1,75 +1,46 @@
 //@ts-check
-const Component = require("../interfaces/Component")
+const Layer = require("../interfaces/Layer")
 const moment = require("moment")
 const { RichEmbed } = require("discord.js")
-const logger = require("../utils/logging")
+const log = require("../utils/logging").getLogger("RSSWatcher")
 const RssAdapter = require("../interfaces/RssAdapter")
 
 
-class RssFeedComponent extends Component {
+class RssFeedReader extends Layer {
     /**
      *
      * @param { RssAdapter } rssAdapter
      * @param { string } feedname
      */
-    constructor (rssAdapter, feedname = "") {
+    constructor (rssAdapter, feedname = "", channel) {
         super()
-
-        this.subscribedChannels = []
-        this._feedName = feedname
-
+        this.name = feedname
+        this.channel = channel
         this.coolDownTime = Date.now() + 3000
-
         this._watcher = rssAdapter
-
         this._setupWatcher()
-
-        setTimeout(() => logger.info("Ready", { location: this }), this.coolDownTime - Date.now())
-    }
-
-    addChannel (channel) {
-        if (this.bot && !this.bot.channels.exists("id", channel))
-            return this;
-        this.Channels.push(channel)
-        return this
-    }
-
-    getChannelsList () {
-        return this.subscribedChannels
-    }
-
-    getFeedName () {
-        if (!this._feedName) return this.getShortID()
-        return this._feedName
-    }
-
-    getRssUrl () {
-        return this._watcher.url
-    }
-
-    get Channels () {
-        return this.getChannelsList()
+        setTimeout(() => log.i("Ready"), this.coolDownTime - Date.now())
     }
 
     _setupWatcher () {
         this._watcher.onArticle(async item => {
-            if (!this.bot || !this.botReady() || Date.now() < this.coolDownTime) return
-            await this.broadcastArticle(item)
+            if (Date.now() < this.coolDownTime) return
+            await this.sendArticle(item)
         })
 
         this._watcher.onError(err => {
-            logger.error(err, { location: this })
+            log.e(err)
         })
 
         this._watcher.run(err => {
-            if (!!err) return logger.error(err, { location: this })
-            logger.debug("Watcher backend ready", { location: this })
+            if (!!err) return log.error(err)
+            log.d("Watcher backend ready")
         })
     }
 
     _formatAricle (article) {
         const embed = new RichEmbed()
-        embed.setTitle(`[ NEW ${this.getFeedName()}]`)
+        embed.setTitle(`[ NEW ${this.name}]`)
         embed.setColor("#4DD0D9")
         embed.addField("Date", moment(article.date).format("DD/MM/YYYY HH:mm:ss"))
         embed.addField("Title", article.title)
@@ -78,45 +49,17 @@ class RssFeedComponent extends Component {
         return embed
     }
 
-    async broadcastArticle (article) {
-        if (!this.bot) return
-        if (this.getChannelsList() <= 0 || !this.botReady())
-            return logger.silly("Bot not ready and/or no channels in channel list", { location: this })
-
-        for (const channel of this.getChannelsList()) {
-            await this.sendTo(channel, article)
-        }
+    async sendArticle (article) {
+        await this.channel.send(this._formatAricle(article))
     }
 
-    async sendTo (channel, article) {
-
-        if (!this.botReady()) return
-
-        const dchannel = this.bot.getChannel(channel)
-
-        if (!!!dchannel) {
-            logger.warn(`❌ No channel ${channel} found.`, { location: this })
-            return
-        }
-
-        dchannel.send(this._formatAricle(article))
-    }
-
-    install (bot) {
-        super.install(bot)
-        bot.on("ready", () => {
-            this.subscribedChannels = this.subscribedChannels.filter(id => bot.channels.exists("id", id))
-        })
-    }
-
-    async _cleanUp () {
+    stop () {
         this._watcher.destroy()
-        this.uninstall()
     }
 
     toString () {
-        return `RssFeedReader#${this.getFeedName()}`
+        return `RssFeedReader(name="${this.name}")`
     }
 }
 
-module.exports = (adapter, feedname) => new RssFeedComponent(adapter, feedname)
+module.exports = (adapter, feedname, channel) => new RssFeedReader(adapter, feedname, channel)

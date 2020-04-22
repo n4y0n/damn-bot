@@ -3,9 +3,11 @@ const winston = require("winston")
 const { format } = winston
 const { printf } = format
 const moment = require("moment")
+// @ts-ignore
 const isDocker = require("is-docker")
 const path = require("path")
 
+// @ts-ignore
 const init = () => {
 
     const level = process.env.NODE_ENV !== "production" ? "silly" : "info"
@@ -34,14 +36,28 @@ const init = () => {
         }))
     }
 
+    logger.stream = {
+        // @ts-ignore
+        write: function (message, encoding) {
+            module.exports.info(message)
+        }
+    }
+
     return logger
 }
 
-module.exports = init()
+const logger = init()
 
-module.exports.stream = {
-    write: function (message, encoding) {
-        module.exports.info(message)
+module.exports = {
+    // @ts-ignore
+    getLogger(name) { 
+        return {
+            v: message => logger.verbose(message, { location: name }),
+            w: message => logger.warn(message, { location: name }),
+            i: message => logger.info(message, { location: name }),
+            e: message => logger.error(message, { location: name }),
+            d: message => logger.debug(message, { location: name }),
+        }
     }
 }
 

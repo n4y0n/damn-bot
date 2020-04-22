@@ -1,6 +1,6 @@
 const { RichEmbed } = require('discord.js');
 const Component = require('../interfaces/Component');
-const logger = require('../utils/logging');
+const log = require('../utils/logging').getLogger("AuguriBocc");
 
 const messagi = ['🎉🎉🎈 Auguri Bocc!!! 🎈🎉🎉', '🎉 Buon Compleanno!!', "🎈🎈 Felice aniversario di nascita' 🎈🎈", "Hey Bocc... indovina. AUGURI!🎉"];
 
@@ -13,7 +13,7 @@ class AuguriBocc extends Component {
     constructor() {
         super();
         this.discordjs = { RichEmbed }
-        logger.info('Setting up timers...', { location: this })
+        log.i('Setting up timers...')
         this._timeToStart = 0;
         this._timeToEnd = (new Date('2020-3-31')).valueOf() - Date.now();
         if (this._timeToStart <= 0) {
@@ -34,7 +34,7 @@ class AuguriBocc extends Component {
         if (this._timeoutHandler) {
             throw Error('Timeout already started ticking.');
         }
-        logger.debug("Time to start " + this._timeToStart)
+        log.d("Time to start " + this._timeToStart)
         this._timeoutHandler = setTimeout(
             this.initInterval.bind(this),
             this._timeToStart
@@ -63,7 +63,7 @@ class AuguriBocc extends Component {
                 let msg = randomMessage();
                 await channel.sendMessage(msg)
                 if (this.targetBocc) {
-                    logger.debug('Sending pm to bocc.')
+                    log.debug('Sending pm to bocc.')
                     await this.targetBocc.send(msg)
                 }
             },
@@ -91,6 +91,3 @@ class AuguriBocc extends Component {
         return 'AuguriBocc#' + this.getShortID();
     }
 }
-
-module.exports = (startDate, endDate, intervalSeconds, eventFn) =>
-    new AuguriBocc(startDate, endDate, intervalSeconds, eventFn);

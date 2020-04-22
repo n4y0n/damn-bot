@@ -1,6 +1,6 @@
 //@ts-check
-const Processor = require('../../interfaces/Processor')
-const log = require('../../utils/logging')
+const Layer = require('../../interfaces/Layer')
+const log = require('../../utils/logging').getLogger("CiaoBocc")
 const { Message } = require('discord.js')
 
 const coseBelle = ['Ciuao', 'Hey', 'Sup', 'Felice di Bocc']
@@ -16,7 +16,7 @@ function generaRispostaBuona (name) {
     return `${coseBelle[rngBello]} ${name}`
 }
 
-module.exports = class CiaoBoccProcessorComponent extends Processor {
+module.exports = class CiaoBoccProcessorComponent extends Layer {
     constructor () {
         super()
     }
@@ -25,23 +25,23 @@ module.exports = class CiaoBoccProcessorComponent extends Processor {
      *
      * @param {Message} message
      */
-    async process (message) {
+    async onMessage (message) {
         // @ts-ignore
         if (!message.mentions.users.get(this.bot.user.id) && !!message.channel.name) return
         if (message.author.id !== '224977582846640128') {
             if (message.author.id === '231747075094740992') {
                 await message.channel.send('WIP! Just u wait (￣_,￣ )')
-                return false
+                return false;
             }
             await message.channel.send(generaRispostaCattiva(message.author.username))
-            return false
+            return false;
         }
-        log.info('è bocc', { location: this })
+        log.d('è bocc')
         await message.channel.send(generaRispostaBuona('') + 'Bocc!!')
-        return false
+        return false;
     }
 
     toString () {
-        return 'CiaoBoccProcessorComponent(' + this.getShortID() + ')'
+        return 'CiaoBocc'
     }
 }

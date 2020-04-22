@@ -1,15 +1,14 @@
 //@ts-check
-const Processor = require('../../interfaces/Processor')
-const logger = require('../../utils/logging')
-const {Message} = require('discord.js')
+const Layer = require('../../interfaces/Layer')
+const log = require('../../utils/logging').getLogger("MessageLogger")
 
-class MessageLogManager extends Processor {
-    constructor (showID = false) {
+class MessageLogManager extends Layer {
+    constructor (debug = false) {
         super()
-        this.showID = showID
+        this.debug = debug
     }
 
-    async process (message) {
+    async onMessage (message) {
         const guildname = message.guild.name
         const guildid = message.guild.id
 
@@ -17,16 +16,16 @@ class MessageLogManager extends Processor {
         const channelid = message.channel.id ? message.channel.id : "XXXXXXXXXXXXXXXXXX"
         const auid = message.author.id
         
-        if (this.showID) {
-            logger.verbose(`${guildname}(${guildid})/${channelname}(${channelid}) -> ${message.author.username}(${auid}): ${message.content}`, { location: this })
+        if (this.debug) {
+            log.v(`${guildname}(${guildid})/${channelname}(${channelid}) -> ${message.author.username}(${auid}): ${message.content}`)
         } else {
-            logger.verbose(`${guildname}/${channelname} -> ${message.author.username}: ${message.content}`, { location: this })
+            log.v(`${guildname}/${channelname} -> ${message.author.username}: ${message.content}`)
         }
         return false
     }
 
     toString () {
-        return `MessagesLogger#${this.getShortID()}`
+        return `MessagesLogger`
     }
 }
 
