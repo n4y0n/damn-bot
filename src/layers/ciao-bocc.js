@@ -1,6 +1,6 @@
 //@ts-check
-const Layer = require('../../interfaces/Layer')
-const log = require('../../utils/logging').getLogger("CiaoBocc")
+const Layer = require('../interfaces/Layer')
+const log = require('../utils/logging').getLogger("CiaoBocc")
 const { Message } = require('discord.js')
 
 const coseBelle = ['Ciuao', 'Hey', 'Sup', 'Felice di Bocc']

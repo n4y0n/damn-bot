@@ -1,7 +1,7 @@
 //@ts-check
-const Layer = require("../../interfaces/Layer")
-const CommandProcessor = require("../../commands/CommandProcessor")
-const log = require('../../utils/logging').getLogger("CommandManager")
+const Layer = require("../interfaces/Layer")
+const CommandProcessor = require("../commands/CommandProcessor")
+const log = require('../utils/logging').getLogger("CommandManager")
 
 module.exports = class CommandManager extends Layer {
     constructor (prefix = "", cli = null, extra) {

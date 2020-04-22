@@ -2,11 +2,9 @@
 require('dotenv').config()
 
 const log = require('./utils/logging').getLogger("EntryPoint")
-const { filename } = require('./utils/logging')
 
 const CliManager = require('./utils/termial-cli')
-const CommandManager = require('./components/listeners/command-manager')
-
+const CommandManager = require('./layers/command-manager')
 
 const LayeredBot = require('./DBot')
 
@@ -25,7 +23,7 @@ bot.addLayer(new CommandManager('-').
         addCommand(require('./commands/Mc.command')))
 
 bot.on('ready', async () => {
-    bot.addLayer(require('./components/listeners/log-manager'), 0)
+    bot.addLayer(require('./layers/log-manager'), 0)
     CliManager.create(bot);
     log.i('Bot took: ' + (Date.now() - start) + 'ms')
 })

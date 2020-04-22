@@ -1,6 +1,6 @@
 //@ts-check
-const Layer = require('../../interfaces/Layer')
-const log = require('../../utils/logging').getLogger("MessageLogger")
+const Layer = require('../interfaces/Layer')
+const log = require('../utils/logging').getLogger("MessageLogger")
 
 class MessageLogManager extends Layer {
     constructor (debug = false) {
