@@ -4,13 +4,11 @@ require('dotenv').config()
 const logger = require('./utils/logging')
 const { filename } = require('./utils/logging')
 
-const initCli = require('./utils/termial-cli')
-
-const MyBot = require('./DBot')
-
+const CliManager = require('./utils/termial-cli')
 const CommandManager = require('./components/listeners/command-manager')
 
-const botChannel = '538747728763682817'//'670943087807299607'//
+
+const MyBot = require('./DBot')
 
 const start = Date.now()
 let bot = new MyBot({
@@ -30,8 +28,7 @@ bot.addComponent(
 
 bot.on('ready', async () => {
     bot.addComponent(require('./components/listeners/log-manager'))
-    initCli(bot, botChannel)
-
+    CliManager.create(bot);
     logger.info('Bot took: ' + (Date.now() - start) + 'ms', { location: filename(__dirname, __filename) })
 })
 
