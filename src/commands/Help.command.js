@@ -1,19 +1,23 @@
 //@ts-check
 const { RichEmbed } = require('discord.js')
 const DiscordCommand = require('../interfaces/discord-command')
-const LayeredBot = require("../dbot");
+const log = require("../utils/logging").getLogger("Command Help")
 
-module.exports = new DiscordCommand('help', {
-    description: 'Lists all available commands.'
-})
+module.exports = bot => {
+    const command = new DiscordCommand('help', {
+        description: 'Lists all available commands.'
+    });
 
-module.exports.exec = async function ({channel}) {
-    const commandlist = new RichEmbed()
-    commandlist.setTitle('[ Command List ]')
-    const commands = LayeredBot.getInstance().commands()
-
-    for (const command of commands) {
-        commandlist.addField(command.toString(), command.getDescription())
+    command.exec = async function ({channel}) {
+        const commandlist = new RichEmbed()
+        commandlist.setTitle('[ Command List ]')
+        const commands = bot.commands;
+    
+        for (const [key, command] of commands.entries()) {
+            commandlist.addField(key, command.getDescription())
+        }
+        await channel.send(commandlist)
     }
-    await channel.send(commandlist)
+
+    return command;
 }

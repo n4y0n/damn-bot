@@ -1,6 +1,6 @@
 //@ts-check
-const Command = require('../interfaces/Command');
-const logger = require('../utils/logging');
+const DiscordCommand = require('../interfaces/discord-command');
+const log = require('../utils/logging').getLogger("Command Minecraft Stats");
 const RichEmbed = require('discord.js').RichEmbed;
 const axios = require('axios').default;
 
@@ -9,16 +9,12 @@ const httpClient = axios.create({
     timeout: 3000,
 });
 
-module.exports = new Command('mctest', {
-    alias: 'mct',
+module.exports = new DiscordCommand('mctest', {
     description: 'Test minecraft server for status (default: nayon.club)'
 });
 
-module.exports.exec = async function(ctx) {
-    const chn = ctx['chn'];
-    const { args } = ctx;
-    args.shift();
-    let server = args.shift() || 'nayon.club';
+module.exports.exec = async function(message, serverAddrs) {
+    let server = serverAddrs || '207.180.211.96';
 
     const serverStatus = new RichEmbed();
 
@@ -52,7 +48,7 @@ module.exports.exec = async function(ctx) {
         serverStatus.setColor('#FF0c05');
         serverStatus.addField('Status', 'OFFLINE');
         serverStatus.addField('Players', '0/0');
-        logger.warn(e, { location: module.exports });
+        log.w(e);
     }
-    await chn.send(serverStatus);
+    await message.channel.send(serverStatus);
 };

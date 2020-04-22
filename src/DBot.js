@@ -2,9 +2,7 @@
 const { Client } = require("discord.js")
 const log = require("./utils/logging").getLogger("LayeredBotCore");
 
-const instance = null;
-
-module.exports = class DBot extends Client {
+class DBot extends Client {
 
     layers = []
 
@@ -20,34 +18,40 @@ module.exports = class DBot extends Client {
         })
     }
 
+    get commands() { return this.layersAlias.get("commands"); }
+
     addLayer(layer, options) {
         let index = null;
         let alias = null;
-        if (options instanceof Object) {
+
+        if (typeof options === 'number') { index = options; }
+        else if (typeof options === 'string') { alias = options; }
+        else if (typeof options === 'object') {
             index = options.index;
             alias = options.alias;
         }
-        if (options instanceof Number) index = options;
-        if (options instanceof String) alias = options;
-
 
         log.d("Added layer - " + layer + " ✔");
         if(index) {
             if (index >= this.layers.length) index = this.layers.length - 1;
             this.layers.splice(index, 0, this.layers);
-            if (alias) this.layersAlias.set(alias, layer);
         } else {
             this.layers.push(layer);
-            if (alias) this.layersAlias.set(alias, layer);
         }
+
+        if (alias) { this.layersAlias.set(alias, layer); }
     }
 
     toString () {
         return "LayeredBot"
     }
+}
 
-    static getInstance(options) {
-        if (instance) return instance;
-        return new DBot(options);
-    }
+
+let instance = null;
+module.exports = DBot;
+module.exports.getInstance = options => {
+    if (instance !== null) { return instance; }
+    instance = new DBot(options);
+    return instance;
 }

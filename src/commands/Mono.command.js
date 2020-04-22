@@ -1,14 +1,12 @@
 //@ts-check
 const { RichEmbed } = require('discord.js')
-const Command = require('../interfaces/Command')
+const DiscordCommand = require('../interfaces/discord-command')
 
-module.exports = new Command('helpgatari', {
-    alias: 'fffuckk',
+module.exports = new DiscordCommand('helpgatari', {
     description: 'Lists Monogatari watch order'
 })
 
-module.exports.exec = async function (ctx) {
-    const channel = ctx['chn']
+module.exports.exec = async function ({ channel }) {
     let rm = new RichEmbed()
     rm.setTitle('[ Hey don\'t panic! ]')
     rm.addField("1)", "Bakemonogatari\n---")

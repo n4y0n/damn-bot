@@ -20,15 +20,16 @@ module.exports = class CommandManager extends Layer {
             if (this.commands.has(command)) {
                 log.d("Recieved comand.");
                 log.d(content);
-                log.d("-".repeat(20));
-
                 await this.commands.get(command).exec(message, ...argumentList);
+                log.d("-".repeat(20));
                 return true;
             }
         }
         
         return false;
     }
+
+    entries() { return this.commands.entries(); }
 
     toString () {
         return `CommandManager(prefix="${this.prefix}")`
@@ -38,7 +39,6 @@ module.exports = class CommandManager extends Layer {
         const cm = new CommandManager();
         cm.prefix = prefix;
         cm.commands = new Map(commands.map(c => ([c.name, c])));
-        log.d(cm.commands)
         return cm;
     }
 }

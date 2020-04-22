@@ -7,11 +7,11 @@ module.exports = class DiscordCommand {
         this._description = description
     }
 
-    exec (ctx) {
+    async exec (ctx) {
         throw new Error("Unimplemented")
     }
 
-    undo (ctx) {
+    async undo (ctx) {
         throw new Error("Unimplemented")
     }
 
@@ -20,7 +20,6 @@ module.exports = class DiscordCommand {
     }
 
     getDescription () {
-        if (!!this._description) return this._description
-        return "Command Desc"
+        return !!this._description ?  this._description : "Command Desc"
     }
 }
