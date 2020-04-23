@@ -39,14 +39,22 @@ module.exports = class CommandManager extends Layer {
 
     entries() { return this.commands.entries(); }
 
+    add(command) {
+        log.i("Added command " + command + " ✔");
+        this.commands.set(command.name, command);
+        return this;
+    }
+
     toString() {
-        return `CommandManager(prefix="${this.prefix}")`
+        return `CommandManager(prefix="${this.prefix}")`;
     }
 
     static create({ prefix = "", commands = [] }) {
         const cm = new CommandManager();
         cm.prefix = prefix;
-        cm.commands = new Map(commands.map(c => ([c.name, c])));
+        for (const command of commands) {
+            cm.add(command);
+        }
         return cm;
     }
 

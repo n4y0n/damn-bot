@@ -4,8 +4,8 @@ require('dotenv').config()
 
 const log = require('./utils/logging').getLogger("EntryPoint")
 
-const CommandManager = require('./layers/command-manager')
-const restrict = require('./commands/middleware/restrict')
+const CommandManager = require('./layers/command-manager');
+const restrict = require('./commands/middleware/restrict');
 
 const LayeredBot = require('./DBot')
 
@@ -19,7 +19,8 @@ let bot = LayeredBot.getInstance({
 const commands = [
     require('./commands/clear'), 
     require('./commands/help')(bot),
-    require('./commands/helpgatari'), 
+    require('./commands/feed')(bot),
+    require('./commands/helpgatari'),
     require('./commands/mctest'),
     require('./commands/info')
 ]
@@ -31,7 +32,7 @@ bot.addLayer(CommandManager.create({ prefix: '-', commands })
 
 bot.on('ready', async () => {
     bot.addLayer(require('./layers/log-manager'));
-    log.i('Bot took: ' + (Date.now() - start) + 'ms ✔');
+    log.i('Bot took: ' + (Date.now() - start) + 'ms 🤖');
 })
 
 bot.on('error', err => {

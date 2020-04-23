@@ -1,6 +1,6 @@
 const log = require('../../utils/logging').getLogger("Restrict")
 
-const restricted = new Map([["clear", 0], ["info", 1]]);
+const restricted = new Map([["clear", 0]]);
 const admin = "315437752093245441"
 
 module.exports = async (next, command, message) => {

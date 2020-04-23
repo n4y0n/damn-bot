@@ -1,9 +1,10 @@
 //@ts-check
+const { RichEmbed } = require('discord.js')
+const DiscordCommand = require('../interfaces/discord-command')
 const Layer = require("../interfaces/Layer")
 const moment = require("moment")
-const { RichEmbed } = require("discord.js")
-const log = require("../utils/logging").getLogger("RSSWatcher")
 const RssAdapter = require("../interfaces/RssAdapter")
+const log = require("../utils/logging").getLogger("Command RssFeed")
 
 
 class RssFeedReader extends Layer {
@@ -62,4 +63,22 @@ class RssFeedReader extends Layer {
     }
 }
 
-module.exports = (adapter, feedname, channel) => new RssFeedReader(adapter, feedname, channel)
+module.exports = bot => {
+    const feeds = new Map();
+
+    const command = new DiscordCommand('feed', {
+        description: 'RssFeed Management.'
+    });
+
+    command.exec = async function (message, comand, subcomand) {
+        await message.react("🎷");
+        const emb = new RichEmbed();
+        emb.setTitle('[ RssFeeds Editor ]');
+
+        emb.addField(comand, subcomand);
+
+        await message.channel.send(emb);
+    }
+
+    return command;
+}

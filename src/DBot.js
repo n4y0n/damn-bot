@@ -9,13 +9,18 @@ class DBot extends Client {
     layersAlias = new Map();
 
     constructor (options) {
-        super(options)
+        super(options);
         this.on("message", async message => {
-            if (message.author.id == this.user.id) return
+            if (message.author.id == this.user.id) return;
+
+            if (message.isMentioned(this.user)) {
+                await message.react("🛰");
+            }
+
             for(let layer of this.layers) {
                 if (await layer.onMessage(message)) break;
             }
-        })
+        });
     }
 
     get commands() { return this.layersAlias.get("commands"); }

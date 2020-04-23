@@ -1,5 +1,5 @@
 const { RichEmbed } = require('discord.js');
-const Component = require('../interfaces/Component');
+const Layer = require('../interfaces/Layer');
 const log = require('../utils/logging').getLogger("AuguriBocc");
 
 const messagi = ['🎉🎉🎈 Auguri Bocc!!! 🎈🎉🎉', '🎉 Buon Compleanno!!', "🎈🎈 Felice aniversario di nascita' 🎈🎈", "Hey Bocc... indovina. AUGURI!🎉"];
@@ -9,7 +9,7 @@ const randomMessage = () => {
     return messagi[rnd]; 
 }
 
-class AuguriBocc extends Component {
+class AuguriBocc extends Layer {
     constructor() {
         super();
         this.discordjs = { RichEmbed }
