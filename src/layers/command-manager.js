@@ -22,7 +22,7 @@ module.exports = class CommandManager extends Layer {
                 log.d("Recieved comand.");
                 log.d(content);
 
-                this.dispatch(this.commands.get(command).exec, message, ...argumentList);
+                await this.dispatch(this.commands.get(command), message, ...argumentList);
 
                 log.d("-".repeat(20));
                 return true;
@@ -50,26 +50,26 @@ module.exports = class CommandManager extends Layer {
         return cm;
     }
 
-    dispatch(done, message, ...args) {
+    dispatch(command, message, ...args) {
         var idx = 0;
         var stack = this.middlewares;
         if (stack.length === 0) {
-            return done(message, ...args);
+            return command.exec(message, ...args);
         }
 
         return next();
 
-        function next(err) {
+        async function next(err) {
             if (err) {
-                return done(message, ...args);
+                return log.e(err);
             }
 
             let layer = stack[idx++];
             if (!layer) {
-                return done(message, ...args);
+                return command.exec(message, ...args);
             }
 
-            layer(next, message, ...args);
+            await layer(next, command, message, ...args);
         }
     }
 }

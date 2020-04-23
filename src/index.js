@@ -25,8 +25,7 @@ const commands = [
 ]
 
 bot.addLayer(CommandManager.create({ prefix: '-', commands })
-    .use(restrict)
-    .use((next, message, ...args) => { log.i("After restrict"); next(message, ...args) }),
+    .use(restrict),
     "commands"
 );
 
