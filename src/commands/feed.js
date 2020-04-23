@@ -2,40 +2,40 @@
 const { RichEmbed } = require('discord.js')
 const DiscordCommand = require('../interfaces/discord-command')
 const Layer = require("../interfaces/Layer")
+const RssWatcher = require("rss-watcher")
 const moment = require("moment")
-const RssAdapter = require("../interfaces/RssAdapter")
 const log = require("../utils/logging").getLogger("Command RssFeed")
 
 
 class RssFeedReader extends Layer {
     /**
      *
-     * @param { RssAdapter } rssAdapter
      * @param { string } feedname
      */
-    constructor (rssAdapter, feedname = "", channel) {
+    constructor (feedname = "", url, channel) {
         super()
         this.name = feedname
         this.channel = channel
         this.coolDownTime = Date.now() + 3000
-        this._watcher = rssAdapter
+        this.url = url;
+        this._watcher = new RssWatcher(url)
         this._setupWatcher()
         setTimeout(() => log.i("Ready"), this.coolDownTime - Date.now())
     }
 
     _setupWatcher () {
-        this._watcher.onArticle(async item => {
+        this._watcher.on("new article", async item => {
             if (Date.now() < this.coolDownTime) return
             await this.sendArticle(item)
         })
 
-        this._watcher.onError(err => {
+        this._watcher.on("error", err => {
             log.e(err)
         })
 
-        this._watcher.run(err => {
-            if (!!err) return log.error(err)
-            log.d("Watcher backend ready")
+        this._watcher.run((err) => {
+            if (err) { return log.e(err) }
+            else { log.d("Watcher backend ready") }
         })
     }
 
@@ -55,7 +55,7 @@ class RssFeedReader extends Layer {
     }
 
     stop () {
-        this._watcher.destroy()
+        return this._watcher.destroy()
     }
 
     toString () {
@@ -70,14 +70,49 @@ module.exports = bot => {
         description: 'RssFeed Management.'
     });
 
-    command.exec = async function (message, comand, subcomand) {
-        await message.react("🎷");
+    function listFeeds(message) {
+        const emb = new RichEmbed();
+        emb.setTitle('[ RssFeeds Editor ]');
+        if (feeds.size === 0) { emb.addField("¯\\_(ツ)_/¯", "No feeds."); return; }
+        for (let [key, value] of feeds.entries()) {
+            emb.addField(key, value.url);
+        }
+
+        return message.channel.send(emb);
+    }
+
+    function helpCommands(message) {
         const emb = new RichEmbed();
         emb.setTitle('[ RssFeeds Editor ]');
 
-        emb.addField(comand, subcomand);
+        emb.addField("help", "This help.")
+        emb.addField("list", "Lists registered feeds.");
+        emb.addField("add <feedname> <url>", "Adds a feed.");
 
-        await message.channel.send(emb);
+        return message.channel.send(emb); 
+    }
+
+    function addFeed(message, feedName, feedUrl) {
+        if (!feedName) { return message.react("🛑"); } 
+        if (!feedUrl) { return message.react("🛑"); } 
+
+        const emb = new RichEmbed();
+        emb.setTitle('[ RssFeeds Editor ]');
+        
+        feeds.set(feedName, new RssFeedReader(feedName, feedUrl, message.channel));
+
+        return message.react("✨")
+    }
+
+    command.exec = async function (message, command, feedName, feedUrl) {
+        await message.react("🎷");
+
+        switch (command) {
+            case "list": return listFeeds(message);
+            case "help": return helpCommands(message);
+            case "add" : return addFeed(message, feedName, feedUrl);
+            default: return helpCommands(message);
+        }
     }
 
     return command;
