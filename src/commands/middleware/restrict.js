@@ -1,12 +1,13 @@
 const log = require('../../utils/logging').getLogger("Restrict")
 
-const restricted = ["clear", "info"];
+const restricted = new Map([["clear", 0], ["info", 1]]);
 const admin = "315437752093245441"
 
-module.exports = async (next, command, message, ...args) => {
-    if (command.name in restricted && !(message.author.id === admin)) {
+module.exports = async (next, command, message) => {
+    if (restricted.has(command.name) && message.author.id !== admin) {
+        log.i("Blocked command " + command + " from " + message.author);
         await message.react("🚩");
     } else {
-        next();
+        await next();
     }
 }
