@@ -85,9 +85,10 @@ module.exports = bot => {
         const emb = new RichEmbed();
         emb.setTitle('[ RssFeeds Editor ]');
 
-        emb.addField("help", "This help.")
+        emb.addField("help", "This help.");
         emb.addField("list", "Lists registered feeds.");
         emb.addField("add <feedname> <url>", "Adds a feed.");
+        emb.addField("load", "Load.");
 
         return message.channel.send(emb); 
     }
@@ -104,6 +105,10 @@ module.exports = bot => {
         return message.react("✨")
     }
 
+    function loadFeeds(message) {
+        
+    }
+
     command.exec = async function (message, command, feedName, feedUrl) {
         await message.react("🎷");
 
@@ -111,6 +116,7 @@ module.exports = bot => {
             case "list": return listFeeds(message);
             case "help": return helpCommands(message);
             case "add" : return addFeed(message, feedName, feedUrl);
+            case "load": return loadFeeds(message);
             default: return helpCommands(message);
         }
     }
