@@ -18,7 +18,7 @@ class DBot extends Client {
             }
 
             for(let layer of this.layers) {
-                if (await layer.onMessage(message)) break;
+                if (await layer.onMessage(message, this)) break;
             }
         });
     }

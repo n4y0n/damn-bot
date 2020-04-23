@@ -15,14 +15,14 @@ module.exports = class CommandManager extends Layer {
         const { content } = message;
 
         if (content.substr(0, this.prefix.length) === this.prefix || !this.prefix) {
-            const [commandString, ...argumentList] = content.split(" ");
-            const command = commandString.replace(this.prefix, "");
+            const [cs, ...args] = content.split(" ");
+            const command = cs.replace(this.prefix, "");
 
             if (this.commands.has(command)) {
                 log.d("Recieved comand.");
                 log.d(content);
 
-                await this.dispatch(this.commands.get(command), message, ...argumentList);
+                await this.dispatch(this.commands.get(command), message, args);
 
                 log.d("-".repeat(20));
                 return true;
@@ -58,7 +58,7 @@ module.exports = class CommandManager extends Layer {
         return cm;
     }
 
-    dispatch(command, message, ...args) {
+    dispatch(command, message, args) {
         var idx = 0;
         var stack = this.middlewares;
         if (stack.length === 0) {
@@ -77,7 +77,7 @@ module.exports = class CommandManager extends Layer {
                 return command.exec(message, ...args);
             }
 
-            await layer(next, command, message, ...args);
+            await layer(next, command, message, args);
         }
     }
 }
