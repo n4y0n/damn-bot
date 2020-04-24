@@ -1,19 +1,17 @@
 //@ts-check
 const { RichEmbed } = require('discord.js')
 const DiscordCommand = require('../interfaces/discord-command')
-const Layer = require("../interfaces/Layer")
 const RssWatcher = require("rss-watcher")
 const moment = require("moment")
 const log = require("../utils/logging").getLogger("Command RssFeed")
 
 
-class RssFeedReader extends Layer {
+class RssFeedReader {
     /**
      *
      * @param { string } feedname
      */
     constructor (feedname = "", url, channel) {
-        super()
         this.name = feedname
         this.channel = channel
         this.coolDownTime = Date.now() + 3000
