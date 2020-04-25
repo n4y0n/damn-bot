@@ -40,7 +40,7 @@ module.exports = class CommandManager extends Layer {
     entries() { return this.commands.entries(); }
 
     add(command) {
-        log.i("Added command " + command + " ✔");
+        log.i("Added " + command + " ✔");
         this.commands.set(command.name, command);
         return this;
     }

@@ -56,6 +56,7 @@ class AuguriBocc extends Layer {
 
     async onReady() {
         this.targetBocc = await this.bot.fetchUser('224977582846640128') // Change me, hardcodded bocc fetch
+        this.targetKevon = await this.bot.fetchUser('191550289512366080') // Change me, hardcodded kevon fetch
         // this.initTimeout();
         const channel = await this.bot.getChannel('538747728763682817')
         this._intervalHandler = setInterval(
