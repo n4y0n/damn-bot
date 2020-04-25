@@ -1,6 +1,8 @@
 //@ts-check
 const start = Date.now()
 require('dotenv').config()
+const isDocker = require("is-docker")
+const Cli = require("./utils/termial-cli")
 
 const log = require('./utils/logging').getLogger("EntryPoint")
 
@@ -32,6 +34,7 @@ bot.addLayer(CommandManager.create({ prefix: '-', commands })
 
 bot.on('ready', async () => {
     bot.addLayer(require('./layers/log-manager'));
+    if (!isDocker()) Cli.init(bot);
     log.i('Bot took: ' + (Date.now() - start) + 'ms 🤖');
 })
 

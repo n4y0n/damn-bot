@@ -20,6 +20,6 @@ module.exports = class DiscordCommand {
     }
 
     getDescription () {
-        return !!this._description ?  this._description : "Command Desc"
+        return this._description ?  this._description : "Command Desc"
     }
 }
