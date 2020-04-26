@@ -3,7 +3,7 @@ const Layer = require('../interfaces/Layer')
 const log = require('../utils/logging').getLogger("MessageLogger")
 
 class MessageLogManager extends Layer {
-    constructor (debug = false) {
+    constructor (debug = true) {
         super()
         this.debug = debug
     }

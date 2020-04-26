@@ -1,17 +1,31 @@
 //@ts-check
-const readline = require("readline")
-const log = require("./logging").getLogger("CliManager")
+const readline = require("readline");
+const { Client } = require("discord.js");
+const log = require("./logging").getLogger("CliManager");
 
+/**
+ * @param {Client} bot
+ */
 async function init (bot) {
 
     const commands = new Map();
 
-    commands.set("say", async function (bot, to, message) {
+
+    commands.set("say", async function (_, to, message, autodelete) {
         if (!to || !message) throw Error();
-        // const channel = await bot.channels.get('538747728763682817'); //'670943087807299607'//
-        // const message = await channel.send("test boi.");
-        // await message.react("🙂");
-        // setTimeout(async () => await message.delete(), 3000);
+        let receiver = null;
+        if (/w*\/w*/gi.test(to)) {
+            let data = to.split("/");
+            const [guild] = await bot.guilds.array().filter(g => g.name === data[0]);
+            if (!guild) return log.i("Guild " + data[0] + " not found!");
+            
+            receiver = await guild.channels.array().filter(c => c.name === data[1]).pop();
+            if (!receiver) return log.i("Channel " + data[1] + " not found!");
+        } else {
+            
+        }
+        const msg = await receiver.send(message);
+        if (autodelete) setTimeout(async () => await msg.delete(), 30000);
     });
 
     commands.set("hw", async function (bot, ...args) {
@@ -22,6 +36,7 @@ async function init (bot) {
     commands.set("help", async function (bot) {
         log.i("say <to> <message>");
         log.i("hw <message>");
+        log.i("help");
     });
 
     const interface = readline.createInterface({
@@ -33,7 +48,7 @@ async function init (bot) {
     interface.on("line", async line => {
         if (!line) { return; }
         const execute = parseCommand(line);
-        try { await execute(bot); } catch(e) { await parseCommand("help")(bot); } finally { log.d("✨"); }
+        try { await execute(bot); } catch(e) { await parseCommand("help")(bot); }// finally { log.d("✨"); }
     });
 
     function parseCommand(string) {
@@ -92,14 +107,15 @@ async function init (bot) {
         return ((s1 == s2) ? 0 : ((s1 > s2) ? 1 : -1));
     }
 
-    function completeCommand(line) {
+    function completeCommand(line, cb) {
         let matchs = []
         for (let [command, _] of commands.entries()) {
             if (strcmp(command, line, line.length) != 0) { continue; }
 
             matchs.push(command)
         }
-        return [matchs, line]
+
+        return cb(null, [matchs, line])
     }
 }
 
