@@ -1,6 +1,11 @@
 //@ts-check
 const Layer = require('../interfaces/Layer')
+const fs = require('fs')
 const log = require('../utils/logging').getLogger("MessageLogger")
+
+function appendLog(message) {
+    fs.appendFileSync("../../logs/messages.log", message);
+}
 
 class MessageLogManager extends Layer {
     constructor (debug = true) {
@@ -16,11 +21,14 @@ class MessageLogManager extends Layer {
         const channelid = message.channel.id ? message.channel.id : "XXXXXXXXXXXXXXXXXX"
         const auid = message.author.id
         
+        let messageText = ""
         if (this.debug) {
-            log.v(`${guildname}(${guildid})/${channelname}(${channelid}) -> ${message.author.username}(${auid}): ${message.content}`)
+            messageText = `${guildname}(${guildid})/${channelname}(${channelid}) -> ${message.author.username}(${auid}): ${message.content}`;
         } else {
-            log.v(`${guildname}/${channelname} -> ${message.author.username}: ${message.content}`)
+            messageText = `${guildname}/${channelname} -> ${message.author.username}: ${message.content}`
         }
+        log.v(messageText);
+        appendLog(messageText);
         return false
     }
 

@@ -10,8 +10,7 @@ async function init (bot) {
 
     const commands = new Map();
 
-
-    commands.set("say", async function (_, to, message, autodelete) {
+    commands.set("say", async function (_, to, message, autodelete, autodeleteTime = 30000) {
         if (!to || !message) throw Error();
         let receiver = null;
         if (/w*\/w*/gi.test(to)) {
@@ -25,7 +24,7 @@ async function init (bot) {
             
         }
         const msg = await receiver.send(message);
-        if (autodelete) setTimeout(async () => await msg.delete(), 30000);
+        if (autodelete) setTimeout(async () => await msg.delete(), autodeleteTime);
     });
 
     commands.set("hw", async function (bot, ...args) {
