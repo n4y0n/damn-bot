@@ -14,5 +14,16 @@ export async function commandHandler(message: Message) {
 }
 
 async function dispatchMessage(message: Message) {
-    
+    if (message.isMentioned(get("client").user)) {
+        message.content = message.content.replace("<@!" + get("client").user.id + ">", "").trim();
+        if (!message.content) return;
+    }
+
+    if (message.content === "entra") {
+        const voiceConnection = await message.member.voiceChannel.join();
+    }
+
+    if (message.content === "esci") {
+        message.member.voiceChannel.leave();
+    }
 }
