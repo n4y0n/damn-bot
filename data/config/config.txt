@@ -37,31 +37,11 @@ maxtime = 0
 
 // This sets an alternative folder to be used as the Playlists folder
 // This can be a relative or absolute path
-playlistsfolder = "Playlists"
+playlistsfolder = "playlists"
 
 // By default, the bot will DM the owner if the bot is running and a new version of the bot
 // becomes available. Set this to false to disable this feature.
 updatealerts=true
-
-
-// Changing this changes the lyrics provider
-// Currently available providers: "A-Z Lyrics", "Genius", "MusicMatch"
-// At the time of writing, I would recommend sticking with A-Z Lyrics or MusicMatch,
-// as Genius tends to have a lot of non-song results and you might get something
-// completely unrelated to what you want.
-// If you are interested in contributing a provider, please see
-// https://github.com/jagrosh/JLyrics
-lyrics.default = "A-Z Lyrics"
-
-
-// These settings allow you to configure custom aliases for all commands.
-// Multiple aliases may be given, separated by commas.
-//
-// Example 1: Giving command "play" the alias "p":
-// play = [ p ]
-//
-// Example 2: Giving command "search" the aliases "yts" and "find":
-// search = [ yts, find ]
 
 aliases {
   // General commands
