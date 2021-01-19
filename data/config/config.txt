@@ -1,0 +1,103 @@
+owner = 315437752093245441
+
+prefix = "-"
+
+game = "DEFAULT"
+
+// Valid values: ONLINE IDLE DND INVISIBLE
+status = ONLINE
+
+altprefix = "@mention"
+
+// If you set these, it will change the various emojis
+success = "✨"
+warning = "💡"
+error = "🚫"
+loading = "⌚"
+searching = "🔎"
+
+// !!cmds to see the help text
+help = help
+
+// Note: If you set this to true, the nowplaying boxes will NOT refresh
+// This is because refreshing the boxes causes the image to be reloaded
+// every time it refreshes.
+npimages = false
+
+
+// If you set this, the bot will not leave a voice channel after it finishes a queue.
+// Keep in mind that being connected to a voice channel uses additional bandwith,
+// so this option is not recommended if bandwidth is a concern.
+stayinchannel = false
+
+// This sets the maximum amount of seconds any track loaded can be. If not set or set
+// to any number less than or equal to zero, there is no maximum time length. This time
+// restriction applies to songs loaded from any source.
+maxtime = 0
+
+// This sets an alternative folder to be used as the Playlists folder
+// This can be a relative or absolute path
+playlistsfolder = "Playlists"
+
+// By default, the bot will DM the owner if the bot is running and a new version of the bot
+// becomes available. Set this to false to disable this feature.
+updatealerts=true
+
+
+// Changing this changes the lyrics provider
+// Currently available providers: "A-Z Lyrics", "Genius", "MusicMatch"
+// At the time of writing, I would recommend sticking with A-Z Lyrics or MusicMatch,
+// as Genius tends to have a lot of non-song results and you might get something
+// completely unrelated to what you want.
+// If you are interested in contributing a provider, please see
+// https://github.com/jagrosh/JLyrics
+lyrics.default = "A-Z Lyrics"
+
+
+// These settings allow you to configure custom aliases for all commands.
+// Multiple aliases may be given, separated by commas.
+//
+// Example 1: Giving command "play" the alias "p":
+// play = [ p ]
+//
+// Example 2: Giving command "search" the aliases "yts" and "find":
+// search = [ yts, find ]
+
+aliases {
+  // General commands
+  settings = [ status ]
+
+  // Music commands
+  lyrics = []
+  nowplaying = [ np, current ]
+  play = []
+  playlists = [ pls ]
+  queue = [ list ]
+  remove = [ delete ]
+  scsearch = []
+  search = [ ytsearch ]
+  shuffle = []
+  skip = [ voteskip ]
+
+  // Admin commands
+  prefix = [ setprefix ]
+  setdj = []
+  settc = []
+  setvc = []
+  rssfeed = [ rss ]
+  set-text-channel = [ stc ]
+
+  // DJ Commands
+  forceremove = [ forcedelete, modremove, moddelete, modelete, fdelete, fremove ]
+  forceskip = [ modskip, fskip ]
+  movetrack = [ move ]
+  pause = []
+  playnext = []
+  repeat = []
+  skipto = [ jumpto ]
+  stop = []
+  volume = [ vol ]
+
+  // Owner Commands
+  clear = [ cls ]
+}
