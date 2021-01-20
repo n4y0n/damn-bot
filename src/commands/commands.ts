@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Message, RichEmbed } from "discord.js";
 import { get } from "../config";
 import { play, skip, stop } from "./ytmusic";
 
@@ -40,5 +40,24 @@ async function dispatchMessage(message: Message) {
 	}
 	if (message.content === "stop") {
 		await stop(message);
+	}
+	if (message.content === "info") {
+		const embed = new RichEmbed();
+		embed.setTitle("Seylum's Dependencies");
+		buildDeps(embed);
+		embed.setFooter("powered by node " + process.version);
+		embed.setThumbnail(message.client.user.avatarURL);
+		await message.channel.send(embed);
+	}
+}
+
+function buildDeps(embed: RichEmbed) {
+	try {
+		const { dependencies } = require("../../package.json");
+		for(const [key, val] of Object.entries(dependencies)) {
+			embed.addField(key, "v" + val);
+		}
+	} catch (err) {
+		console.log(err);
 	}
 }
