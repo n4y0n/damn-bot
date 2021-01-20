@@ -14,13 +14,13 @@ export async function commandHandler(message: Message) {
 		(get("prefix") && message.content.startsWith(get("prefix"))) ||
 		message.isMentioned(message.client.user)
 	) {
-		removeActivation(message);
+		removePrefix(message);
 		if (!message.content) return;
 		await dispatchMessage(message);
 	}
 }
 
-function removeActivation(message: Message) {
+function removePrefix(message: Message) {
 	if (message.isMentioned(message.client.user)) {
 		message.content = message.content
 			.replace("<@!" + message.client.user.id + ">", "")
