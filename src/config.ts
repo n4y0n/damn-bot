@@ -1,4 +1,6 @@
-let store = {};
+let store = {
+    "owner": "315437752093245441"
+};
 
 export function config() {
 

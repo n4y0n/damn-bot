@@ -5,6 +5,7 @@ import {
 	VoiceConnection,
 } from "discord.js";
 import * as ytdl from "ytdl-core";
+import { get } from "../config";
 
 const queue = new Map<string, QueueContruct>();
 
@@ -105,6 +106,12 @@ function startSong(guild, song) {
 }
 
 export async function stop(message: Message) {
+	if (!checkPermissions(message)) {
+		return message.channel.send(
+			"You don't have permission to perform this action."
+		);
+	}
+
 	const serverQueue = queue.get(message.guild.id);
 
 	if (!message.member.voiceChannel)
@@ -119,11 +126,17 @@ export async function stop(message: Message) {
 
 	if (serverQueue.connection.dispatcher)
 		serverQueue.connection.dispatcher.end();
-	
+
 	serverQueue.voiceChannel.leave();
 }
 
 export async function skip(message: Message) {
+	if (!checkPermissions(message)) {
+		return message.channel.send(
+			"You don't have permission to perform this action."
+		);
+	}
+
 	const serverQueue = queue.get(message.guild.id);
 
 	if (!message.member.voiceChannel)
@@ -135,10 +148,23 @@ export async function skip(message: Message) {
 
 	if (serverQueue.connection.dispatcher)
 		serverQueue.connection.dispatcher.end();
-	
+
 	serverQueue.songs.shift();
 	if (serverQueue.songs.length > 0)
 		startSong(message.guild, serverQueue.songs[0]);
-	else
-		serverQueue.voiceChannel.leave();
+	else serverQueue.voiceChannel.leave();
+}
+
+async function checkPermissions(message: Message) {
+	// posso fare tutto in un unico if ma meglio lasciare tutto separato per leggibilita
+
+	if (message.author.id === get("owner") || (message.guild && message.member.id === message.guild.owner.id)) {
+		return true;
+	}
+
+	if (message.member.roles.some(role => get(message.guild.id) && role.id === get(message.guild.id).get("djrole"))) {
+		return true;
+	}
+
+	return false;
 }
