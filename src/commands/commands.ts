@@ -35,12 +35,15 @@ async function dispatchMessage(message: Message) {
 	if (message.content.startsWith("play")) {
 		await play(message);
 	}
+
 	if (message.content.startsWith("skip")) {
 		await skip(message);
 	}
+
 	if (message.content === "stop") {
 		await stop(message);
 	}
+
 	if (message.content === "info") {
 		const embed = new RichEmbed();
 		embed.setTitle("Seylum's Dependencies");
@@ -54,7 +57,7 @@ async function dispatchMessage(message: Message) {
 function buildDeps(embed: RichEmbed) {
 	try {
 		const { dependencies } = require("../../package.json");
-		for(const [key, val] of Object.entries(dependencies)) {
+		for (const [key, val] of Object.entries(dependencies)) {
 			embed.addField(key, "v" + val);
 		}
 	} catch (err) {

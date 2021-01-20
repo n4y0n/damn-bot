@@ -1,5 +1,6 @@
 let store = {
-    "owner": "315437752093245441"
+    "owner": "315437752093245441",
+    "prefix": "-"
 };
 
 export function config() {
