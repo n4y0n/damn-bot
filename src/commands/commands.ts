@@ -1,5 +1,6 @@
 import { Message } from "discord.js";
 import { get } from "../config";
+import { play, skip, stop } from "./ytmusic";
 
 export async function commandHandler(message: Message) {
 	if (message.author.bot) return;
@@ -30,4 +31,14 @@ function removeActivation(message: Message) {
 	}
 }
 
-async function dispatchMessage(message: Message) {}
+async function dispatchMessage(message: Message) {
+	if (message.content.startsWith("play")) {
+		await play(message);
+	}
+	if (message.content.startsWith("skip")) {
+		await skip(message);
+	}
+	if (message.content === "stop") {
+		await stop(message);
+	}
+}

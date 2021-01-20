@@ -116,7 +116,11 @@ export async function stop(message: Message) {
 		return message.channel.send("There is no song that I could stop!");
 
 	serverQueue.songs = [];
-	serverQueue.connection.dispatcher.end();
+
+	if (serverQueue.connection.dispatcher)
+		serverQueue.connection.dispatcher.end();
+	
+	serverQueue.voiceChannel.leave();
 }
 
 export async function skip(message: Message) {
@@ -128,5 +132,13 @@ export async function skip(message: Message) {
 		);
 	if (!serverQueue)
 		return message.channel.send("There is no song that I could skip!");
-	serverQueue.connection.dispatcher.end();
+
+	if (serverQueue.connection.dispatcher)
+		serverQueue.connection.dispatcher.end();
+	
+	serverQueue.songs.shift();
+	if (serverQueue.songs.length > 0)
+		startSong(message.guild, serverQueue.songs[0]);
+	else
+		serverQueue.voiceChannel.leave();
 }
