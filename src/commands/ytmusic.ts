@@ -140,10 +140,12 @@ export async function skip(message: Message) {
 
 	const serverQueue = queue.get(message.guild.id);
 
-	if (!message.member.voiceChannel)
+	if (!message.member.voiceChannel) {
 		return message.channel.send(
 			"You have to be in a voice channel to stop the music!"
 		);
+	}
+
 	if (!serverQueue)
 		return message.channel.send("There is no song that I could skip!");
 
@@ -167,5 +169,6 @@ async function checkPermissions(message: Message) {
 		return true;
 	}
 
+	await message.react("🛑");
 	return false;
 }

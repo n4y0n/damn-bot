@@ -48,7 +48,7 @@ export async function save() {
 	await fh.close();
 }
 
-export function get(key: "client" | string | Symbol, def?: any): any {
+export function get(key: string | Symbol, def?: any): any {
 	return store.get(key) || def;
 }
 
