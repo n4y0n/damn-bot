@@ -22,7 +22,8 @@ class Song {
 class QueueContruct {
 	textChannel: TextChannel;
 	voiceChannel: VoiceChannel;
-	connection: VoiceConnection = null;
+	connection: VoiceConnection;
+
 	songs: Array<Song> = [];
 	volume: number = 5;
 	playing: boolean = true;

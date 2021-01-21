@@ -1,18 +1,22 @@
 import { commandHandler } from "./commands/commands";
 import { Channel, Client } from "discord.js";
 import { config as DotEnvInit } from "dotenv";
-import { config, get, set } from "./config";
+import { config, get, MagicNames, set } from "./config";
 
 DotEnvInit();
 config();
 
 const client = new Client();
-set("client", client);
+set(MagicNames.CLIENT, client);
 
 client.on("message", commandHandler);
 
 client.on("ready", () => {
-    client.user.setActivity("prefix " + get("prefix"));
+    client.user.setActivity("\"@" + client.user.username + " info\" for more help.");
+
+    // initialize guilds config map
+    client.guilds.forEach(guild => !get(guild.id) ? set(guild.id, new Map()) : null);
+    
     console.log("[📡] Bot ready!");
 });
 
