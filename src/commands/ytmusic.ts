@@ -1,4 +1,5 @@
 import {
+	Channel,
 	Message,
 	TextChannel,
 	VoiceChannel,
@@ -13,7 +14,7 @@ class Song {
 	title: string;
 	url: string;
 
-	constructor(title, url) {
+	constructor(title: string, url: string) {
 		this.title = title;
 		this.url = url;
 	}
@@ -28,7 +29,7 @@ class QueueContruct {
 	volume: number = 5;
 	playing: boolean = true;
 
-	constructor(tc, vc, con = null) {
+	constructor(tc: TextChannel | any, vc: VoiceChannel, con: VoiceConnection = null) {
 		this.textChannel = tc;
 		this.voiceChannel = vc;
 		this.connection = con;
