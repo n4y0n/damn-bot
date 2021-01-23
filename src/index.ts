@@ -19,7 +19,7 @@ function init() {
 
 		// initialize guilds config map
 		client.guilds.forEach((guild) =>
-			!get(guild.id) ? set(guild.id, new Map()) : null
+			!get(guild.id) ? set(guild.id, {}) : null
 		);
 
 		console.log("[📡] Bot ready!");

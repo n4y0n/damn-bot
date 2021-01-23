@@ -165,7 +165,7 @@ async function checkPermissions(message: Message) {
 		return true;
 	}
 
-	if (message.member.roles.some(role => get(message.guild.id) && role.id === get(message.guild.id).get("djrole"))) {
+	if (message.member.roles.some(role => get(message.guild.id) && role.id === get(message.guild.id)["djrole"])) {
 		return true;
 	}
 
