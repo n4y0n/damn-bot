@@ -6,7 +6,7 @@ import {
 	VoiceConnection,
 } from "discord.js";
 import * as ytdl from "ytdl-core";
-import { get } from "../config";
+import { get } from "../globalConfigs";
 
 const queue = new Map<string, QueueContruct>();
 

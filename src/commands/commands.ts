@@ -1,8 +1,8 @@
 import { Message, RichEmbed } from "discord.js";
-import { get } from "../config";
+import { get } from "../globalConfigs";
 import { play, skip, stop } from "./ytmusic";
 
-export async function commandHandler(message: Message) {
+export async function onMessageHandler(message: Message) {
 	if (message.author.bot) return;
 
 	if (message.isMentioned(message.client.user)) {

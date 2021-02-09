@@ -1,7 +1,8 @@
-import { commandHandler } from "./commands/commands";
+import { onMessageHandler } from "./commands/commands";
 import { Channel, Client } from "discord.js";
 import { config as DotEnvInit } from "dotenv";
-import { config, get, MagicNames, set } from "./config";
+import { config, MagicNames, set } from "./globalConfigs";
+import { config as gconfig } from "./guild";
 
 DotEnvInit();
 config().then(init);
@@ -10,16 +11,13 @@ function init() {
 	const client = new Client();
 	set(MagicNames.CLIENT, client);
 
-	client.on("message", commandHandler);
+	client.on("message", onMessageHandler);
 
 	client.on("ready", () => {
+		gconfig(client);
+
 		client.user.setActivity(
 			'"@' + client.user.username + ' info" for more help.'
-		);
-
-		// initialize guilds config map
-		client.guilds.forEach((guild) =>
-			!get(guild.id) ? set(guild.id, {}) : null
 		);
 
 		console.log("[📡] Bot ready!");

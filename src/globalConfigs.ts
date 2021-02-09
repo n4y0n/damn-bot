@@ -14,11 +14,11 @@ export async function config() {
 		data = await fh.readFile({ encoding: "utf-8" });
 		await fh.close();
 	} catch (e) {
-        console.log("[💔] Error configuration file not found.");
-        console.log(" |  " + e);
-        console.log(" |  Will now use default config." )
-        return await save();
-    }
+		console.log("[💔] Error configuration file not found.");
+		console.log(" |  " + e);
+		console.log(" |  Will now use default config.");
+		return await save();
+	}
 
 	try {
 		const j = JSON.parse(data);
@@ -27,9 +27,9 @@ export async function config() {
 		}
 	} catch (e) {
 		console.log("[💔] Error parsing configuration file.");
-        console.log(" |  " + e);
-        console.log(" |  Will now use default config." )
-        return await save();
+		console.log(" |  " + e);
+		console.log(" |  Will now use default config.");
+		return await save();
 	}
 }
 
@@ -55,10 +55,9 @@ export function get(key: string | Symbol, def?: any): any {
 export function set(key: string | Symbol, value: any): void {
 	store.set(key, value);
 
-	if (typeof key === "string")
-		save();
+	if (typeof key === "string") save();
 }
 
 export const MagicNames = {
 	CLIENT: Symbol.for("client"),
-}
+};
