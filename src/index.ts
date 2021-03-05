@@ -1,17 +1,15 @@
-import { onMessageHandler } from "./commands/commands";
 import { Channel, Client } from "discord.js";
 import { config as DotEnvInit } from "dotenv";
-import { config, MagicNames, set } from "./globalConfigs";
+import { load } from "./config";
 import { config as gconfig } from "./guild";
 
 DotEnvInit();
-config().then(init);
+load().then(init);
 
 function init() {
 	const client = new Client();
-	set(MagicNames.CLIENT, client);
 
-	client.on("message", onMessageHandler);
+	client.on("message", () => {});
 
 	client.on("ready", () => {
 		gconfig(client);

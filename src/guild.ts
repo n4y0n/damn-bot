@@ -1,9 +1,7 @@
 import { Client } from "discord.js";
-import { get, set } from "./globalConfigs";
+import { setupGuildConfig } from "./config";
 
 export function config(client: Client) {
 	// initialize guilds config map
-	client.guilds.forEach((guild) =>
-		!get(guild.id) ? set(guild.id, {}) : null
-	);
+	client.guilds.forEach(guild => setupGuildConfig(guild));
 }

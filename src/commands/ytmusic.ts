@@ -6,7 +6,6 @@ import {
 	VoiceConnection,
 } from "discord.js";
 import * as ytdl from "ytdl-core";
-import { get } from "../globalConfigs";
 
 const queue = new Map<string, QueueContruct>();
 
@@ -160,16 +159,5 @@ export async function skip(message: Message) {
 }
 
 async function checkPermissions(message: Message) {
-	// posso fare tutto in un unico if ma meglio lasciare tutto separato per leggibilita
-
-	if (message.author.id === get("owner") || (message.guild && message.member.id === message.guild.owner.id)) {
-		return true;
-	}
-
-	if (message.member.roles.some(role => get(message.guild.id) && role.id === get(message.guild.id)["djrole"])) {
-		return true;
-	}
-
-	await message.react("🛑");
-	return false;
+	return true;
 }
