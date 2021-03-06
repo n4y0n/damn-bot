@@ -1,9 +1,8 @@
 import { Channel, Client } from "discord.js";
-import { config as DotEnvInit } from "dotenv";
+import { config } from "dotenv";
 import { load } from "./config";
-import { config as gconfig } from "./guild";
 
-DotEnvInit();
+config();
 load();
 
 const client = new Client();
@@ -11,8 +10,6 @@ const client = new Client();
 client.on("message", () => {});
 
 client.on("ready", () => {
-	gconfig(client);
-
 	client.user.setActivity(
 		'"@' + client.user.username + ' info" for more help.'
 	);

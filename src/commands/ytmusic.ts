@@ -1,5 +1,4 @@
 import {
-	Channel,
 	Message,
 	TextChannel,
 	VoiceChannel,
@@ -10,28 +9,47 @@ import * as ytdl from "ytdl-core";
 const queue = new Map<string, QueueContruct>();
 
 class Song {
-	title: string;
-	url: string;
-
-	constructor(title: string, url: string) {
-		this.title = title;
-		this.url = url;
-	}
+	constructor(public title: string, public url: string) {}
 }
 
 class QueueContruct {
-	textChannel: TextChannel;
-	voiceChannel: VoiceChannel;
-	connection: VoiceConnection;
+	public textChannel: TextChannel;
+	public voiceChannel: VoiceChannel;
+	public connection: VoiceConnection;
 
-	songs: Array<Song> = [];
-	volume: number = 5;
-	playing: boolean = true;
+	public volume: number = 5;
+	public playing: boolean = true;
 
-	constructor(tc: TextChannel | any, vc: VoiceChannel, con: VoiceConnection = null) {
+	private m_songs: Array<Song> = [];
+
+	constructor(
+		tc: TextChannel | any,
+		vc: VoiceChannel,
+		con: VoiceConnection = null
+	) {
 		this.textChannel = tc;
 		this.voiceChannel = vc;
 		this.connection = con;
+	}
+
+	enqueue(song: Song) {
+		this.m_songs.push(song);
+	}
+
+	first() {
+		return this.m_songs[0];
+	}
+
+	shift() {
+		this.m_songs.shift();
+	}
+
+	clear() {
+		this.m_songs = [];
+	}
+
+	size() {
+		return this.m_songs.length;
 	}
 }
 
@@ -64,23 +82,21 @@ export async function play(message: Message) {
 		// Setting the queue using our contract
 		queue.set(message.guild.id, queueContruct);
 		// Pushing the song to our songs array
-		queueContruct.songs.push(song);
+		queueContruct.enqueue(song);
 
 		try {
 			// Here we try to join the voicechat and save our connection into our object.
 			var connection = await voiceChannel.join();
 			queueContruct.connection = connection;
 			// Calling the play function to start a song
-			startSong(message.guild, queueContruct.songs[0]);
+			startSong(message.guild, queueContruct.first());
 		} catch (err) {
 			// Printing the error message if the bot fails to join the voicechat
-			console.log(err);
 			queue.delete(message.guild.id);
 			voiceChannel.leave();
 		}
 	} else {
-		serverQueue.songs.push(song);
-		console.log(serverQueue.songs);
+		serverQueue.enqueue(song);
 		return message.channel.send(
 			`${song.title} has been added to the queue!`
 		);
@@ -98,8 +114,8 @@ function startSong(guild, song) {
 	const dispatcher = serverQueue.connection
 		.playStream(ytdl(song.url))
 		.on("end", () => {
-			serverQueue.songs.shift();
-			startSong(guild, serverQueue.songs[0]);
+			serverQueue.shift();
+			startSong(guild, serverQueue.first());
 		})
 		.on("error", (error) => console.error(error));
 	dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
@@ -107,12 +123,6 @@ function startSong(guild, song) {
 }
 
 export async function stop(message: Message) {
-	if (!checkPermissions(message)) {
-		return message.channel.send(
-			"You don't have permission to perform this action."
-		);
-	}
-
 	const serverQueue = queue.get(message.guild.id);
 
 	if (!message.member.voiceChannel)
@@ -123,7 +133,7 @@ export async function stop(message: Message) {
 	if (!serverQueue)
 		return message.channel.send("There is no song that I could stop!");
 
-	serverQueue.songs = [];
+	serverQueue.clear();
 
 	if (serverQueue.connection.dispatcher)
 		serverQueue.connection.dispatcher.end();
@@ -132,12 +142,6 @@ export async function stop(message: Message) {
 }
 
 export async function skip(message: Message) {
-	if (!checkPermissions(message)) {
-		return message.channel.send(
-			"You don't have permission to perform this action."
-		);
-	}
-
 	const serverQueue = queue.get(message.guild.id);
 
 	if (!message.member.voiceChannel) {
@@ -152,12 +156,7 @@ export async function skip(message: Message) {
 	if (serverQueue.connection.dispatcher)
 		serverQueue.connection.dispatcher.end();
 
-	serverQueue.songs.shift();
-	if (serverQueue.songs.length > 0)
-		startSong(message.guild, serverQueue.songs[0]);
+	serverQueue.shift();
+	if (serverQueue.size() > 0) startSong(message.guild, serverQueue.first());
 	else serverQueue.voiceChannel.leave();
-}
-
-async function checkPermissions(message: Message) {
-	return true;
 }
