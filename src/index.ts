@@ -4,31 +4,29 @@ import { load } from "./config";
 import { config as gconfig } from "./guild";
 
 DotEnvInit();
-load().then(init);
+load();
 
-function init() {
-	const client = new Client();
+const client = new Client();
 
-	client.on("message", () => {});
+client.on("message", () => {});
 
-	client.on("ready", () => {
-		gconfig(client);
+client.on("ready", () => {
+	gconfig(client);
 
-		client.user.setActivity(
-			'"@' + client.user.username + ' info" for more help.'
-		);
+	client.user.setActivity(
+		'"@' + client.user.username + ' info" for more help.'
+	);
 
-		console.log("[📡] Bot ready!");
-	});
+	console.log("[📡] Bot ready!");
+});
 
-	client.on("error", async (e) => {
-		console.log("[📡] Error, riconnecting...");
-		return client.login(process.env.TOKEN);
-	});
+client.on("error", async (e) => {
+	console.log("[📡] Error, riconnecting...");
+	return client.login(process.env.TOKEN);
+});
 
-	client.on("disconnect", (channel: Channel) => {
-		console.log("[📡] Disconnected from " + channel.id);
-	});
+client.on("disconnect", (channel: Channel) => {
+	console.log("[📡] Disconnected from " + channel.id);
+});
 
-	client.login(process.env.TOKEN);
-}
+client.login(process.env.TOKEN);

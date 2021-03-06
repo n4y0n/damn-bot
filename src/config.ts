@@ -1,39 +1,63 @@
 import { Guild } from "discord.js";
 import { homedir } from "os";
 import { join } from "path";
+import debug from "debug";
 
-import { readFileSync, writeFileSync } from "fs";
+const log = debug("bot:config");
+
+import { existsSync, readFileSync, writeFileSync } from "fs";
 
 const configPath = join(homedir(), ".discord-bot.conf");
 
-interface Serializable {
-	serialize(): string;
-}
+let configs = {};
+let guilds = {};
 
-class GuildConfig {}
+const deserializeConfig = () => {
+	if (!existsSync(configPath)) return;
+	log("Configuration file has been found.")
+	log("Deserializing from configuration file.")
 
-class Config implements Serializable {
-	private config: Map<string, GuildConfig> = new Map();
+	const { guildsConfig, botConfigs } = JSON.parse(
+		readFileSync(configPath, { encoding: "utf-8" })
+	);
 
-	serialize(): string {
-		return JSON.stringify(this.config);
+	configs = botConfigs;
+	guilds = guildsConfig;
+	log("Deserialization done.")
+};
+
+const serializeConfig = () => {
+	log("Serializing configurations to file.")
+	const guildsConfig = guilds;
+	const botConfigs = configs;
+
+	const data = {
+		guildsConfig,
+		botConfigs,
+	};
+
+	writeFileSync(configPath, JSON.stringify(data), { encoding: "utf-8" });
+	log("Serialization done.")
+};
+
+export const getGuild = (guild: Guild) => {
+	if (!guilds[guild.id]) {
+		guilds[guild.id] = {};
 	}
-}
+	return guilds[guild.id];
+};
 
-function deserializeConfig() {
-	try {
-		return JSON.parse(readFileSync(configPath, { encoding: "utf-8" }));
-	} catch (e) {
-		return {};
+export const get = (key: string) => {
+	if (!configs[key]) {
+		return null;
 	}
+	return configs[key];
 }
 
-function serializeConfig(config: Serializable) {
-	writeFileSync(configPath, config.serialize(), { encoding: "utf-8" });
-}
+export const setupGuildConfig = (guild: Guild) => {
+	if (!guilds[guild.id]) guilds[guild.id] = {};
+};
 
-export function setupGuildConfig(guild: Guild) {}
+export const load = () => deserializeConfig();
 
-export async function load() {
-
-}
+export const save = () => serializeConfig();
