@@ -1,5 +1,4 @@
 import {
-	Guild,
 	Message,
 	TextChannel,
 	VoiceChannel,
@@ -26,11 +25,11 @@ class SimpleQueueContructImpl implements QueueContruct {
 	) {}
 }
 
-function startSong(guild: Guild, song: Song) {
-	const serverQueue: QueueContruct = queue.get(guild.id);
+function startSong(guildID: string, song: Song) {
+	const serverQueue: QueueContruct = queue.get(guildID);
 	if (!song) {
 		serverQueue.voiceChannel.leave();
-		queue.delete(guild.id);
+		queue.delete(guildID);
 		return;
 	}
 
@@ -38,7 +37,7 @@ function startSong(guild: Guild, song: Song) {
 		.playStream(ytdl(song.url))
 		.on("end", () => {
 			serverQueue.songs.shift();
-			startSong(guild, serverQueue.songs[0]);
+			startSong(guildID, serverQueue.songs[0]);
 		})
 		.on("error", (error) => console.error(error));
 	dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
@@ -81,7 +80,7 @@ export async function play(message: Message) {
 			var connection = await voiceChannel.join();
 			queueContruct.connection = connection;
 			// Calling the play function to start a song
-			startSong(message.guild, queueContruct.songs[0]);
+			startSong(message.guild.id, queueContruct.songs[0]);
 		} catch (err) {
 			// Printing the error message if the bot fails to join the voicechat
 			queue.delete(message.guild.id);
@@ -130,6 +129,6 @@ export async function skip(message: Message) {
 		serverQueue.connection.dispatcher.end();
 
 	serverQueue.songs.shift();
-	if (serverQueue.songs.length > 0) startSong(message.guild, serverQueue.songs[0]);
+	if (serverQueue.songs.length > 0) startSong(message.guild.id, serverQueue.songs[0]);
 	else serverQueue.voiceChannel.leave();
 }

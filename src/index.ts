@@ -26,8 +26,7 @@ client.on("ready", async () => {
 });
 
 client.on("error", async (e) => {
-	log("[📡] Error, riconnecting...");
-	return client.login(process.env.TOKEN);
+	log("[📡] %o", e);
 });
 
 client.on("disconnect", (channel: Channel) => {
