@@ -1,56 +1,48 @@
 import {
+	Guild,
 	Message,
 	TextChannel,
 	VoiceChannel,
 	VoiceConnection,
 } from "discord.js";
 import * as ytdl from "ytdl-core";
+import { QueueContruct, Song } from "../types/commands.music";
 
 const queue = new Map<string, QueueContruct>();
 
-class Song {
+class SimpleSongImpl implements Song {
 	constructor(public title: string, public url: string) {}
 }
 
-class QueueContruct {
-	public textChannel: TextChannel;
-	public voiceChannel: VoiceChannel;
-	public connection: VoiceConnection;
-
+class SimpleQueueContructImpl implements QueueContruct {
 	public volume: number = 5;
 	public playing: boolean = true;
-
-	private m_songs: Array<Song> = [];
+	public songs: Array<Song> = [];
 
 	constructor(
-		tc: TextChannel | any,
-		vc: VoiceChannel,
-		con: VoiceConnection = null
-	) {
-		this.textChannel = tc;
-		this.voiceChannel = vc;
-		this.connection = con;
+		public textChannel: TextChannel,
+		public voiceChannel: VoiceChannel,
+		public connection: VoiceConnection = null
+	) {}
+}
+
+function startSong(guild: Guild, song: Song) {
+	const serverQueue: QueueContruct = queue.get(guild.id);
+	if (!song) {
+		serverQueue.voiceChannel.leave();
+		queue.delete(guild.id);
+		return;
 	}
 
-	enqueue(song: Song) {
-		this.m_songs.push(song);
-	}
-
-	first() {
-		return this.m_songs[0];
-	}
-
-	shift() {
-		this.m_songs.shift();
-	}
-
-	clear() {
-		this.m_songs = [];
-	}
-
-	size() {
-		return this.m_songs.length;
-	}
+	const dispatcher = serverQueue.connection
+		.playStream(ytdl(song.url))
+		.on("end", () => {
+			serverQueue.songs.shift();
+			startSong(guild, serverQueue.songs[0]);
+		})
+		.on("error", (error) => console.error(error));
+	dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
+	serverQueue.textChannel.send(`Start playing: **${song.title}**`);
 }
 
 export async function play(message: Message) {
@@ -69,7 +61,7 @@ export async function play(message: Message) {
 	}
 
 	const songInfo = await ytdl.getInfo(message.content);
-	const song = new Song(
+	const song: Song = new SimpleSongImpl(
 		songInfo.videoDetails.title,
 		songInfo.videoDetails.video_url
 	);
@@ -78,48 +70,29 @@ export async function play(message: Message) {
 
 	if (!serverQueue) {
 		// Creating the contract for our queue
-		const queueContruct = new QueueContruct(message.channel, voiceChannel);
+		const queueContruct = new SimpleQueueContructImpl(message.channel as TextChannel, voiceChannel);
 		// Setting the queue using our contract
 		queue.set(message.guild.id, queueContruct);
 		// Pushing the song to our songs array
-		queueContruct.enqueue(song);
+		queueContruct.songs.push(song);
 
 		try {
 			// Here we try to join the voicechat and save our connection into our object.
 			var connection = await voiceChannel.join();
 			queueContruct.connection = connection;
 			// Calling the play function to start a song
-			startSong(message.guild, queueContruct.first());
+			startSong(message.guild, queueContruct.songs[0]);
 		} catch (err) {
 			// Printing the error message if the bot fails to join the voicechat
 			queue.delete(message.guild.id);
 			voiceChannel.leave();
 		}
 	} else {
-		serverQueue.enqueue(song);
+		serverQueue.songs.push(song);
 		return message.channel.send(
 			`${song.title} has been added to the queue!`
 		);
 	}
-}
-
-function startSong(guild, song) {
-	const serverQueue = queue.get(guild.id);
-	if (!song) {
-		serverQueue.voiceChannel.leave();
-		queue.delete(guild.id);
-		return;
-	}
-
-	const dispatcher = serverQueue.connection
-		.playStream(ytdl(song.url))
-		.on("end", () => {
-			serverQueue.shift();
-			startSong(guild, serverQueue.first());
-		})
-		.on("error", (error) => console.error(error));
-	dispatcher.setVolumeLogarithmic(serverQueue.volume / 5);
-	serverQueue.textChannel.send(`Start playing: **${song.title}**`);
 }
 
 export async function stop(message: Message) {
@@ -133,7 +106,7 @@ export async function stop(message: Message) {
 	if (!serverQueue)
 		return message.channel.send("There is no song that I could stop!");
 
-	serverQueue.clear();
+	serverQueue.songs = [];
 
 	if (serverQueue.connection.dispatcher)
 		serverQueue.connection.dispatcher.end();
@@ -156,7 +129,7 @@ export async function skip(message: Message) {
 	if (serverQueue.connection.dispatcher)
 		serverQueue.connection.dispatcher.end();
 
-	serverQueue.shift();
-	if (serverQueue.size() > 0) startSong(message.guild, serverQueue.first());
+	serverQueue.songs.shift();
+	if (serverQueue.songs.length > 0) startSong(message.guild, serverQueue.songs[0]);
 	else serverQueue.voiceChannel.leave();
 }
