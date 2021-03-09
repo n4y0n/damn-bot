@@ -1,10 +1,12 @@
 import {
+	Client,
 	Message,
 	TextChannel,
 	VoiceChannel,
 	VoiceConnection,
 } from "discord.js";
 import * as ytdl from "ytdl-core";
+import { get } from "../config";
 import { QueueContruct, Song } from "../types/commands.music";
 
 const queue = new Map<string, QueueContruct>();
@@ -44,34 +46,32 @@ function startSong(guildID: string, song: Song) {
 	serverQueue.textChannel.send(`Start playing: **${song.title}**`);
 }
 
-export async function play(message: Message) {
-	const voiceChannel = message.member.voiceChannel;
-
+export async function play(guildID: string, voiceChannel: VoiceChannel, textChannel: TextChannel, messageContent: string) {
 	if (!voiceChannel)
-		return message.channel.send(
+		return textChannel.send(
 			"You need to be in a voice channel to play music!"
 		);
 
-	const permissions = voiceChannel.permissionsFor(message.client.user);
+	const permissions = voiceChannel.permissionsFor((get("client") as Client).user);
 	if (!permissions.has("CONNECT") || !permissions.has("SPEAK")) {
-		return message.channel.send(
+		return textChannel.send(
 			"I need the permissions to join and speak in your voice channel!"
 		);
 	}
 
-	const songInfo = await ytdl.getInfo(message.content);
+	const songInfo = await ytdl.getInfo(messageContent);
 	const song: Song = new SimpleSongImpl(
 		songInfo.videoDetails.title,
 		songInfo.videoDetails.video_url
 	);
 
-	const serverQueue: QueueContruct = queue.get(message.guild.id);
+	const serverQueue: QueueContruct = queue.get(guildID);
 
 	if (!serverQueue) {
 		// Creating the contract for our queue
-		const queueContruct = new SimpleQueueContructImpl(message.channel as TextChannel, voiceChannel);
+		const queueContruct = new SimpleQueueContructImpl(textChannel, voiceChannel);
 		// Setting the queue using our contract
-		queue.set(message.guild.id, queueContruct);
+		queue.set(guildID, queueContruct);
 		// Pushing the song to our songs array
 		queueContruct.songs.push(song);
 
@@ -80,15 +80,15 @@ export async function play(message: Message) {
 			var connection = await voiceChannel.join();
 			queueContruct.connection = connection;
 			// Calling the play function to start a song
-			startSong(message.guild.id, queueContruct.songs[0]);
+			startSong(guildID, queueContruct.songs[0]);
 		} catch (err) {
 			// Printing the error message if the bot fails to join the voicechat
-			queue.delete(message.guild.id);
+			queue.delete(guildID);
 			voiceChannel.leave();
 		}
 	} else {
 		serverQueue.songs.push(song);
-		return message.channel.send(
+		return textChannel.send(
 			`${song.title} has been added to the queue!`
 		);
 	}

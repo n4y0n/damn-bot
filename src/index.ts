@@ -1,7 +1,7 @@
 import { Channel, Client } from "discord.js";
 import debug from "debug";
 import { config } from "dotenv";
-import { get, load } from "./config";
+import { get, load, setClient } from "./config";
 
 const log = debug("bot:bot");
 
@@ -12,6 +12,7 @@ config();
 load();
 
 const client = new Client();
+setClient(client);
 
 client.on("message", () => {});
 

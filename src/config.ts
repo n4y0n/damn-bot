@@ -1,4 +1,4 @@
-import { Guild, PresenceStatus } from "discord.js";
+import { Client, Guild } from "discord.js";
 import { homedir } from "os";
 import { join } from "path";
 import debug from "debug";
@@ -6,12 +6,13 @@ import debug from "debug";
 const log = debug("bot:config");
 
 import { existsSync, readFileSync, writeFileSync } from "fs";
-import { BotConfigKey, BotStatus } from "./types/config";
+import { BotConfigKey } from "./types/config";
 
 const configPath = join(homedir(), ".discord-bot.json");
 
 let configs = {};
 let guilds = {};
+let _client: Client;
 
 const generateDefaultConfigurations = () => {
 	log("Configuration file not found. Generating one with default values.");
@@ -83,12 +84,21 @@ const serializeConfig = () => {
 	log("Serialization done.");
 };
 
-export const getGuild = (guild: Guild) => {
-	if (!guilds[guild.id]) {
-		guilds[guild.id] = {};
+export const getGuild = (guild: Guild | string) => {
+	let key: string;
+	if (typeof guild !== "string") {
+		key = guild.id;
 	}
-	return guilds[guild.id];
+
+	if (!guilds[key]) {
+		guilds[key] = {};
+	}
+	return guilds[key];
 };
+
+export const setClient = (client: Client) => {
+	_client = client;
+}
 
 export const get = (key: BotConfigKey) => {
 	if (configs[key] === undefined) {
@@ -110,6 +120,8 @@ function getDefaultOrValue(key: BotConfigKey, value: any) {
 			return value ? value : get("altprefix");
 		case "status":
 			return value.toLowerCase();
+		case "client":
+			return _client;
 		default:
 			return value;
 	}
