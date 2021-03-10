@@ -15,7 +15,10 @@ load();
 const client = new Client();
 setClient(client);
 
-client.on("message", (message: Message) => {});
+client.on("message", (message: Message) => {
+	const [isCommand, command] = parseMessage(message);
+	if (isCommand) runCommand(command);
+});
 
 client.on("ready", async () => {
 	const status = get("status");
@@ -35,7 +38,4 @@ client.on("disconnect", (channel: Channel) => {
 	log("[📡] Disconnected from " + channel.id);
 });
 
-// client.login(get("token"));
-
-const [isCommand, command] = parseMessage({ content: "-play" } as Message);
-if (isCommand) runCommand(command);
+client.login(get("token"));

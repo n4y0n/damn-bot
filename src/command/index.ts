@@ -32,10 +32,16 @@ export const parseMessage = (message: Message): [boolean, Command?] => {
 	return [true, command];
 };
 
-export const runCommand = (command: Command) => {
-	const executor = map.get(command.command);
-	if (executor) executor.run(command);
-}
+export const runCommand = async (command: Command) => {
+	try {
+		const executor = map.get(command.command);
+		if (executor) await executor.run(command);
+		await command.message.react(get("success"));
+	} catch (e) {
+		log(e);
+		await command.message.react(get("error"));
+	}
+};
 
 function importCommands() {
 	const commandsFiles = readdirSync(commandsFolder).filter(
@@ -45,7 +51,8 @@ function importCommands() {
 		try {
 			const command = require(`${commandsFolder}/${file}`);
 			for (let id of command.ids()) {
-				if (map.has(id)) log("[WARNING] Overriding already existing command id.");
+				if (map.has(id))
+					log("[WARNING] Overriding already existing command id.");
 				map.set(id, command);
 			}
 		} catch (e) {}
