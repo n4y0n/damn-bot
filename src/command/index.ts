@@ -8,7 +8,7 @@ const log = debug("bot:commands");
 
 const commandsFolder = `${__dirname}`;
 const map: Map<string, CommandExecutor> = new Map();
-const commandsInfo: Map<string, CommandInfo> = new Map();
+const commandsInfo: Array<CommandInfo> = [];
 importCommands();
 
 export const parseMessage = (message: Message): [boolean, Command?] => {
@@ -44,6 +44,8 @@ export const runCommand = async (command: Command) => {
 	}
 };
 
+export const commandsInformation = () => commandsInfo;
+
 function importCommands() {
 	const executorsFiles = readdirSync(commandsFolder).filter(
 		(value) => value.endsWith(".js") && value !== "index.js"
@@ -55,7 +57,7 @@ function importCommands() {
 				if (map.has(id))
 					log("[WARNING] Overriding already existing executor id.");
 				map.set(id, executor);
-				commandsInfo.set(id, executor.info());
+				commandsInfo.push(executor.info());
 			}
 		} catch (e) {}
 	}

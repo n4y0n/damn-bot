@@ -1,12 +1,12 @@
 import { play, skip, stop } from "../controller/ytmusic";
-import { Command } from "../types/commands";
+import { Command, CommandInfo } from "../types/commands";
 
 export const ids = (): Array<string> => {
-	return ["play", "skip", "stop"];
+	return ["music"];
 };
 
 export const run = async (command: Command) => {
-	switch (command.command) {
+	switch (command.arguments?.[0]) {
 		case "play":
 			return play(command.message);
 		case "skip":
@@ -15,3 +15,11 @@ export const run = async (command: Command) => {
 			return stop(command.message);
 	}
 };
+
+export const info = () => {
+	return {
+		name: "music",
+		description: "Music related commands.",
+		arguments: ["play", "skip", "stop"]
+	} as CommandInfo
+}
