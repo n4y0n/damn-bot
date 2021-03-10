@@ -7,7 +7,7 @@ import debug from "debug";
 const log = debug("bot:config");
 
 import { existsSync, readFileSync, writeFileSync } from "fs";
-import { BotConfigKey } from "./types/config";
+import { BotConfigKey, GuildConfigKey } from "./types/config";
 
 const configPath = join(homedir(), ".discord-bot.json");
 
@@ -107,7 +107,7 @@ const serializeConfig = () => {
 	log("Serialization done.");
 };
 
-export const getGuild = (guild: Guild | string) => {
+export const getGuildConf = (guild: Guild | string, conf: GuildConfigKey) => {
 	let key: string;
 	if (typeof guild !== "string") {
 		key = guild.id;
@@ -117,6 +117,19 @@ export const getGuild = (guild: Guild | string) => {
 		guilds[key] = {};
 	}
 	return guilds[key];
+};
+
+export const setGuildConf = (guild: Guild | string, conf: GuildConfigKey, value: any) => {
+	let key: string;
+	if (typeof guild !== "string") {
+		key = guild.id;
+	}
+
+	if (!guilds[key]) {
+		guilds[key] = {};
+	}
+
+	guilds[key][conf] = value;
 };
 
 export const setClient = (client: Client) => {
