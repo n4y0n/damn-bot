@@ -10,11 +10,12 @@ export interface Command {
 export interface CommandInfo {
 	name: string;
 	description: string;
+	subcommands?: Array<CommandInfo>
 	arguments?: string[]
 }
 
 export interface CommandExecutor {
-	ids: () => Array<string>;
+	alias: () => Array<string>;
 	run: (command: Command) => void;
 	info: () => CommandInfo;
 }

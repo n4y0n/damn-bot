@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { DiscordAPIError, Message } from "discord.js";
 import { readdirSync } from "fs";
 import debug from "debug";
 import { Command, CommandExecutor, CommandInfo } from "../types/commands";
@@ -7,8 +7,9 @@ import { get } from "../config";
 const log = debug("bot:commands");
 
 const commandsFolder = `${__dirname}`;
-const map: Map<string, CommandExecutor> = new Map();
-const commandsInfo: Array<CommandInfo> = [];
+const executors: Map<string, CommandExecutor> = new Map();
+const aliases: Map<string, string> = new Map();
+const commandsInfo: Map<string, CommandInfo> = new Map();
 importCommands();
 
 export const parseMessage = (message: Message): [boolean, Command?] => {
@@ -19,7 +20,7 @@ export const parseMessage = (message: Message): [boolean, Command?] => {
 	const args = message.content.split(" ");
 	const ctext = args[0].replace(get("prefix"), "").trim();
 
-	if (!map.has(ctext)) {
+	if (!executors.has(ctext) && !aliases.has(ctext)) {
 		return [false, null];
 	}
 
@@ -35,16 +36,22 @@ export const parseMessage = (message: Message): [boolean, Command?] => {
 
 export const runCommand = async (command: Command) => {
 	try {
-		const executor = map.get(command.command);
+		const executor = executors.get(command.command) ?? executors.get(aliases.get(command.command));
 		if (executor) await executor.run(command);
 		await command.message.react(get("success"));
 	} catch (e) {
 		log(e);
-		await command.message.react(get("error"));
+		if ((e as DiscordAPIError).code !== 10008) {
+			await command.message.react(get("error"));
+		}
 	}
 };
 
-export const commandsInformation = () => commandsInfo;
+export const commandsInformation = (
+	command: string = null
+): CommandInfo | IterableIterator<CommandInfo> => {
+	return command ? commandsInfo.get(command) ?? commandsInfo.get(aliases.get(command)) : commandsInfo.values();
+};
 
 function importCommands() {
 	const executorsFiles = readdirSync(commandsFolder).filter(
@@ -52,12 +59,19 @@ function importCommands() {
 	);
 	for (let file of executorsFiles) {
 		try {
-			const executor = require(`${commandsFolder}/${file}`);
-			for (let id of executor.ids()) {
-				if (map.has(id))
-					log("[WARNING] Overriding already existing executor id.");
-				map.set(id, executor);
-				commandsInfo.push(executor.info());
+			const executor = require(`${commandsFolder}/${file}`) as CommandExecutor;
+			const cInfo = executor.info();
+			const cName = cInfo.name;
+
+			if (executors.has(cName)) {
+				log("[WARNING] Overriding already existing executor id.");
+			}
+
+			executors.set(cName, executor);
+			commandsInfo.set(cName, cInfo);
+
+			for (let alias of executor.alias()) {
+				aliases.set(alias, cName);
 			}
 		} catch (e) {}
 	}

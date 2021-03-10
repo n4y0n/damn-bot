@@ -1,4 +1,4 @@
-import { Channel, Client, Message, TextChannel } from "discord.js";
+import { Channel, Client, Message, Permissions, TextChannel } from "discord.js";
 import debug from "debug";
 import { config } from "dotenv";
 import { get, load, setClient } from "./config";
@@ -27,6 +27,9 @@ client.on("ready", async () => {
 	await client.user.setActivity(game);
 	await client.user.setStatus(status);
 
+	const inviteUrl = await client.generateInvite(Permissions.ALL);
+
+	console.log(inviteUrl);
 	console.log("[📡] Bot ready!");
 });
 

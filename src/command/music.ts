@@ -1,8 +1,8 @@
 import { play, skip, stop } from "../controller/ytmusic";
 import { Command, CommandInfo } from "../types/commands";
 
-export const ids = (): Array<string> => {
-	return ["music"];
+export const alias = (): Array<string> => {
+	return ["m", "ytm"];
 };
 
 export const run = async (command: Command) => {
@@ -20,6 +20,22 @@ export const info = () => {
 	return {
 		name: "music",
 		description: "Music related commands.",
-		arguments: ["play", "skip", "stop"]
-	} as CommandInfo
-}
+		subcommands: [
+			{
+				name: "play",
+				description:
+					"Start background play of the provided youtube url.",
+				arguments: ["url"],
+			},
+			{
+				name: "skip",
+				description: "Skip currently playing url.",
+			},
+			{
+				name: "stop",
+				description:
+					"Stop all song, clear the playlist and disconnect.",
+			},
+		],
+	} as CommandInfo;
+};
