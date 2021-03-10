@@ -35,6 +35,9 @@ export const info = () => {
 };
 
 function genEmbed(embed: RichEmbed, com: CommandInfo) {
+	embed.setTitle(`HELP ${com.name}`);
+	embed.addField(com.name, com.description)
+	embed.addBlankField();
 	for (let info of com.subcommands ?? []) {
 		embed.addField(
 			`${get("prefix")}${com.name} ${buildCommandHelpString(info)}`,
