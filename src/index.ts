@@ -1,7 +1,8 @@
-import { Channel, Client } from "discord.js";
+import { Channel, Client, Message, TextChannel } from "discord.js";
 import debug from "debug";
 import { config } from "dotenv";
 import { get, load, setClient } from "./config";
+import { parseMessage, runCommand } from "./command";
 
 const log = debug("bot:bot");
 
@@ -14,7 +15,7 @@ load();
 const client = new Client();
 setClient(client);
 
-client.on("message", () => {});
+client.on("message", (message: Message) => {});
 
 client.on("ready", async () => {
 	const status = get("status");
@@ -23,15 +24,18 @@ client.on("ready", async () => {
 	await client.user.setActivity(game);
 	await client.user.setStatus(status);
 
-	log("[📡] Bot ready!");
+	console.log("[📡] Bot ready!");
 });
 
-client.on("error", async (e) => {
-	log("[📡] %o", e);
+client.on("error", (e) => {
+	console.error("[📡] %o", e);
 });
 
 client.on("disconnect", (channel: Channel) => {
 	log("[📡] Disconnected from " + channel.id);
 });
 
-client.login(process.env.TOKEN);
+// client.login(get("token"));
+
+const [isCommand, command] = parseMessage({ content: "-play" } as Message);
+if (isCommand) runCommand(command);
