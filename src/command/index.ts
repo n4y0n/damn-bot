@@ -1,13 +1,14 @@
 import { Message } from "discord.js";
 import { readdirSync } from "fs";
 import debug from "debug";
-import { Command, CommandExecutor } from "../types/commands";
+import { Command, CommandExecutor, CommandInfo } from "../types/commands";
 import { get } from "../config";
 
 const log = debug("bot:commands");
 
 const commandsFolder = `${__dirname}`;
 const map: Map<string, CommandExecutor> = new Map();
+const commandsInfo: Map<string, CommandInfo> = new Map();
 importCommands();
 
 export const parseMessage = (message: Message): [boolean, Command?] => {
@@ -44,16 +45,17 @@ export const runCommand = async (command: Command) => {
 };
 
 function importCommands() {
-	const commandsFiles = readdirSync(commandsFolder).filter(
+	const executorsFiles = readdirSync(commandsFolder).filter(
 		(value) => value.endsWith(".js") && value !== "index.js"
 	);
-	for (let file of commandsFiles) {
+	for (let file of executorsFiles) {
 		try {
-			const command = require(`${commandsFolder}/${file}`);
-			for (let id of command.ids()) {
+			const executor = require(`${commandsFolder}/${file}`);
+			for (let id of executor.ids()) {
 				if (map.has(id))
-					log("[WARNING] Overriding already existing command id.");
-				map.set(id, command);
+					log("[WARNING] Overriding already existing executor id.");
+				map.set(id, executor);
+				commandsInfo.set(id, executor.info());
 			}
 		} catch (e) {}
 	}

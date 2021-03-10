@@ -7,7 +7,14 @@ export interface Command {
 	arguments?: string[];
 }
 
+export interface CommandInfo {
+	name: string;
+	description: string;
+	arguments?: string[]
+}
+
 export interface CommandExecutor {
 	ids: () => Array<string>;
 	run: (command: Command) => void;
+	info: () => CommandInfo;
 }
