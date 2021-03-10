@@ -1,9 +1,4 @@
-import {
-	Message,
-	TextChannel,
-	VoiceChannel,
-	VoiceConnection,
-} from "discord.js";
+import { Message, TextChannel, VoiceChannel, VoiceConnection } from "discord.js";
 import * as ytdl from "ytdl-core";
 import { QueueContruct, Song } from "../types/commands.music";
 

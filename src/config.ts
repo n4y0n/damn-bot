@@ -116,7 +116,7 @@ export const getGuildConf = (guild: Guild | string, conf: GuildConfigKey) => {
 	if (!guilds[key]) {
 		guilds[key] = {};
 	}
-	return guilds[key];
+	return guilds[key][conf];
 };
 
 export const setGuildConf = (guild: Guild | string, conf: GuildConfigKey, value: any) => {
