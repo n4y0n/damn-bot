@@ -16,7 +16,7 @@ export const parseMessage = (message: Message): [boolean, Command?] => {
 	if (!message.content.startsWith(get("prefix"))) {
 		return [false, null];
 	}
-
+	// TODO: use "" per stringhe in un comando
 	const args = message.content.split(" ");
 	const ctext = args[0].replace(get("prefix"), "").trim();
 

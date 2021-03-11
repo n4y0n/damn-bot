@@ -14,7 +14,8 @@ export const run = async (command: Command) => {
 	if (command.arguments.length > 0) {
 		genEmbed(
 			embed,
-			commandsInformation(command.arguments.shift()) as CommandInfo
+			commandsInformation(command.arguments.shift()) as CommandInfo,
+			command.arguments
 		);
 	} else {
 		for (let info of commandsInformation() as IterableIterator<CommandInfo>) {
@@ -34,15 +35,20 @@ export const info = () => {
 	} as CommandInfo;
 };
 
-function genEmbed(embed: RichEmbed, com: CommandInfo) {
-	embed.setTitle(`HELP ${com.name}`);
-	embed.addField(com.name, com.description || "lorem ipsum");
-	embed.addBlankField();
-	for (let info of com.subcommands ?? []) {
-		embed.addField(
-			`${get("prefix")}${com.name} ${buildCommandHelpString(info)}`,
-			info.description || "lorem ipsum"
-		);
+function genEmbed(embed: RichEmbed, com: CommandInfo, args: string[]) {
+	if (args.length === 0) {
+		embed.setTitle(`HELP ${com.name}`);
+		embed.addField(com.name, com.description || "lorem ipsum");
+		embed.addBlankField();
+		for (let info of com.subcommands ?? []) {
+			embed.addField(
+				`${get("prefix")}${com.name} ${buildCommandHelpString(info)}`,
+				info.description || "lorem ipsum"
+			);
+		}
+	} else {
+		let sc = args.shift();
+		genEmbed(embed, com.subcommands.find(v => v.name === sc), args);
 	}
 }
 
@@ -63,7 +69,8 @@ function buildCommandHelpString(info: CommandInfo) {
 	}
 
 	let argumentsPresent: string;
-	if (info.arguments) {
+
+	if (info.arguments?.length > 0) {
 		argumentsPresent = "<";
 	}
 
@@ -75,11 +82,11 @@ function buildCommandHelpString(info: CommandInfo) {
 			argumentsPresent += " | ";
 		}
 	}
-	if (info.arguments) {
-		argumentsPresent = ">";
+	if (info.arguments?.length > 0) {
+		argumentsPresent += ">";
 	}
 
-	const argstr = `${(argumentsPresent ?? subcommandsPresent) ?? ""}`;
+	const argstr = `${argumentsPresent ?? subcommandsPresent ?? ""}`;
 
 	return `${info.name} ${argstr}`;
 }
