@@ -11,6 +11,7 @@ export const alias = (): Array<string> => {
 };
 
 export const run = async (command: Command) => {
+	console.log(command)
 	switch (command.subcommand.command) {
 		case "mat":
 			return subCommandGet(command.subcommand);
@@ -30,15 +31,15 @@ export const info = () => {
 		subcommands: [
 			{
 				name: "mat",
-				description: "Materiali publicati dal professore/ssa.",
-				arguments: ["reti", "so2", "bd2", "algo2"],
+				description: `Materiali publicati dal professore/ssa. materia: "reti" | "so2" | "bd2" | "algo2"`,
+				arguments: ["materia"],
 			},
 		],
 	} as CommandInfo;
 };
 
 async function subCommandGet(command: Command) {
-	switch (command.arguments.mat) {
+	switch (command.arguments.materia) {
 		case "reti":
 			return command.reply(await fetchMaterialeReti());
 		case "so2":
