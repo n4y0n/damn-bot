@@ -11,9 +11,15 @@ export const alias = (): Array<string> => {
 };
 
 export const run = async (command: Command) => {
-	switch (command.command) {
+	switch (command.subcommand.command) {
 		case "mat":
-			return subCommandGet(command);
+			return subCommandGet(command.subcommand);
+		default:
+			return command.reply(
+				"`" +
+					command.arguments.subcommand +
+					"` is not a valid subcommand."
+			);
 	}
 };
 

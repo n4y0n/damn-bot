@@ -5,6 +5,7 @@ export interface Command {
 	text: string;
 	message: Message;
 	arguments?: { [name: string]: any };
+	subcommand?: Command;
 
 	reply(content?: StringResolvable, options?: MessageOptions & { split: false } | RichEmbed | Attachment): Promise<Message>;
 	reply(content?: StringResolvable, options?: MessageOptions | RichEmbed | Attachment): Promise<Message | Message[]>;

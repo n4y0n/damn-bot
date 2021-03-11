@@ -22,7 +22,7 @@ export const parseMessage = (message: Message): [boolean, Command?] => {
 		return [false, null];
 	}
 
-	const [comm, args] = parseArguments(message.content);
+	const [comm, args, subc] = parseArguments(message);
 
 	if (!comm) {
 		return [false, null];
@@ -34,6 +34,7 @@ export const parseMessage = (message: Message): [boolean, Command?] => {
 		message: message,
 		text: message.content,
 		reply: message.channel.send.bind(message.channel),
+		subcommand: subc,
 	} as Command;
 
 	return [true, command];
@@ -70,8 +71,6 @@ function importCommands() {
 		try {
 			const executor = require(`${commandsFolder}/${file}`) as CommandExecutor;
 			const cInfo = executor.info();
-			const cSubc = cInfo.subcommands;
-			const hasSubc = !!cSubc;
 			const cName = cInfo.name;
 
 			if (executors.has(cName)) {
@@ -84,49 +83,82 @@ function importCommands() {
 			for (let alias of executor.alias()) {
 				aliases.set(alias, cName);
 			}
-
-			if (hasSubc) {
-				for (let sub of cSubc) {
-					aliases.set(sub.name, cName);
-				}
-			}
 		} catch (e) {}
 	}
 }
 
-function parseArguments(content: string): [string, Arguments | Array<string>] {
-	const splitted = content.split(" ");
+function parseArguments(
+	message: Message
+): [string, { [name: string]: any }, Command] {
+	const splitted = message.content.split(" ");
 	const commandString = splitted[0]?.replace(get("prefix"), "").trim();
+	const _arguments = splitted.slice(1);
 	if (!executors.has(commandString) && !aliases.has(commandString)) {
-		return [null, null];
+		return [null, null, null];
 	}
 	const info = commandsInformation(commandString) as CommandInfo;
-	const args = argsFromInfo(splitted.slice(1), info);
-	return [commandString, args];
+	const args = argsFromInfo(_arguments, info);
+
+	let subcommand: Command;
+	if (_arguments.length > 0) {
+		if (info.subcommands?.length > 0) {
+			const sName = _arguments[0];
+			if (sName) {
+				const sInfo = info.subcommands.find((sc) => sc.name === sName);
+				subcommand = parseSubcommand(message, _arguments, sInfo);
+			}
+		}
+	}
+
+	return [commandString, args, subcommand];
 }
 
 function argsFromInfo(
 	splitted_message: string[],
 	info: CommandInfo
-): string[] | Arguments {
-	if (info.arguments instanceof Array) {
-		const args = {};
-		const keys = info.arguments;
+): { [name: string]: any } {
+	const args = {};
+
+	if (info.arguments?.length > 0) {
+		const keys = info.arguments as Array<string>;
 		for (let key of keys) {
 			const val = splitted_message.shift();
 			if (val) args[key] = val;
 		}
-		return args;
 	} else if (info.arguments instanceof Object) {
-		const args = {};
 		const keys = Object.keys(info.arguments);
 		for (let key of keys) {
 			const val = splitted_message.shift();
 			if (val) args[key] = val;
 			else args[key] = info.arguments[key].def;
 		}
-		return args;
-	} else {
-		return splitted_message;
 	}
+
+	return args;
+}
+
+function parseSubcommand(message: Message, tokens: string[], cInfo: CommandInfo): Command {
+	const command = tokens[0];
+	const _arguments = tokens.slice(1);
+	const args = argsFromInfo(_arguments, cInfo);
+
+	let subcommand: Command;
+	if (_arguments.length > 0) {
+		if (cInfo.subcommands?.length > 0) {
+			const sName = _arguments[0];
+			if (sName) {
+				const sInfo = cInfo.subcommands.find((sc) => sc.name === sName);
+				subcommand = parseSubcommand(message, _arguments, sInfo);
+			}
+		}
+	}
+
+	return {
+		command: command,
+		message: message,
+		text: tokens.join(" "),
+		arguments: args,
+		subcommand: subcommand,
+		reply: message.channel.send.bind(message),
+	} as Command;
 }
