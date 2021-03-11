@@ -1,10 +1,14 @@
-import { Message } from "discord.js";
+import { Attachment, Message, MessageOptions, RichEmbed, StringResolvable } from "discord.js";
 
 export interface Command {
 	command: string;
 	text: string;
 	message: Message;
 	arguments?: { [name: string]: any };
+
+	reply(content?: StringResolvable, options?: MessageOptions & { split: false } | RichEmbed | Attachment): Promise<Message>;
+	reply(content?: StringResolvable, options?: MessageOptions | RichEmbed | Attachment): Promise<Message | Message[]>;
+	reply(options?: MessageOptions | RichEmbed | Attachment): Promise<Message | Message[]>;
 }
 
 export interface Arguments {
@@ -25,6 +29,6 @@ export interface CommandInfo {
 
 export interface CommandExecutor {
 	alias: () => Array<string>;
-	run: (command: Command) => void;
+	run: (command: Command) => Promise<void>;
 	info: () => CommandInfo;
 }

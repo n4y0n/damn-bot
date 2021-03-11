@@ -33,6 +33,7 @@ export const parseMessage = (message: Message): [boolean, Command?] => {
 		arguments: args,
 		message: message,
 		text: message.content,
+		reply: message.channel.send.bind(message.channel),
 	} as Command;
 
 	return [true, command];
@@ -96,7 +97,10 @@ function parseArguments(content: string): [string, Arguments | Array<string>] {
 	return [commandString, args];
 }
 
-function argsFromInfo(splitted_message: string[], info: CommandInfo): string[] | Arguments {
+function argsFromInfo(
+	splitted_message: string[],
+	info: CommandInfo
+): string[] | Arguments {
 	if (info.arguments instanceof Array) {
 		const args = {};
 		const keys = info.arguments;
@@ -111,7 +115,7 @@ function argsFromInfo(splitted_message: string[], info: CommandInfo): string[] |
 		for (let key of keys) {
 			const val = splitted_message.shift();
 			if (val) args[key] = val;
-			else args[key] = info.arguments[key].def
+			else args[key] = info.arguments[key].def;
 		}
 		return args;
 	} else {

@@ -27,7 +27,7 @@ export const run = async (command: Command) => {
 			);
 		}
 	}
-	await command.message.channel.send(embed);
+	await command.reply(embed);
 };
 
 export const info = () => {

@@ -1,14 +1,13 @@
 import { Command, CommandInfo } from "../types/commands";
+import { fetchMessages, deleteMessages } from "../controller/clear";
 
 export const alias = (): Array<string> => {
 	return ["cls"];
 };
 
 export const run = async (command: Command) => {
-	const msgs = await (
-		await command.message.channel.fetchMessages({ limit: command.arguments.num })
-	).filter((m) => m.id !== command.message.id);
-	await command.message.channel.bulkDelete(msgs, true);
+	const messages = await fetchMessages(command);
+	await deleteMessages(command, messages);
 };
 
 export const info = () => {
