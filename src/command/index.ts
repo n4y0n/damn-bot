@@ -70,6 +70,8 @@ function importCommands() {
 		try {
 			const executor = require(`${commandsFolder}/${file}`) as CommandExecutor;
 			const cInfo = executor.info();
+			const cSubc = cInfo.subcommands;
+			const hasSubc = !!cSubc;
 			const cName = cInfo.name;
 
 			if (executors.has(cName)) {
@@ -81,6 +83,12 @@ function importCommands() {
 
 			for (let alias of executor.alias()) {
 				aliases.set(alias, cName);
+			}
+
+			if (hasSubc) {
+				for (let sub of cSubc) {
+					aliases.set(sub.name, cName);
+				}
 			}
 		} catch (e) {}
 	}

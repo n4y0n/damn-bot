@@ -1,4 +1,9 @@
-import { fetchMaterialeAlgoritmi, fetchMaterialeBasiDati, fetchMaterialeReti, fetchMaterialeSistemiOperativi } from "../controller/universita";
+import {
+	fetchMaterialeAlgoritmi,
+	fetchMaterialeBasiDati,
+	fetchMaterialeReti,
+	fetchMaterialeSistemiOperativi,
+} from "../controller/universita";
 import { Command, CommandInfo } from "../types/commands";
 
 export const alias = (): Array<string> => {
@@ -6,15 +11,9 @@ export const alias = (): Array<string> => {
 };
 
 export const run = async (command: Command) => {
-	switch (command.arguments?.[0]) {
-		case "reti":
-			return command.reply(await fetchMaterialeReti());
-		case "so2":
-			return command.reply(await fetchMaterialeSistemiOperativi());
-		case "bd2":
-			return command.reply(await fetchMaterialeBasiDati());
-		case "algo2":
-			return command.reply(await fetchMaterialeAlgoritmi());
+	switch (command.command) {
+		case "mat":
+			return subCommandGet(command);
 	}
 };
 
@@ -31,3 +30,16 @@ export const info = () => {
 		],
 	} as CommandInfo;
 };
+
+async function subCommandGet(command: Command) {
+	switch (command.arguments.mat) {
+		case "reti":
+			return command.reply(await fetchMaterialeReti());
+		case "so2":
+			return command.reply(await fetchMaterialeSistemiOperativi());
+		case "bd2":
+			return command.reply(await fetchMaterialeBasiDati());
+		case "algo2":
+			return command.reply(await fetchMaterialeAlgoritmi());
+	}
+}
