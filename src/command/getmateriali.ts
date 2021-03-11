@@ -11,7 +11,6 @@ export const alias = (): Array<string> => {
 };
 
 export const run = async (command: Command) => {
-	console.log(command)
 	switch (command.subcommand.command) {
 		case "mat":
 			return subCommandGet(command.subcommand);

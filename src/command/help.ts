@@ -11,7 +11,10 @@ export const run = async (command: Command) => {
 	const embed = new RichEmbed();
 	embed.setColor("DARK_PURPLE");
 	embed.setTitle("---HELP---");
-	const argsstr = command.arguments instanceof Array ? command.arguments : Object.keys(command.arguments);
+	const argsstr =
+		command.arguments instanceof Array
+			? command.arguments
+			: Object.values(command.arguments);
 
 	if (argsstr.length > 0) {
 		genEmbed(
@@ -33,7 +36,8 @@ export const run = async (command: Command) => {
 export const info = () => {
 	return {
 		name: "help",
-		description: "Provides help."
+		description: "Provides help.",
+		arguments: ["command", "subcommand", "..."],
 	} as CommandInfo;
 };
 
@@ -50,7 +54,11 @@ function genEmbed(embed: RichEmbed, com: CommandInfo, args: string[]) {
 		}
 	} else {
 		let sc = args.shift();
-		genEmbed(embed, com.subcommands.find(v => v.name === sc), args);
+		genEmbed(
+			embed,
+			com.subcommands.find((v) => v.name === sc),
+			args
+		);
 	}
 }
 
@@ -96,7 +104,7 @@ function buildCommandHelpString(info: CommandInfo) {
 function toArray(obj: {} | [] | undefined) {
 	if (!obj) return [];
 	if (obj instanceof Array) {
-		return obj
+		return obj;
 	} else {
 		return Object.keys(obj);
 	}
