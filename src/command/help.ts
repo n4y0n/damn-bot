@@ -11,11 +11,13 @@ export const run = async (command: Command) => {
 	const embed = new RichEmbed();
 	embed.setColor("DARK_PURPLE");
 	embed.setTitle("---HELP---");
-	if (command.arguments.length > 0) {
+	const argsstr = command.arguments instanceof Array ? command.arguments : Object.keys(command.arguments);
+
+	if (argsstr.length > 0) {
 		genEmbed(
 			embed,
-			commandsInformation(command.arguments.shift()) as CommandInfo,
-			command.arguments
+			commandsInformation(argsstr.shift()) as CommandInfo,
+			argsstr
 		);
 	} else {
 		for (let info of commandsInformation() as IterableIterator<CommandInfo>) {
@@ -31,7 +33,7 @@ export const run = async (command: Command) => {
 export const info = () => {
 	return {
 		name: "help",
-		description: "Provides help.",
+		description: "Provides help."
 	} as CommandInfo;
 };
 
@@ -70,11 +72,11 @@ function buildCommandHelpString(info: CommandInfo) {
 
 	let argumentsPresent: string;
 
-	if (info.arguments?.length > 0) {
+	if (info.arguments) {
 		argumentsPresent = "<";
 	}
 
-	const aa = info.arguments ?? [];
+	const aa = toArray(info.arguments);
 	for (let s = 0; s < aa.length; s++) {
 		const a = aa[s];
 		argumentsPresent += a;
@@ -82,11 +84,20 @@ function buildCommandHelpString(info: CommandInfo) {
 			argumentsPresent += " | ";
 		}
 	}
-	if (info.arguments?.length > 0) {
+	if (info.arguments) {
 		argumentsPresent += ">";
 	}
 
 	const argstr = `${argumentsPresent ?? subcommandsPresent ?? ""}`;
 
 	return `${info.name} ${argstr}`;
+}
+
+function toArray(obj: {} | [] | undefined) {
+	if (!obj) return [];
+	if (obj instanceof Array) {
+		return obj
+	} else {
+		return Object.keys(obj);
+	}
 }

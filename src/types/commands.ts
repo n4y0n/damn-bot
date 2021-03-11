@@ -4,14 +4,23 @@ export interface Command {
 	command: string;
 	text: string;
 	message: Message;
-	arguments?: string[];
+	arguments?: { [name: string]: any };
+}
+
+export interface Arguments {
+	[name: string]: Argument;
+}
+
+export interface Argument {
+	def?: any;
+	verify?: (value: string) => boolean;
 }
 
 export interface CommandInfo {
 	name: string;
 	description: string;
-	subcommands?: Array<CommandInfo>
-	arguments?: string[]
+	subcommands?: Array<CommandInfo>;
+	arguments?: Arguments | Array<string>;
 }
 
 export interface CommandExecutor {
