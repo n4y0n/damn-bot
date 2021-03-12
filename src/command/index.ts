@@ -1,12 +1,7 @@
 import { DiscordAPIError, Message } from "discord.js";
 import { readdirSync } from "fs";
+import { Command, CommandExecutor, CommandInfo } from "../types/commands";
 import debug from "debug";
-import {
-	Arguments,
-	Command,
-	CommandExecutor,
-	CommandInfo,
-} from "../types/commands";
 import { get } from "../config";
 
 const log = debug("bot:commands");
@@ -87,9 +82,9 @@ function importCommands() {
 	}
 }
 
-function parseArguments(
-	message: Message
-): [string, { [name: string]: any }, Command] {
+function parseArguments(message: Message):
+[string, { [name: string]: any }, Command]
+{
 	const splitted = message.content.split(" ");
 	const commandString = splitted[0]?.replace(get("prefix"), "").trim();
 	const _arguments = splitted.slice(1);

@@ -6,13 +6,13 @@ export const alias = (): Array<string> => {
 };
 
 export const run = async (command: Command) => {
-	switch (command.arguments?.[0]) {
+	switch (command.subcommand.command) {
 		case "play":
-			return play(command.message);
+			return play(command.subcommand);
 		case "skip":
-			return skip(command.message);
+			return skip(command.subcommand);
 		case "stop":
-			return stop(command.message);
+			return stop(command.subcommand);
 	}
 };
 

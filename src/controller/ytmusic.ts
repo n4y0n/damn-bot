@@ -1,5 +1,11 @@
-import { Message, TextChannel, VoiceChannel, VoiceConnection } from "discord.js";
+import {
+	Message,
+	TextChannel,
+	VoiceChannel,
+	VoiceConnection,
+} from "discord.js";
 import * as ytdl from "ytdl-core";
+import { Command } from "../types/commands";
 import { QueueContruct, Song } from "../types/commands.music";
 
 const queue = new Map<string, QueueContruct>();
@@ -39,37 +45,40 @@ function startSong(guildID: string, song: Song) {
 	serverQueue.textChannel.send(`Start playing: **${song.title}**`);
 }
 
-export async function play(message: Message) {
-	const voiceChannel = message.member.voiceChannel;
+export async function play(command: Command) {
+	const voiceChannel = command.message.member.voiceChannel;
+	const guildID = command.message.guild.id;
 
 	if (!voiceChannel)
-		return message.channel.send(
+		return command.reply(
 			"You need to be in a voice channel to play music!"
 		);
 
-	const permissions = voiceChannel.permissionsFor(message.client.user);
+	const permissions = voiceChannel.permissionsFor(
+		command.message.client.user
+	);
 	if (!permissions.has("CONNECT") || !permissions.has("SPEAK")) {
-		return message.channel.send(
+		return command.reply(
 			"I need the permissions to join and speak in your voice channel!"
 		);
 	}
 
-	const songInfo = await ytdl.getInfo(message.content);
+	const songInfo = await ytdl.getInfo(command.arguments.url);
 	const song: Song = new SimpleSongImpl(
 		songInfo.videoDetails.title,
 		songInfo.videoDetails.video_url
 	);
 
-	const serverQueue: QueueContruct = queue.get(message.guild.id);
+	const serverQueue: QueueContruct = queue.get(guildID);
 
 	if (!serverQueue) {
 		// Creating the contract for our queue
 		const queueContruct = new SimpleQueueContructImpl(
-			message.channel as TextChannel,
+			command.message.channel as TextChannel,
 			voiceChannel
 		);
 		// Setting the queue using our contract
-		queue.set(message.guild.id, queueContruct);
+		queue.set(guildID, queueContruct);
 		// Pushing the song to our songs array
 		queueContruct.songs.push(song);
 
@@ -78,30 +87,30 @@ export async function play(message: Message) {
 			var connection = await voiceChannel.join();
 			queueContruct.connection = connection;
 			// Calling the play function to start a song
-			startSong(message.guild.id, queueContruct.songs[0]);
+			startSong(guildID, queueContruct.songs[0]);
 		} catch (err) {
 			// Printing the error message if the bot fails to join the voicechat
-			queue.delete(message.guild.id);
+			queue.delete(guildID);
 			voiceChannel.leave();
 		}
 	} else {
 		serverQueue.songs.push(song);
-		return message.channel.send(
+		return command.reply(
 			`${song.title} has been added to the queue!`
 		);
 	}
 }
 
-export async function stop(message: Message) {
-	const serverQueue = queue.get(message.guild.id);
+export async function stop(command: Command) {
+	const serverQueue = queue.get(command.message.guild.id);
 
-	if (!message.member.voiceChannel)
-		return message.channel.send(
+	if (!command.message.member.voiceChannel)
+		return command.reply(
 			"You have to be in a voice channel to stop the music!"
 		);
 
 	if (!serverQueue)
-		return message.channel.send("There is no song that I could stop!");
+		return command.reply("There is no song that I could stop!");
 
 	serverQueue.songs = [];
 
@@ -111,23 +120,24 @@ export async function stop(message: Message) {
 	serverQueue.voiceChannel.leave();
 }
 
-export async function skip(message: Message) {
-	const serverQueue = queue.get(message.guild.id);
+export async function skip(command: Command) {
+	const guildID = command.message.guild.id;
+	const serverQueue = queue.get(guildID);
 
-	if (!message.member.voiceChannel) {
-		return message.channel.send(
+	if (!command.message.member.voiceChannel) {
+		return command.reply(
 			"You have to be in a voice channel to stop the music!"
 		);
 	}
 
 	if (!serverQueue)
-		return message.channel.send("There is no song that I could skip!");
+		return command.reply("There is no song that I could skip!");
 
 	if (serverQueue.connection.dispatcher)
 		serverQueue.connection.dispatcher.end();
 
 	serverQueue.songs.shift();
 	if (serverQueue.songs.length > 0)
-		startSong(message.guild.id, serverQueue.songs[0]);
+		startSong(guildID, serverQueue.songs[0]);
 	else serverQueue.voiceChannel.leave();
 }
