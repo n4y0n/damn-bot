@@ -10,35 +10,35 @@ const log = debug("bot:bot");
 config();
 
 // Load bot configurations from $HOME/.discord-bot.json
-load();
+load().then(() => {
+	const client = new Client();
+	setClient(client);
 
-const client = new Client();
-setClient(client);
+	client.on("message", (message: Message) => {
+		const [isCommand, command] = parseMessage(message);
+		if (isCommand) runCommand(command);
+	});
 
-client.on("message", (message: Message) => {
-	const [isCommand, command] = parseMessage(message);
-	if (isCommand) runCommand(command);
+	client.on("ready", async () => {
+		const status = get("status");
+		const game = get("game");
+
+		await client.user.setActivity(game);
+		await client.user.setStatus(status);
+
+		const inviteUrl = await client.generateInvite(Permissions.ALL);
+
+		console.log(inviteUrl);
+		console.log("[📡] Bot ready!");
+	});
+
+	client.on("error", (e) => {
+		console.error("[📡] %o", e);
+	});
+
+	client.on("disconnect", (channel: Channel) => {
+		log("[📡] Disconnected from " + channel.id);
+	});
+
+	client.login(get("token"));
 });
-
-client.on("ready", async () => {
-	const status = get("status");
-	const game = get("game");
-
-	await client.user.setActivity(game);
-	await client.user.setStatus(status);
-
-	const inviteUrl = await client.generateInvite(Permissions.ALL);
-
-	console.log(inviteUrl);
-	console.log("[📡] Bot ready!");
-});
-
-client.on("error", (e) => {
-	console.error("[📡] %o", e);
-});
-
-client.on("disconnect", (channel: Channel) => {
-	log("[📡] Disconnected from " + channel.id);
-});
-
-client.login(get("token"));

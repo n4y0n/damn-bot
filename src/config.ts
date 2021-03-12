@@ -73,10 +73,9 @@ const generateDefaultConfigurations = async () => {
 	serializeConfig();
 };
 
-const deserializeConfig = () => {
+const deserializeConfig = async () => {
 	if (!existsSync(configPath)) {
-		generateDefaultConfigurations();
-		return;
+		return generateDefaultConfigurations();
 	}
 
 	log("Configuration file has been found.");
