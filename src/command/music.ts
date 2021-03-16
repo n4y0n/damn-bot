@@ -39,3 +39,7 @@ export const info = () => {
 		],
 	} as CommandInfo;
 };
+
+export const check = () => {
+
+};

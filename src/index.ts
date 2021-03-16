@@ -10,11 +10,16 @@ const log = debug("bot:bot");
 config();
 
 // Load bot configurations from $HOME/.discord-bot.json
-load().then(() => {
+load().then(main);
+
+function main() {
 	const client = new Client();
 	setClient(client);
 
 	client.on("message", (message: Message) => {
+		if (!isForMe(message)) return;
+		clearContent(message);
+
 		const [isCommand, command] = parseMessage(message);
 		if (isCommand) runCommand(command);
 	});
@@ -41,4 +46,26 @@ load().then(() => {
 	});
 
 	client.login(get("token"));
-});
+}
+
+function clearContent(message: Message) {
+	if(message.content.startsWith(get("prefix"))) {
+		message.content = message.content.substr(get("prefix").length);
+		return;
+	}
+	if (message.isMentioned(message.client.user)) {
+		// <@!716280540147482624>
+		message.content = message.content.replace(`<!${message.client.user.id}>`, "")
+	}
+}
+
+function isForMe(message: Message) {
+	if (message.content.startsWith(get("prefix"))) {
+		return true;
+	}
+	if (get("prefix") === "@mention" || get("altprefix") === "@mention") {
+		return message.isMentioned(message.client.user)
+	}
+	return false;
+}
+

@@ -13,10 +13,6 @@ const commandsInfo: Map<string, CommandInfo> = new Map();
 importCommands();
 
 export const parseMessage = (message: Message): [boolean, Command?] => {
-	if (!message.content.startsWith(get("prefix"))) {
-		return [false, null];
-	}
-
 	const [comm, args, subc] = parseArguments(message);
 
 	if (!comm) {
@@ -86,8 +82,8 @@ function parseArguments(message: Message):
 [string, { [name: string]: any }, Command]
 {
 	const splitted = message.content.split(" ");
-	const commandString = splitted[0]?.replace(get("prefix"), "").trim();
-	const _arguments = splitted.slice(1);
+	const commandString = splitted[0]?.trim();
+	const _arguments = splitted.slice(1) ?? [];
 	if (!executors.has(commandString) && !aliases.has(commandString)) {
 		return [null, null, null];
 	}
@@ -114,13 +110,13 @@ function argsFromInfo(
 ): { [name: string]: any } {
 	const args = {};
 
-	if (info.arguments?.length > 0) {
+	if (info?.arguments?.length > 0) {
 		const keys = info.arguments as Array<string>;
 		for (let key of keys) {
 			const val = splitted_message.shift();
 			if (val) args[key] = val;
 		}
-	} else if (info.arguments instanceof Object) {
+	} else if (info?.arguments && info.arguments instanceof Object) {
 		const keys = Object.keys(info.arguments);
 		for (let key of keys) {
 			const val = splitted_message.shift();
