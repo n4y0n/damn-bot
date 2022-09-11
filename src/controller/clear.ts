@@ -1,5 +1,9 @@
 import { Collection, Message } from "discord.js";
-import { Command } from "../types/commands";
+
+interface Command {
+	message: Message;
+	arguments: any;
+}
 
 export const fetchMessages = async (command: Command) => {
 	const messages = await command.message.channel.fetchMessages({ limit: command.arguments.num });

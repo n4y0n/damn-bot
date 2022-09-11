@@ -2,7 +2,6 @@ import { Channel, Client, Message, Permissions, TextChannel } from "discord.js";
 import debug from "debug";
 import { config } from "dotenv";
 import { get, load, setClient } from "./config";
-import { parseMessage, runCommand } from "./command";
 
 const log = debug("bot:bot");
 
@@ -18,10 +17,9 @@ function main() {
 
 	client.on("message", (message: Message) => {
 		if (!isForMe(message)) return;
-		clearContent(message);
+		sanitizeMessage(message);
 
-		const [isCommand, command] = parseMessage(message);
-		if (isCommand) runCommand(command);
+
 	});
 
 	client.on("ready", async () => {
@@ -48,7 +46,7 @@ function main() {
 	client.login(get("token"));
 }
 
-function clearContent(message: Message) {
+function sanitizeMessage(message: Message) {
 	if(message.content.startsWith(get("prefix"))) {
 		message.content = message.content.substr(get("prefix").length);
 		return;
