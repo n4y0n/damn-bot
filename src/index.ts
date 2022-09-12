@@ -1,7 +1,8 @@
-import { Channel, Client, Message, Permissions, TextChannel } from "discord.js";
+import { Channel, Client, Message, Permissions } from "discord.js";
 import debug from "debug";
 import { config } from "dotenv";
-import { get, load, setClient } from "./config";
+import { get, load, setClient, Utils } from "./config";
+import { handleMessage } from "./controller/handler";
 
 const log = debug("bot:bot");
 
@@ -18,8 +19,7 @@ function main() {
 	client.on("message", (message: Message) => {
 		if (!isForMe(message)) return;
 		sanitizeMessage(message);
-
-
+		handleMessage(message);
 	});
 
 	client.on("ready", async () => {
@@ -52,18 +52,19 @@ function sanitizeMessage(message: Message) {
 		return;
 	}
 	if (message.isMentioned(message.client.user)) {
-		// <@!716280540147482624>
-		message.content = message.content.replace(`<!${message.client.user.id}>`, "")
+		message.content = Utils.removeMention(message.content, message.client.user.id);
 	}
 }
 
 function isForMe(message: Message) {
+	if (message.author.bot) return false;
+
 	if (message.content.startsWith(get("prefix"))) {
 		return true;
 	}
+
 	if (get("prefix") === "@mention" || get("altprefix") === "@mention") {
 		return message.isMentioned(message.client.user)
 	}
 	return false;
 }
-

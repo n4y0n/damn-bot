@@ -165,3 +165,12 @@ function getDefaultOrValue(key: BotConfigKey, value: any) {
 			return value;
 	}
 }
+
+export const Utils = {
+	removeMentions: (str: string) => {
+		return str.replace(/<@!?[0-9]+>/g, "").trim();
+	},
+	removeMention: (str: string, id: string) => {
+		return str.replace(RegExp("^<@!?" + id + ">"), "").trim();
+	}
+}
