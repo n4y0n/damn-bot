@@ -30,11 +30,11 @@ async function setupIntervals(client: Client) {
     log("[📡] Setting up intervals");
     if (process.platform === 'win32') return;
 
-    // TODO: Setup interval for h@h process check
-    setInterval(async () => {
-        const process = await Utils.displayProcessBy("node");
-        log(process);
-    }, 60000);
+    // // TODO: Setup interval for h@h process check
+    // setInterval(async () => {
+    //     const process = await Utils.displayProcessBy("node");
+    //     log(process);
+    // }, 60000);
 }
 
 async function setupNotifications(client: Client) {
