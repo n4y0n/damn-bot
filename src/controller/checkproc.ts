@@ -35,6 +35,7 @@ async function setupIntervals(client: Client) {
     //     const process = await Utils.displayProcessBy("node");
     //     log(process);
     // }, 60000);
+
 }
 
 async function setupNotifications(client: Client) {
