@@ -1,4 +1,4 @@
-import { Client, Guild } from "discord.js";
+import { Client, Guild, Message } from "discord.js";
 import { homedir } from "os";
 import { join } from "path";
 import { createInterface } from "readline";
@@ -167,6 +167,7 @@ function getDefaultOrValue(key: BotConfigKey, value: any) {
 	}
 }
 
+const messageLogger = debug("bot:message");
 export const Utils = {
 	removeMentions: (str: string) => {
 		return str.replace(/<@!?[0-9]+>/g, "").trim();
@@ -182,5 +183,8 @@ export const Utils = {
 				resolve(stdout);
 			});
 		});
+	},
+	logMessage: (message: Message) => {
+		messageLogger(`[${message.guild.name}] ${message.author.username}: ${message.content}`);
 	}
 }

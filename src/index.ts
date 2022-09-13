@@ -18,6 +18,9 @@ function main() {
 	setClient(client);
 
 	client.on("message", (message: Message) => {
+		log("[📡] Message received");
+		logMessage(message);
+
 		if (!isForMe(message)) return;
 		sanitizeMessage(message);
 		handleMessage(message);
