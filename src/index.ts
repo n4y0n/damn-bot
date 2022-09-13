@@ -19,7 +19,7 @@ function main() {
 
 	client.on("message", (message: Message) => {
 		log("[📡] Message received");
-		logMessage(message);
+		Utils.logMessage(message);
 
 		if (!isForMe(message)) return;
 		sanitizeMessage(message);
