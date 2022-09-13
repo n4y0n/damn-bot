@@ -3,6 +3,7 @@ import debug from "debug";
 import { config } from "dotenv";
 import { get, load, setClient, Utils } from "./config";
 import { handleMessage } from "./controller/handler";
+import checkproc from "./controller/checkproc";
 
 const log = debug("bot:bot");
 
@@ -26,17 +27,17 @@ function main() {
 		const status = get("status");
 		const game = get("game");
 
+		await checkproc(client);
+
 		await client.user.setActivity(game);
 		await client.user.setStatus(status);
-
 		const inviteUrl = await client.generateInvite(Permissions.ALL);
-
-		console.log(inviteUrl);
-		console.log("[📡] Bot ready!");
+		console.log("Use this url to make me join your server: %s", inviteUrl);
+		log("[📡] Bot ready!");
 	});
 
 	client.on("error", (e) => {
-		console.error("[📡] %o", e);
+		log("[ERROR] %o", e);
 	});
 
 	client.on("disconnect", (channel: Channel) => {

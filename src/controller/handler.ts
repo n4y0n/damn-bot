@@ -1,4 +1,5 @@
 import { Message } from "discord.js";
+import { checkCommand } from "./checkproc";
 import { deleteMessages, fetchMessages } from "./clear";
 
 export const handleMessage = async (message: Message) => {
@@ -12,6 +13,9 @@ export const handleMessage = async (message: Message) => {
             break;
         case "ping":
             await ping(message);
+            break;
+        case "checkproc":
+            await checkCommand(message);
             break;
         default:
             break;

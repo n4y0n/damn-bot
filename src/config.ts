@@ -2,6 +2,7 @@ import { Client, Guild } from "discord.js";
 import { homedir } from "os";
 import { join } from "path";
 import { createInterface } from "readline";
+import * as child_process from "child_process"
 import debug from "debug";
 
 const log = debug("bot:config");
@@ -30,7 +31,7 @@ const generateDefaultConfigurations = async () => {
 	console.log("Enter bot token: ");
 
 	const it = rl[Symbol.asyncIterator]();
-	const token = await(await it.next()).value;
+	const token = await (await it.next()).value;
 	rl.close();
 
 	if (!token || token.length < 5) {
@@ -172,5 +173,14 @@ export const Utils = {
 	},
 	removeMention: (str: string, id: string) => {
 		return str.replace(RegExp("^<@!?" + id + ">"), "").trim();
+	},
+	displayProcessBy: (pattern: string) => {
+		let command = process.platform === 'win32' ? 'tasklist | findstr ' + pattern : 'ps -ef | grep' + pattern;
+		return new Promise((resolve, reject) => {
+			child_process.exec(command, (err, stdout, stdin) => {
+				if (err) return reject(err);
+				resolve(stdout);
+			});
+		});
 	}
 }
