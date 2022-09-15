@@ -4,17 +4,17 @@ import { join } from "path";
 import { createInterface } from "readline";
 import * as child_process from "child_process"
 import debug from "debug";
-
-const log = debug("bot:config");
-
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { BotConfigKey, GuildConfigKey } from "./types/config";
 
+
+const log = debug("bot:config");
 const configPath = join(homedir(), ".discord-bot.json");
 
 let configs = {};
 let guilds = {};
 let _client: Client;
+
 
 const generateDefaultConfigurations = async () => {
 	log("Configuration file not found. Generating one with default values.");
@@ -184,7 +184,7 @@ export const Utils = {
 			});
 		});
 	},
-	logMessage: (message: Message) => {
+	logMessage: async (message: Message) => {
 		messageLogger(`[${message.guild.name}] ${message.author.username}: ${message.content}`);
 	}
 }

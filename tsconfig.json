@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
-        "target": "es2016",
+        "module": "CommonJS",
+        "target": "ES2022",
         "jsx": "preserve",
         "strictFunctionTypes": true,
         "sourceMap": false,
