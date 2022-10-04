@@ -38,6 +38,8 @@ async function main() {
 		.setDescription('Clears messages')
 		.addNumberOption(option =>
 			option.setName('number')
+				.setMaxValue(100)
+				.setMinValue(1)
 				.setDescription('The number of messages to clear')
 				.setRequired(true)
 		)
@@ -66,6 +68,7 @@ async function main() {
 
 			const number = interaction.options.getNumber('number');
 			const messages = await fetchMessages(interaction.channel, number);
+			log(`Deleting ${messages.size} messages`);
 			await deleteMessages(interaction.channel, messages)
 
 			await interaction.editReply({
