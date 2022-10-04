@@ -1,20 +1,21 @@
 import {
+	Channel,
 	Client,
-	IntentsBitField,
+	Collection,
+	GatewayIntentBits,
 	Interaction,
 	Message,
+	OAuth2Scopes,
 	Routes,
 	SlashCommandBuilder,
+	TextChannel,
 } from "discord.js";
 
 import debug from "debug";
-import { config } from "dotenv";
-import { get, load, setClient, Utils } from "./config";
+import { get, load, setClient, Util } from "./config";
 import { REST } from '@discordjs/rest';
 
 const log = debug("bot:bot");
-// Load environments from .env
-config();
 // Load bot configurations from $HOME/.discord-bot.json
 load().then(main);
 
@@ -23,11 +24,9 @@ async function main() {
 	const commands = []
 	const client = new Client({
 		intents: [
-			IntentsBitField.Flags.Guilds,
-			IntentsBitField.Flags.GuildMessages,
-			IntentsBitField.Flags.GuildMembers,
-			IntentsBitField.Flags.GuildEmojisAndStickers,
-			IntentsBitField.Flags.GuildScheduledEvents,
+			GatewayIntentBits.Guilds,
+			GatewayIntentBits.GuildMessages,
+			GatewayIntentBits.GuildScheduledEvents,
 		],
 	});
 	const rest = new REST({ version: '10' }).setToken(get("token"));
@@ -37,6 +36,11 @@ async function main() {
 	const clear = new SlashCommandBuilder()
 		.setName('clear')
 		.setDescription('Clears messages')
+		.addNumberOption(option =>
+			option.setName('number')
+				.setDescription('The number of messages to clear')
+				.setRequired(true)
+		)
 		.setDMPermission(false);
 
 	const ping = new SlashCommandBuilder()
@@ -47,17 +51,26 @@ async function main() {
 	commands.push(clear, ping);
 
 	client.on('interactionCreate', async (interaction: Interaction) => {
-		console.log(interaction);
-
 		if (!interaction.isChatInputCommand()) return;
 		if (interaction.commandName === 'ping') {
-			const int = await interaction.reply({
-				content: 'Pinging...',
+			await interaction.reply({
+				content: `Pong! API Latency is ${Math.round(client.ws.ping)}ms`,
 				ephemeral: true,
 			});
-			await interaction.editReply({
-				content: `Pong! Latency is ${(await int.awaitMessageComponent()).createdTimestamp - interaction.createdTimestamp}ms. API Latency is ${Math.round(client.ws.ping)}ms`
+		}
+		if (interaction.commandName === 'clear') {
+			await interaction.reply({
+				content: `Clearing messages...`,
+				ephemeral: true,
 			});
+
+			const number = interaction.options.getNumber('number');
+			const messages = await fetchMessages(interaction.channel, number);
+			await deleteMessages(interaction.channel, messages)
+
+			await interaction.editReply({
+				content: `Cleared messages!`,
+			})
 		}
 	});
 
@@ -72,7 +85,12 @@ async function main() {
 
 		client.user.setActivity(game);
 		client.user.setStatus(status);
-		const inviteUrl = client.generateInvite();
+		const inviteUrl = client.generateInvite({
+			scopes: [
+				OAuth2Scopes.Guilds,
+				OAuth2Scopes.Bot,
+			],
+		});
 		log("[📡] Bot ready!");
 		console.log("Use this url to make me join your server: %s", inviteUrl);
 	});
@@ -80,18 +98,12 @@ async function main() {
 	client.login(get("token"));
 }
 
-async function clear(message: Message, args: string[]) {
-	const num = parseInt(args[0]);
-	if (isNaN(num)) {
-		await message.channel.send("Please provide a number of messages to delete");
-		return;
-	}
+export const fetchMessages = async (channel: Channel, limit: number): Promise<Collection<string, Message<boolean>>> => {
+	const c = channel as TextChannel;
+	return c.messages.fetch({ limit });
+};
 
-	if (num < 1 || num > 100) {
-		await message.channel.send("Please provide a number between 1 and 100");
-		return;
-	}
-
-	// const messages = await fetchMessages({ message, arguments: { num } });
-	// await deleteMessages({ message, arguments: { num } }, messages);
-}
+export const deleteMessages = (channel: Channel, messagesCollection: Collection<string, Message>) => {
+	const c = channel as TextChannel;
+	return c.bulkDelete(messagesCollection, true);
+};

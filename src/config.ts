@@ -152,7 +152,7 @@ function getDefaultOrValue(key: BotConfigKey, value: any) {
 	switch (key) {
 		case "game":
 			return value === "DEFAULT"
-				? `Type ${get("prefix")} ${get("help")}.`
+				? `Type ${get("prefix")}${get("help")}.`
 				: value;
 		case "prefix":
 			return value ? value : get("altprefix");
@@ -168,7 +168,7 @@ function getDefaultOrValue(key: BotConfigKey, value: any) {
 }
 
 const messageLogger = debug("bot:message");
-export const Utils = {
+export const Util = {
 	removeMentions: (str: string) => {
 		return str.replace(/<@!?[0-9]+>/g, "").trim();
 	},
