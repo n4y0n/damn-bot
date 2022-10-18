@@ -50,7 +50,58 @@ async function main() {
 		.setDMPermission(false)
 		.setDescription('Replies with Pong!');
 
-	commands.push(clear, ping);
+	const help = new SlashCommandBuilder()
+		.setName('help')
+		.setDMPermission(false)
+		.setDescription('Replies with a list of commands');
+
+	const macro = new SlashCommandBuilder()
+		.setName('macro')
+		.setDescription('Macro commands')
+		.addSubcommand(subcommand =>
+			subcommand.setName('add')
+				.setDescription('Add a macro')
+				.addStringOption(option =>
+					option.setName('name')
+						.setDescription('The name of the macro')
+						.setRequired(true)
+				)
+				.addStringOption(option =>
+					option.setName('content')
+						.setDescription('The content of the macro')
+						.setRequired(true)
+				)
+		)
+		.addSubcommand(subcommand =>
+			subcommand.setName('remove')
+				.setDescription('Remove a macro')
+				.addStringOption(option =>
+					option.setName('name')
+						.setDescription('The name of the macro')
+						.setRequired(true)
+				)
+		)
+		.addSubcommand(subcommand =>
+			subcommand.setName('list')
+				.setDescription('List all macros')
+		)
+		.addSubcommand(subcommand =>
+			subcommand.setName('clear')
+				.setDescription('Clear all macros')
+		)
+		.setDMPermission(false);
+
+	const m = new SlashCommandBuilder()
+		.setName('m')
+		.setDescription('Macro commands')
+		.addStringOption(option =>
+			option.setName('name')
+				.setDescription('The name of the macro')
+				.setRequired(true)
+				.addChoices({ name: 'bonk', value: 'bonk' }, { name: 'bbonk', value: 'bonk2' })
+		)
+
+	commands.push(clear, ping, help, macro, m);
 
 	client.on('interactionCreate', async (interaction: Interaction) => {
 		if (!interaction.isChatInputCommand()) return;
@@ -74,6 +125,49 @@ async function main() {
 			await interaction.editReply({
 				content: `Cleared messages!`,
 			})
+		}
+		if (interaction.commandName === 'help') {
+			await interaction.reply({
+				content: `Commands: ${commands.map(command => command.name).join(", ")}`,
+				ephemeral: true,
+			});
+		}
+		if (interaction.commandName === 'macro') {
+			const subcommand = interaction.options.getSubcommand();
+			if (subcommand === 'add') {
+				const name = interaction.options.getString('name');
+				const content = interaction.options.getString('content');
+				await interaction.reply({
+					content: `Adding macro ${name} with content ${content}`,
+					ephemeral: true,
+				});
+			}
+			if (subcommand === 'remove') {
+				const name = interaction.options.getString('name');
+				await interaction.reply({
+					content: `Removing macro ${name}`,
+					ephemeral: true,
+				});
+			}
+			if (subcommand === 'list') {
+				await interaction.reply({
+					content: `Listing macros`,
+					ephemeral: true,
+				});
+			}
+			if (subcommand === 'clear') {
+				await interaction.reply({
+					content: `Clearing macros`,
+					ephemeral: true,
+				});
+			}
+		}
+		if (interaction.commandName === 'm') {
+			const name = interaction.options.getString('name');
+			await interaction.reply({
+				content: getContentForMacro(name),
+				ephemeral: true,
+			});
 		}
 	});
 
@@ -110,3 +204,30 @@ export const deleteMessages = (channel: Channel, messagesCollection: Collection<
 	const c = channel as TextChannel;
 	return c.bulkDelete(messagesCollection, true);
 };
+
+export const getContentForMacro = (name: string): string => {
+	switch (name) {
+		case 'bonk':
+			return 'https://tenor.com/view/bonk-gif-20120291';
+		case 'bonk2':
+			return `⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠻⣿⣿⣿⣿⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣿⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+			⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠰⡡⢌⢆⠂⡀⢌⢎⠜⡌⢎⢎⢞⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+			⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠀⡜⡔⡌⡜⡌⢎⢌⠜⡜⡜⡜⢆⢎⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+			⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠄⠀⠠⠂⡐⡰⡡⡡⣌⢎⢎⢎⢎⢎⢞⢽⠂⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢢⢢⣿⣿⣿⣿⣿⣿⣿
+			⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⡐⡔⠔⡐⡔⡔⡱⣱⣲⡤⠀⠀⠀⡀⡑⡑⠱⡡⡸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠻⡇⠟⠋⠉⢹⣿⣿⢡⢢⣹⢣⣿⣿⣿⣿⣿⣿⣿
+			⣿⣿⣿⣿⣿⣿⣿⣿⡿⡡⠢⡂⡌⢆⢌⢒⢱⠽⣻⣻⣿⢯⢯⣻⡝⡔⢄⠄⡀⠐⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠛⣿⣿⣧⢻⣿⣿⣿⠣⢢⢣⢣⣿⣿⣿⣿⣿⣿⣿⣿⣿
+			⣿⣿⣿⣿⣿⣿⠟⢆⢆⢆⢆⠆⢂⢂⠆⠥⢣⠭⣫⣻⢿⣟⣟⠽⡭⢭⢫⢲⠄⠀⠀⠘⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⢈⠙⠳⠹⣿⣿⣿⢏⢢⢣⢃⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+			⣿⣿⣿⣿⡿⡒⠰⡡⡌⡒⠥⢢⢢⢂⠐⡐⡐⢌⢎⢹⡽⣏⠌⠀⠘⡜⡞⡜⡔⠀⠀⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠛⠻⣿⣿⣆⣿⣿⣿⡿⠰⡱⡡⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+			⣿⣿⣿⡿⠠⠠⢂⠠⢡⢣⢣⢣⢣⢣⢣⣊⢲⢡⢣⢣⣻⡽⡜⣒⠔⡄⡐⢄⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⢿⣿⡇⣿⣿⣿⣿⢡⡘⡌⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+			⣿⣿⣿⢢⢂⠄⠐⡐⡐⢄⢂⢣⢫⢫⢯⣻⣻⣻⢯⣻⣻⢿⣿⣟⡽⣳⣝⣽⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠏⣶⢹⣿⣿⣿⣿⣿⣿⡋⡜⢆⠆⢂⢂⠄⠄⠄⠀⠀⠌⢻⣿⣿⣿⣿⣿⣿⣿
+			⣿⣿⠡⢢⢢⠢⠠⠀⢂⢌⢎⢎⣎⡝⡝⣝⡽⡽⣻⣻⣿⣿⣿⡿⣿⣿⢿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡈⣿⢰⣿⣿⣿⢍⢎⢆⢣⠡⢂⠀⡰⡠⠠⠀⠀⠀⠀⡀⠄⢻⣿⣿⣿⣿⣿
+			⣿⠃⠀⠠⠢⠢⡂⠄⠄⢂⢂⢣⢻⣻⣻⣟⡿⣻⢿⢿⡿⡿⣿⣿⣻⡽⣻⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢣⢃⠂⢀⠀⠄⡜⣝⡽⣣⢢⠠⠠⠠⢀⠄⠄⠄⠸⣿⣿⣿⣿
+			⣿⠢⠠⠠⡐⡐⠰⡐⡐⡐⠔⡔⡔⡝⣟⣟⣟⣟⣟⣟⣟⣟⣟⣟⡝⡭⣫⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢏⠎⠀⠀⢀⢐⠔⡌⡌⢎⢏⢏⢎⢆⢂⢂⠄⡐⠄⠄⠄⢹⣿⣿⣿
+			⣿⡐⡐⠄⢂⢂⢂⢂⢂⠄⢂⢂⠆⡌⢎⢭⢫⢯⢯⢯⣻⣻⠽⡽⡽⡽⡹⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⡔⠄⠀⠀⠠⢢⢢⠢⡀⠠⢣⢯⢫⢎⢆⠆⢂⠐⠄⢂⠄⠄⡀⠹⣿⣿
+			⣿⣇⠄⠄⢂⠄⡐⡐⡐⠄⠀⠄⢢⢌⢒⢱⢭⣫⢫⢫⢫⢎⢍⢯⣻⢯⢯⢺⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⡱⣼⣿⠀⠀⠀⠰⢢⢂⠄⠀⡌⡞⡽⡭⢎⢎⠢⢂⠄⠄⠄⠄⠄⠄⠄⠸⣿
+			⣿⣿⣷⠐⠄⠄⠄⠄⡀⠀⠀⠠⠢⡱⡱⡱⡽⣘⡜⡜⡜⢀⠠⣘⣟⣟⣟⡝⢿⣿⣿⣿⣿⣿⣿⣿⣿⢡⣸⣿⣿⣿⣦⠀⠀⠠⡀⠀⠄⢆⢣⣏⢯⢫⣊⢆⠆⢂⠄⠄⠠⡀⠄⠄⡐⠄⢽
+			⣿⣿⣿⣿⣦⡀⠄⡀⠀⠀⠀⡐⡐⠥⢣⢫⢯⢎⢞⡜⡖⡄⡀⢢⢫⢯⣻⣳⣷⣡⣡⢩⢋⢯⢻⢍⢢⣿⣿⣿⣿⣿⣿⣿⣿⣯⢢⢢⢣⡹⣹⡹⡹⡜⡌⠆⠄⠄⠄⠄⠠⠠⡐⡐⡐⡐⠌`;
+		default:
+			return 'Macro not found';
+	}
+}
