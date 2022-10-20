@@ -6,6 +6,7 @@ import {
 	Interaction,
 	Message,
 	OAuth2Scopes,
+	PermissionsBitField,
 	Routes,
 	SlashCommandBuilder,
 	TextChannel,
@@ -43,6 +44,19 @@ async function main() {
 				.setDescription('The number of messages to clear')
 				.setRequired(true)
 		)
+		.setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator | PermissionsBitField.Flags.ManageMessages)
+		.setDMPermission(false);
+	
+	const autoban = new SlashCommandBuilder()
+		.setName('autoban')
+		.setDescription('Autoban')
+		.addStringOption(option =>
+			option.setName('enable')
+				.setDescription('Randomly ban people UwU')
+				.setRequired(true)
+				.addChoices({name: 'Enable', value: 'enable'}, {name: 'Disable', value: 'disable'})
+		)
+		//.setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
 		.setDMPermission(false);
 
 	const ping = new SlashCommandBuilder()
@@ -55,42 +69,6 @@ async function main() {
 		.setDMPermission(false)
 		.setDescription('Replies with a list of commands');
 
-	const macro = new SlashCommandBuilder()
-		.setName('macro')
-		.setDescription('Macro commands')
-		.addSubcommand(subcommand =>
-			subcommand.setName('add')
-				.setDescription('Add a macro')
-				.addStringOption(option =>
-					option.setName('name')
-						.setDescription('The name of the macro')
-						.setRequired(true)
-				)
-				.addStringOption(option =>
-					option.setName('content')
-						.setDescription('The content of the macro')
-						.setRequired(true)
-				)
-		)
-		.addSubcommand(subcommand =>
-			subcommand.setName('remove')
-				.setDescription('Remove a macro')
-				.addStringOption(option =>
-					option.setName('name')
-						.setDescription('The name of the macro')
-						.setRequired(true)
-				)
-		)
-		.addSubcommand(subcommand =>
-			subcommand.setName('list')
-				.setDescription('List all macros')
-		)
-		.addSubcommand(subcommand =>
-			subcommand.setName('clear')
-				.setDescription('Clear all macros')
-		)
-		.setDMPermission(false);
-
 	const m = new SlashCommandBuilder()
 		.setName('m')
 		.setDescription('Macro commands')
@@ -98,10 +76,10 @@ async function main() {
 			option.setName('name')
 				.setDescription('The name of the macro')
 				.setRequired(true)
-				.addChoices({ name: 'bonk', value: 'bonk' }, { name: 'bbonk', value: 'bonk2' })
+				.addChoices({ name: 'bonk', value: 'bonk' })
 		)
 
-	commands.push(clear, ping, help, macro, m);
+	commands.push(clear, ping, help, m, autoban);
 
 	client.on('interactionCreate', async (interaction: Interaction) => {
 		if (!interaction.isChatInputCommand()) return;
@@ -110,7 +88,7 @@ async function main() {
 				content: `Pong! API Latency is ${Math.round(client.ws.ping)}ms`,
 				ephemeral: true,
 			});
-		}
+		} else
 		if (interaction.commandName === 'clear') {
 			await interaction.reply({
 				content: `Clearing messages...`,
@@ -125,49 +103,37 @@ async function main() {
 			await interaction.editReply({
 				content: `Cleared messages!`,
 			})
-		}
+		} else
 		if (interaction.commandName === 'help') {
 			await interaction.reply({
 				content: `Commands: ${commands.map(command => command.name).join(", ")}`,
 				ephemeral: true,
 			});
-		}
-		if (interaction.commandName === 'macro') {
-			const subcommand = interaction.options.getSubcommand();
-			if (subcommand === 'add') {
-				const name = interaction.options.getString('name');
-				const content = interaction.options.getString('content');
-				await interaction.reply({
-					content: `Adding macro ${name} with content ${content}`,
-					ephemeral: true,
-				});
-			}
-			if (subcommand === 'remove') {
-				const name = interaction.options.getString('name');
-				await interaction.reply({
-					content: `Removing macro ${name}`,
-					ephemeral: true,
-				});
-			}
-			if (subcommand === 'list') {
-				await interaction.reply({
-					content: `Listing macros`,
-					ephemeral: true,
-				});
-			}
-			if (subcommand === 'clear') {
-				await interaction.reply({
-					content: `Clearing macros`,
-					ephemeral: true,
-				});
-			}
-		}
+		} else
 		if (interaction.commandName === 'm') {
 			const name = interaction.options.getString('name');
 			await interaction.reply({
 				content: getContentForMacro(name),
 				ephemeral: true,
 			});
+		} else
+		if (interaction.commandName === 'autoban') {
+			const enable = interaction.options.getString('enable');
+			await interaction.reply({
+				content: `Sorry, not implemented yet 🤭✌️`,
+				ephemeral: true,
+			})
+			// if (enable === 'enable') {
+			// 	await interaction.reply({
+			// 		content: `Autoban enabled!`,
+			// 		ephemeral: true,
+			// 	});
+			// } else if (enable === 'disable') {
+			// 	await interaction.reply({
+			// 		content: `Autoban disabled!`,
+			// 		ephemeral: true,
+			// 	});
+			// }
 		}
 	});
 
@@ -208,8 +174,6 @@ export const deleteMessages = (channel: Channel, messagesCollection: Collection<
 export const getContentForMacro = (name: string): string => {
 	switch (name) {
 		case 'bonk':
-			return 'https://tenor.com/view/bonk-gif-20120291';
-		case 'bonk2':
 			return `⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠻⣿⣿⣿⣿⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣿⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
 			⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠰⡡⢌⢆⠂⡀⢌⢎⠜⡌⢎⢎⢞⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
 			⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠀⡜⡔⡌⡜⡌⢎⢌⠜⡜⡜⡜⢆⢎⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
