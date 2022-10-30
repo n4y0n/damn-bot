@@ -1,23 +1,7 @@
-import {
-	Channel,
-	Client,
-	Collection,
-	GatewayIntentBits,
-	Interaction,
-	Message,
-	OAuth2Scopes,
-	PermissionsBitField,
-	Routes,
-	SlashCommandBuilder,
-	TextChannel,
-} from "discord.js";
-
-import debug from "debug";
-import { get, load, setClient, Util } from "./config";
-import { REST } from '@discordjs/rest';
-
-const log = debug("bot:bot");
+const { Client, REST, SlashCommandBuilder, GatewayIntentBits, PermissionsBitField, Routes, OAuth2Scopes } = require("discord.js");
+const log = require("debug")("bot:main");
 // Load bot configurations from $HOME/.discord-bot.json
+const { load, get } = require("./config")
 load().then(main);
 
 
@@ -31,8 +15,6 @@ async function main() {
 		],
 	});
 	const rest = new REST({ version: '10' }).setToken(get("token"));
-	setClient(client);
-
 
 	const clear = new SlashCommandBuilder()
 		.setName('clear')
@@ -46,7 +28,7 @@ async function main() {
 		)
 		.setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator | PermissionsBitField.Flags.ManageMessages)
 		.setDMPermission(false);
-	
+
 	const autoban = new SlashCommandBuilder()
 		.setName('autoban')
 		.setDescription('Autoban')
@@ -54,7 +36,7 @@ async function main() {
 			option.setName('enable')
 				.setDescription('Randomly ban people UwU')
 				.setRequired(true)
-				.addChoices({name: 'Enable', value: 'enable'}, {name: 'Disable', value: 'disable'})
+				.addChoices({ name: 'Enable', value: 'enable' }, { name: 'Disable', value: 'disable' })
 		)
 		//.setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
 		.setDMPermission(false);
@@ -81,7 +63,7 @@ async function main() {
 
 	commands.push(clear, ping, help, m, autoban);
 
-	client.on('interactionCreate', async (interaction: Interaction) => {
+	client.on('interactionCreate', async (interaction) => {
 		if (!interaction.isChatInputCommand()) return;
 		if (interaction.commandName === 'ping') {
 			await interaction.reply({
@@ -89,52 +71,52 @@ async function main() {
 				ephemeral: true,
 			});
 		} else
-		if (interaction.commandName === 'clear') {
-			await interaction.reply({
-				content: `Clearing messages...`,
-				ephemeral: true,
-			});
+			if (interaction.commandName === 'clear') {
+				await interaction.reply({
+					content: `Clearing messages...`,
+					ephemeral: true,
+				});
 
-			const number = interaction.options.getNumber('number');
-			const messages = await fetchMessages(interaction.channel, number);
-			log(`Deleting ${messages.size} messages`);
-			await deleteMessages(interaction.channel, messages)
+				const number = interaction.options.getNumber('number');
+				const messages = await fetchMessages(interaction.channel, number);
+				log(`Deleting ${messages.size} messages`);
+				await deleteMessages(interaction.channel, messages)
 
-			await interaction.editReply({
-				content: `Cleared messages!`,
-			})
-		} else
-		if (interaction.commandName === 'help') {
-			await interaction.reply({
-				content: `Commands: ${commands.map(command => command.name).join(", ")}`,
-				ephemeral: true,
-			});
-		} else
-		if (interaction.commandName === 'm') {
-			const name = interaction.options.getString('name');
-			await interaction.reply({
-				content: getContentForMacro(name),
-				ephemeral: true,
-			});
-		} else
-		if (interaction.commandName === 'autoban') {
-			const enable = interaction.options.getString('enable');
-			await interaction.reply({
-				content: `Sorry, not implemented yet 🤭✌️`,
-				ephemeral: true,
-			})
-			// if (enable === 'enable') {
-			// 	await interaction.reply({
-			// 		content: `Autoban enabled!`,
-			// 		ephemeral: true,
-			// 	});
-			// } else if (enable === 'disable') {
-			// 	await interaction.reply({
-			// 		content: `Autoban disabled!`,
-			// 		ephemeral: true,
-			// 	});
-			// }
-		}
+				await interaction.editReply({
+					content: `Cleared messages!`,
+				})
+			} else
+				if (interaction.commandName === 'help') {
+					await interaction.reply({
+						content: `Commands: ${commands.map(command => command.name).join(", ")}`,
+						ephemeral: true,
+					});
+				} else
+					if (interaction.commandName === 'm') {
+						const name = interaction.options.getString('name');
+						await interaction.reply({
+							content: getContentForMacro(name),
+							ephemeral: true,
+						});
+					} else
+						if (interaction.commandName === 'autoban') {
+							const enable = interaction.options.getString('enable');
+							await interaction.reply({
+								content: `Sorry, not implemented yet 🤭✌️`,
+								ephemeral: true,
+							})
+							// if (enable === 'enable') {
+							// 	await interaction.reply({
+							// 		content: `Autoban enabled!`,
+							// 		ephemeral: true,
+							// 	});
+							// } else if (enable === 'disable') {
+							// 	await interaction.reply({
+							// 		content: `Autoban disabled!`,
+							// 		ephemeral: true,
+							// 	});
+							// }
+						}
 	});
 
 	client.on("ready", async () => {
@@ -161,17 +143,15 @@ async function main() {
 	client.login(get("token"));
 }
 
-export const fetchMessages = async (channel: Channel, limit: number): Promise<Collection<string, Message<boolean>>> => {
-	const c = channel as TextChannel;
-	return c.messages.fetch({ limit });
+module.exports.fetchMessages = async (channel, limit) => {
+	return channel.messages.fetch({ limit });
 };
 
-export const deleteMessages = (channel: Channel, messagesCollection: Collection<string, Message>) => {
-	const c = channel as TextChannel;
-	return c.bulkDelete(messagesCollection, true);
+module.exports.deleteMessages = (channel, messagesCollection) => {
+	return channel.bulkDelete(messagesCollection, true);
 };
 
-export const getContentForMacro = (name: string): string => {
+module.exports.getContentForMacro = (name) => {
 	switch (name) {
 		case 'bonk':
 			return `⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠻⣿⣿⣿⣿⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣿⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿

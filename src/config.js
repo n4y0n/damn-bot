@@ -1,19 +1,16 @@
-import { Client, Guild, Message } from "discord.js";
-import { homedir } from "os";
-import { join } from "path";
-import { createInterface } from "readline";
-import * as child_process from "child_process"
-import debug from "debug";
-import { existsSync, readFileSync, writeFileSync } from "fs";
-import { BotConfigKey, GuildConfigKey } from "./types/config";
-
+const { homedir } = require("os");
+const { join } = require("path");
+const { createInterface } = require("readline");
+const child_process = require("child_process");
+const debug = require("debug");
+const { existsSync, readFileSync, writeFileSync } = require("fs");
 
 const log = debug("bot:config");
 const configPath = join(homedir(), ".discord-bot.json");
 
 let configs = {};
 let guilds = {};
-let _client: Client;
+let _client;
 
 
 const generateDefaultConfigurations = async () => {
@@ -107,8 +104,8 @@ const serializeConfig = () => {
 	log("Serialization done.");
 };
 
-export const getGuildConf = (guild: Guild | string, conf: GuildConfigKey) => {
-	let key: string;
+module.exports.getGuildConf = (guild, conf) => {
+	let key;
 	if (typeof guild !== "string") {
 		key = guild.id;
 	}
@@ -119,8 +116,8 @@ export const getGuildConf = (guild: Guild | string, conf: GuildConfigKey) => {
 	return guilds[key][conf];
 };
 
-export const setGuildConf = (guild: Guild | string, conf: GuildConfigKey, value: any) => {
-	let key: string;
+module.exports.setGuildConf = (guild, conf, value) => {
+	let key;
 	if (typeof guild !== "string") {
 		key = guild.id;
 	}
@@ -132,11 +129,11 @@ export const setGuildConf = (guild: Guild | string, conf: GuildConfigKey, value:
 	guilds[key][conf] = value;
 };
 
-export const setClient = (client: Client) => {
+module.exports.setClient = (client) => {
 	_client = client;
 };
 
-export const get = (key: BotConfigKey) => {
+module.exports.get = (key) => {
 	if (configs[key] === undefined) {
 		return null;
 	}
@@ -144,11 +141,11 @@ export const get = (key: BotConfigKey) => {
 	return getDefaultOrValue(key, value);
 };
 
-export const load = () => deserializeConfig();
+module.exports.load = () => deserializeConfig();
 
-export const save = () => serializeConfig();
+module.exports.save = () => serializeConfig();
 
-function getDefaultOrValue(key: BotConfigKey, value: any) {
+function getDefaultOrValue(key, value) {
 	switch (key) {
 		case "game":
 			return value === "DEFAULT"
@@ -168,14 +165,14 @@ function getDefaultOrValue(key: BotConfigKey, value: any) {
 }
 
 const messageLogger = debug("bot:message");
-export const Util = {
-	removeMentions: (str: string) => {
+module.exports.Util = {
+	removeMentions: (str) => {
 		return str.replace(/<@!?[0-9]+>/g, "").trim();
 	},
-	removeMention: (str: string, id: string) => {
+	removeMention: (str, id) => {
 		return str.replace(RegExp("^<@!?" + id + ">"), "").trim();
 	},
-	displayProcessBy: (pattern: string) => {
+	displayProcessBy: (pattern) => {
 		let command = process.platform === 'win32' ? 'tasklist | findstr ' + pattern : 'ps -ef | grep' + pattern;
 		return new Promise((resolve, reject) => {
 			child_process.exec(command, (err, stdout, stdin) => {
@@ -184,7 +181,7 @@ export const Util = {
 			});
 		});
 	},
-	logMessage: async (message: Message) => {
+	logMessage: async (message) => {
 		messageLogger(`[${message.guild.name}] ${message.author.username}: ${message.content}`);
 	}
 }
