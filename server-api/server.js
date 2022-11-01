@@ -15,10 +15,6 @@ app.get('*', (req, res) => {
     res.send(content);
 });
 
-router.get('/', (req, res) => {
-    res.send('hello');
-});
-
 function renderToString(req, store, context) {
     const content = renderToString(
         <Provider store={store}>
