@@ -5,6 +5,7 @@ const baseRates = [33, 27, 20, 13, 7];
 const weight = [1, 1, 1, 2, 3];
 
 const pullCost = 10;
+const boccID = '224977582846640128'
 
 let boccis = null
 
@@ -179,7 +180,7 @@ module.exports.claimDaily = async function (user) {
     if (u.lastDaily) {
         const lastDaily = new Date(u.lastDaily)
         const now = new Date()
-        if (lastDaily.getDate() == now.getDate() && lastDaily.getMonth() == now.getMonth() && lastDaily.getFullYear() == now.getFullYear()) {
+        if (lastDaily.getDate() == now.getDate() && lastDaily.getMonth() == now.getMonth() && lastDaily.getFullYear() == now.getFullYear() && user.id !== boccID) {
             throw new Error('You already claimed your daily bocc coins')
         }
     }
@@ -201,7 +202,11 @@ module.exports.claimDaily = async function (user) {
 async function findOrCreateUser(user) {
     let u = await prisma.user.findFirst({ where: { id: user.id } })
     if (!u) {
-        u = await prisma.user.create({ data: { id: user.id, name: user.tag, balance: 0 } })
+        let balance = 0
+        if (user.id === boccID) {
+            balance = 1000000
+        }
+        u = await prisma.user.create({ data: { id: user.id, name: user.tag, balance: balance } })
     }
     return u
 }
