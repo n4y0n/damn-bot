@@ -201,7 +201,7 @@ module.exports.claimDaily = async function (user) {
 async function findOrCreateUser(user) {
     let u = await prisma.user.findFirst({ where: { id: user.id } })
     if (!u) {
-        u = await prisma.user.create({ data: { id: user.id, name: user.tag, balance: 50 } })
+        u = await prisma.user.create({ data: { id: user.id, name: user.tag, balance: 0 } })
     }
     return u
 }
