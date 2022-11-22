@@ -80,7 +80,7 @@ async function main() {
 	const balance = new SlashCommandBuilder()
 		.setName('balance')
 		.setDescription('Shows your balance')
-	
+
 	const daily = new SlashCommandBuilder()
 		.setName('daily')
 		.setDescription('Claim your daily balance')
@@ -179,12 +179,20 @@ async function main() {
 				ephemeral: true,
 			});
 		} else if (interaction.commandName === 'daily') {
-			const balance = await claimDaily(interaction.user);
-			log(`${interaction.user.tag} claimed their daily balance of ${balance} bocc coins`);
-			await interaction.reply({
-				content: `You claimed your daily balance of ${balance} bocc coins!`,
-				ephemeral: true,
-			});
+			try {
+				const balance = await claimDaily(interaction.user);
+				log(`${interaction.user.tag} claimed their daily balance of ${balance} bocc coins`);
+				await interaction.reply({
+					content: `You claimed your daily balance of ${balance} bocc coins!`,
+					ephemeral: true,
+				});
+			} catch (e) {
+				log(e);
+				await interaction.reply({
+					content: `${e}`,
+					ephemeral: true,
+				});
+			}
 		}
 	});
 
