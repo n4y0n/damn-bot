@@ -4,10 +4,16 @@ const log = require("debug")("bot:main");
 const { load, get } = require("./config")
 load().then(main);
 
-const { pull: pullBocc, getCollection: getBoccs, getCollectionCount } = require("./boccha")
+const { pull: pullBocc, getCollection: getBoccs, getCollectionCount, getBalance, initBalance, incrementBalance, claimDaily } = require("./boccha")
 
 
 async function main() {
+	await initBalance()
+
+	setInterval(async () => {
+		incrementBalance()
+	}, 1000 * 60)
+
 	const commands = []
 	const client = new Client({
 		intents: [
@@ -71,7 +77,16 @@ async function main() {
 		.setName('collection')
 		.setDescription('Shows your collection of boccs')
 
-	commands.push(clear, ping, help, m, pull, collection);
+	const balance = new SlashCommandBuilder()
+		.setName('balance')
+		.setDescription('Shows your balance')
+	
+	const daily = new SlashCommandBuilder()
+		.setName('daily')
+		.setDescription('Claim your daily balance')
+
+
+	commands.push(clear, ping, help, m, pull, collection, balance, daily);
 
 	client.on('interactionCreate', async (interaction) => {
 		if (!interaction.isChatInputCommand()) return;
@@ -106,12 +121,20 @@ async function main() {
 				ephemeral: true,
 			});
 		} else if (interaction.commandName === 'pull') {
-			const bocc = await pullBocc(interaction.user);
-			log(`${interaction.user.tag} pulled ${bocc.stars}${bocc.name}`);
-			await interaction.reply({
-				content: `${bocc.stars} | ${bocc.name}`,
-				ephemeral: true,
-			});
+			try {
+				const bocc = await pullBocc(interaction.user);
+				log(`${interaction.user.tag} pulled ${bocc.stars}${bocc.name}`);
+				await interaction.reply({
+					content: `${bocc.stars} | ${bocc.name}`,
+					ephemeral: true,
+				});
+			} catch (e) {
+				log(e);
+				await interaction.reply({
+					content: `${e}`,
+					ephemeral: true,
+				});
+			}
 		} else if (interaction.commandName === 'collection') {
 			const boccs = await getBoccs(interaction.user);
 			const allBoccsCount = await getCollectionCount();
@@ -148,6 +171,20 @@ async function main() {
 					ephemeral: true,
 				});
 			}
+		} else if (interaction.commandName === 'balance') {
+			const balance = await getBalance(interaction.user);
+			log(`${interaction.user.tag} has ${balance} bocc coins`);
+			await interaction.reply({
+				content: `You have ${balance} bocc coins\nYou can use them to pull boccs!\nUse \`/pull\` to pull a bocc\nThe cost of pulling a bocc is 10 bocc coins\nYou can get bocc coins by waiting, or by using the \`/daily\` command`,
+				ephemeral: true,
+			});
+		} else if (interaction.commandName === 'daily') {
+			const balance = await claimDaily(interaction.user);
+			log(`${interaction.user.tag} claimed their daily balance of ${balance} bocc coins`);
+			await interaction.reply({
+				content: `You claimed your daily balance of ${balance} bocc coins!`,
+				ephemeral: true,
+			});
 		}
 	});
 

@@ -4,6 +4,8 @@ const prisma = new PrismaClient()
 const baseRates = [33, 27, 20, 13, 7];
 const weight = [1, 1, 1, 2, 3];
 
+const pullCost = 10;
+
 let boccis = null
 
 module.exports.pull = async function (user) {
@@ -16,9 +18,10 @@ module.exports.pull = async function (user) {
             }
         }
     }
-    const u = await prisma.user.findFirst({ where: { id: user.id } })
-    if (!u) {
-        await prisma.user.create({ data: { id: user.id, name: user.tag } })
+    const u = await findOrCreateUser(user)
+
+    if (u.balance < pullCost) {
+        throw new Error('You don\'t have enough bocc coins to pull a bocc')
     }
 
     let maxRarity = 0;
@@ -70,6 +73,17 @@ module.exports.pull = async function (user) {
     //     results.push(regain);
     // }
 
+    await prisma.user.update({
+        where: {
+            id: user.id
+        },
+        data: {
+            balance: {
+                decrement: pullCost
+            }
+        }
+    })
+
     await prisma.pull.create({
         data: {
             userId: user.id,
@@ -108,4 +122,85 @@ module.exports.getCollection = async function (user) {
 
 module.exports.getCollectionCount = async function () {
     return prisma.bocc.count()
+}
+
+module.exports.getBalance = async function (user) {
+    const u = await findOrCreateUser(user)
+    return u.balance
+}
+
+module.exports.addBalance = async function (user, amount) {
+    await findOrCreateUser(user)
+    return prisma.user.update({
+        where: {
+            id: user.id
+        },
+        data: {
+            balance: {
+                increment: amount
+            }
+        }
+    })
+}
+
+module.exports.initBalance = async function () {
+    const users = await prisma.user.findMany()
+    for (const user of users) {
+        await prisma.user.update({
+            where: {
+                id: user.id
+            },
+            data: {
+                balance: 0
+            }
+        })
+    }
+}
+
+module.exports.incrementBalance = async function () {
+    const users = await prisma.user.findMany()
+    for (const user of users) {
+        await prisma.user.update({
+            where: {
+                id: user.id
+            },
+            data: {
+                balance: {
+                    increment: 1
+                }
+            }
+        })
+    }
+}
+
+module.exports.claimDaily = async function (user) {
+    const u = await findOrCreateUser(user)
+    if (u.lastDaily) {
+        const lastDaily = new Date(u.lastDaily)
+        const now = new Date()
+        if (lastDaily.getDate() == now.getDate() && lastDaily.getMonth() == now.getMonth() && lastDaily.getFullYear() == now.getFullYear()) {
+            throw new Error('You already claimed your daily bocc coins')
+        }
+    }
+
+    await prisma.user.update({
+        where: {
+            id: user.id
+        },
+        data: {
+            balance: {
+                increment: 50
+            },
+            lastDaily: new Date()
+        }
+    })
+}
+
+
+async function findOrCreateUser(user) {
+    let u = await prisma.user.findFirst({ where: { id: user.id } })
+    if (!u) {
+        u = await prisma.user.create({ data: { id: user.id, name: user.tag, balance: 50 } })
+    }
+    return u
 }
