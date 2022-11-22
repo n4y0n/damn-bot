@@ -151,7 +151,8 @@ module.exports.initBalance = async function () {
                 id: user.id
             },
             data: {
-                balance: 0
+                balance: 0,
+                lastDaily: new Date(0)
             }
         })
     }
