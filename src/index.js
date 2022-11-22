@@ -114,9 +114,10 @@ async function main() {
 			});
 		} else if (interaction.commandName === 'collection') {
 			const boccs = await getBoccs(interaction.user);
+			console.log(boccs);
 			log(`${interaction.user.tag} has ${boccs.length} boccs`);
 			await interaction.reply({
-				content: `You have ${boccs.length} boccs`,
+				content: `You have ${boccs.length} boccs: ${boccs.map(b => `${b.stars}${b.name}`).join(", ")}`,
 				ephemeral: true,
 			});
 		}

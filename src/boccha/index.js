@@ -9,22 +9,18 @@ let boccis = null
 module.exports.pull = async function (user) {
     if (!boccis) {
         boccis = await prisma.bocc.findMany()
+        for (const bocc of boccis) {
+            bocc.stars = '';
+            for (j = 0; j < bocc.rarity; j++) {
+                bocc.stars += '★';
+            }
+        }
     }
-
     const u = await prisma.user.findFirst({ where: { id: user.id } })
-
     if (!u) {
         await prisma.user.create({ data: { id: user.id, name: user.tag } })
     }
 
-    for (const bocc of boccis) {
-        bocc.stars = '';
-        for (j = 0; j < bocc.rarity; j++) {
-            bocc.stars += '★';
-        }
-    }
-
-    let results = [];
     let maxRarity = 0;
     let highestId = 0;
     let fiveStar = false;
@@ -92,5 +88,20 @@ module.exports.getCollection = async function (user) {
         }
     })
 
-    return pulls
+    const collection = await prisma.bocc.findMany({
+        where: {
+            id: {
+                in: pulls.map(p => p.boccId)
+            }
+        }
+    })
+
+    for (const bocc of collection) {
+        bocc.stars = '';
+        for (j = 0; j < bocc.rarity; j++) {
+            bocc.stars += '★';
+        }
+    }
+
+    return collection
 }
