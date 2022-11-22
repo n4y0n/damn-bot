@@ -131,7 +131,7 @@ async function main() {
 			} catch (e) {
 				log(e);
 				await interaction.reply({
-					content: `${e}`,
+					content: `${e}\n\`/balance\` for more info`,
 					ephemeral: true,
 				});
 			}
