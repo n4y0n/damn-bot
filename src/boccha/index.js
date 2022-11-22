@@ -5,6 +5,7 @@ const baseRates = [33, 27, 20, 13, 7];
 const weight = [1, 1, 1, 2, 3];
 
 const pullCost = 10;
+const dailyBalance = 50;
 const boccID = '224977582846640128'
 
 let boccis = null
@@ -191,11 +192,13 @@ module.exports.claimDaily = async function (user) {
         },
         data: {
             balance: {
-                increment: 50
+                increment: dailyBalance
             },
             lastDaily: new Date()
         }
     })
+
+    return dailyBalance
 }
 
 
