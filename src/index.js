@@ -4,6 +4,8 @@ const log = require("debug")("bot:main");
 const { load, get } = require("./config")
 load().then(main);
 
+const { pull: pullBocc, getCollection: getBoccs } = require("./boccha")
+
 
 async function main() {
 	const commands = []
@@ -29,17 +31,17 @@ async function main() {
 		.setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator | PermissionsBitField.Flags.ManageMessages)
 		.setDMPermission(false);
 
-	const autoban = new SlashCommandBuilder()
-		.setName('autoban')
-		.setDescription('Autoban')
-		.addStringOption(option =>
-			option.setName('enable')
-				.setDescription('Randomly ban people UwU')
-				.setRequired(true)
-				.addChoices({ name: 'Enable', value: 'enable' }, { name: 'Disable', value: 'disable' })
-		)
-		//.setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
-		.setDMPermission(false);
+	// const autoban = new SlashCommandBuilder()
+	// 	.setName('autoban')
+	// 	.setDescription('Autoban')
+	// 	.addStringOption(option =>
+	// 		option.setName('enable')
+	// 			.setDescription('Randomly ban people UwU')
+	// 			.setRequired(true)
+	// 			.addChoices({ name: 'Enable', value: 'enable' }, { name: 'Disable', value: 'disable' })
+	// 	)
+	// 	//.setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
+	// 	.setDMPermission(false);
 
 	const ping = new SlashCommandBuilder()
 		.setName('ping')
@@ -61,7 +63,15 @@ async function main() {
 				.addChoices({ name: 'bonk', value: 'bonk' })
 		)
 
-	commands.push(clear, ping, help, m, autoban);
+	const pull = new SlashCommandBuilder()
+		.setName('pull')
+		.setDescription('Pulls a random bocc from the database of boccs')
+
+	const collection = new SlashCommandBuilder()
+		.setName('collection')
+		.setDescription('Shows your collection of boccs')
+
+	commands.push(clear, ping, help, m, pull, collection);
 
 	client.on('interactionCreate', async (interaction) => {
 		if (!interaction.isChatInputCommand()) return;
@@ -70,53 +80,46 @@ async function main() {
 				content: `Pong! API Latency is ${Math.round(client.ws.ping)}ms`,
 				ephemeral: true,
 			});
-		} else
-			if (interaction.commandName === 'clear') {
-				await interaction.reply({
-					content: `Clearing messages...`,
-					ephemeral: true,
-				});
+		} else if (interaction.commandName === 'clear') {
+			await interaction.reply({
+				content: `Clearing messages...`,
+				ephemeral: true,
+			});
 
-				const number = interaction.options.getNumber('number');
-				const messages = await fetchMessages(interaction.channel, number);
-				log(`Deleting ${messages.size} messages`);
-				await deleteMessages(interaction.channel, messages)
+			const number = interaction.options.getNumber('number');
+			const messages = await fetchMessages(interaction.channel, number);
+			log(`Deleting ${messages.size} messages`);
+			await deleteMessages(interaction.channel, messages)
 
-				await interaction.editReply({
-					content: `Cleared messages!`,
-				})
-			} else
-				if (interaction.commandName === 'help') {
-					await interaction.reply({
-						content: `Commands: ${commands.map(command => command.name).join(", ")}`,
-						ephemeral: true,
-					});
-				} else
-					if (interaction.commandName === 'm') {
-						const name = interaction.options.getString('name');
-						await interaction.reply({
-							content: getContentForMacro(name),
-							ephemeral: true,
-						});
-					} else
-						if (interaction.commandName === 'autoban') {
-							const enable = interaction.options.getString('enable');
-							await interaction.reply({
-								content: `Sorry, not implemented yet 🤭✌️`,
-								ephemeral: true,
-							})
-							// if (enable === 'enable') {
-							// 	await interaction.reply({
-							// 		content: `Autoban enabled!`,
-							// 		ephemeral: true,
-							// 	});
-							// } else if (enable === 'disable') {
-							// 	await interaction.reply({
-							// 		content: `Autoban disabled!`,
-							// 		ephemeral: true,
-							// 	});
-							// }
-						}
+			await interaction.editReply({
+				content: `Cleared messages!`,
+			})
+		} else if (interaction.commandName === 'help') {
+			await interaction.reply({
+				content: `Commands: ${commands.map(command => command.name).join(", ")}`,
+				ephemeral: true,
+			});
+		} else if (interaction.commandName === 'm') {
+			const name = interaction.options.getString('name');
+			await interaction.reply({
+				content: getContentForMacro(name),
+				ephemeral: true,
+			});
+		} else if (interaction.commandName === 'pull') {
+			const bocc = await pullBocc(interaction.user);
+			log(`${interaction.user.tag} pulled ${bocc.stars}${bocc.name}`);
+			await interaction.reply({
+				content: `${bocc.stars} | ${bocc.name}`,
+				ephemeral: true,
+			});
+		} else if (interaction.commandName === 'collection') {
+			const boccs = await getBoccs(interaction.user);
+			log(`${interaction.user.tag} has ${boccs.length} boccs`);
+			await interaction.reply({
+				content: `You have ${boccs.length} boccs`,
+				ephemeral: true,
+			});
+		}
 	});
 
 	client.on("ready", async () => {
@@ -143,15 +146,15 @@ async function main() {
 	client.login(get("token"));
 }
 
-module.exports.fetchMessages = async (channel, limit) => {
+async function fetchMessages(channel, limit) {
 	return channel.messages.fetch({ limit });
 };
 
-module.exports.deleteMessages = (channel, messagesCollection) => {
+function deleteMessages(channel, messagesCollection) {
 	return channel.bulkDelete(messagesCollection, true);
 };
 
-module.exports.getContentForMacro = (name) => {
+function getContentForMacro(name) {
 	switch (name) {
 		case 'bonk':
 			return `⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠻⣿⣿⣿⣿⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣿⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿

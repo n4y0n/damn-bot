@@ -1,19 +1,96 @@
-// Bocc, Mbocc, Sbocc, El Boccios, Bocci la roccia
-// Mi stavo dimenticando il bocc più importante
-// Bocc il signore dei pandori
-// SSSR+
+const { PrismaClient } = require('@prisma/client')
+const prisma = new PrismaClient()
 
-const boccis = [
-    { href: "/bocc", name: 'Bocc', chance: 0.0002 },
-    { href: "/m-bocc", name: 'Mbocc', chance: 0.0002 },
-    { href: "/s-bocc", name: 'Sbocc', chance: 0.0002 },
-    { href: "/el-boccios", name: 'El Boccios', chance: 0.0002 },
-    { href: "/bocci-la-roccia", name: 'Bocci la roccia', chance: 0.0002 },
-    { href: "/bocc-il-signore-dei-pandori", name: 'Bocc il signore dei pandori', chance: 0.0002 },
-    { href: "/bocc-sssrplus", name: 'SSSR+', chance: 0.0002 },
-]
+const baseRates = [33, 27, 20, 13, 7];
+const weight = [1, 1, 1, 2, 3];
 
-const roll = () => {
-    const r = Math.random()
-    return boccis.find(bocc => r < bocc.chance)
+let boccis = null
+
+module.exports.pull = async function (user) {
+    if (!boccis) {
+        boccis = await prisma.bocc.findMany()
+    }
+
+    const u = await prisma.user.findFirst({ where: { id: user.id } })
+
+    if (!u) {
+        await prisma.user.create({ data: { id: user.id, name: user.tag } })
+    }
+
+    for (const bocc of boccis) {
+        bocc.stars = '';
+        for (j = 0; j < bocc.rarity; j++) {
+            bocc.stars += '★';
+        }
+    }
+
+    let results = [];
+    let maxRarity = 0;
+    let highestId = 0;
+    let fiveStar = false;
+
+    let totalWeight = 0;
+    for (i = 0; i < 5; i++) {
+        totalWeight += baseRates[i] * weight[i];
+    }
+
+    // for (i = 0; i < pullCount; i++) {
+    let r = Math.floor(Math.random() * totalWeight); // The roll
+
+    let rarity = 0;
+    while (r >= 0) {
+        r -= baseRates[rarity] * weight[rarity];
+        rarity++;
+    }
+
+    if (rarity > maxRarity) {
+        maxRarity = rarity;
+        highestId = i;
+    }
+
+    if (rarity == 5) {
+        if (fiveStar) {
+            rarity = Math.ceil(Math.random() * 4);
+        }
+        fiveStar = true;
+    }
+
+    if (maxRarity <= 2 && i == 2) {
+        rarity = 3;
+    }
+
+    // We have our rarity, roll a random regain
+    let availableBoccis = boccis.filter(function (regain) {
+        return regain.rarity == rarity;
+    });
+
+    let regain = availableBoccis[Math.floor(Math.random() * availableBoccis.length)];
+    //     while (results.find(function (r) {
+    //         return r.id == regain.id
+    //     })) {
+    //         regain = availableBoccis[Math.floor(Math.random() * availableBoccis.length)];
+    //     }
+
+    //     results.push(regain);
+    // }
+
+    await prisma.pull.create({
+        data: {
+            userId: user.id,
+            boccId: regain.id,
+        }
+    })
+
+    return regain;
+}
+
+module.exports.getCollection = async function (user) {
+    const pulls = await prisma.pull.groupBy({
+        by: ['boccId', 'userId'],
+        having: {
+            userId: user.id,
+        }
+    })
+
+    return pulls
 }

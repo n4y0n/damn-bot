@@ -7,10 +7,14 @@
     "dev": "nodemon src/index.js",
     "start": "src/index.js"
   },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "@discordjs/rest": "^1.1.0",
+    "@prisma/client": "^4.6.1",
     "debug": "^3.2.7",
     "discord.js": "^14.3.0",
     "express": "^4.18.2"
@@ -18,6 +22,7 @@
   "devDependencies": {
     "@types/debug": "^4.1.5",
     "@types/node": "^18.8.1",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "prisma": "^4.6.1"
   }
 }
