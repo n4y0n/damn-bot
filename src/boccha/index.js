@@ -105,3 +105,7 @@ module.exports.getCollection = async function (user) {
 
     return collection
 }
+
+module.exports.getCollectionCount = async function () {
+    return prisma.bocc.count()
+}

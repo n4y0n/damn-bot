@@ -1,10 +1,10 @@
-const { Client, REST, SlashCommandBuilder, GatewayIntentBits, PermissionsBitField, Routes, OAuth2Scopes } = require("discord.js");
+const { Client, REST, SlashCommandBuilder, GatewayIntentBits, PermissionsBitField, Routes, OAuth2Scopes, EmbedBuilder } = require("discord.js");
 const log = require("debug")("bot:main");
 // Load bot configurations from $HOME/.discord-bot.json
 const { load, get } = require("./config")
 load().then(main);
 
-const { pull: pullBocc, getCollection: getBoccs } = require("./boccha")
+const { pull: pullBocc, getCollection: getBoccs, getCollectionCount } = require("./boccha")
 
 
 async function main() {
@@ -114,11 +114,40 @@ async function main() {
 			});
 		} else if (interaction.commandName === 'collection') {
 			const boccs = await getBoccs(interaction.user);
+			const allBoccsCount = await getCollectionCount();
 			log(`${interaction.user.tag} has ${boccs.length} boccs`);
+
+			const embed = new EmbedBuilder({
+				"type": "rich",
+				"title": `Your Bocc List`,
+				"description": "",
+				"color": 0x00FFFF,
+				"fields": boccs.map(bocc => ({
+					name: "\u200B",
+					value: `${bocc.name} (${bocc.stars})`,
+				})),
+				"thumbnail": {
+					"url": `https://cdn.discordapp.com/avatars/224977582846640128/5ab1c937b374310da6b2bedc57f0a880.png?size=1024`,
+					"height": 0,
+					"width": 0
+				},
+				"footer": {
+					"text": `You have ${boccs.length}/${allBoccsCount} Boccs`,
+					"icon_url": `https://cdn.discordapp.com/avatars/224977582846640128/5ab1c937b374310da6b2bedc57f0a880.png?size=1024`
+				}
+			})
+
 			await interaction.reply({
-				content: `You have ${boccs.length} boccs: ${boccs.map(b => `${b.stars}${b.name}`).join(", ")}`,
+				embeds: [embed],
 				ephemeral: true,
 			});
+
+			if (boccs.length == 8) {
+				await interaction.followUp({
+					content: `You have all boccs! Congratulations!`,
+					ephemeral: true,
+				});
+			}
 		}
 	});
 
