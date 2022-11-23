@@ -39,7 +39,7 @@ const generateDefaultConfigurations = async () => {
 	const defaults = {
 		token: token,
 		owner: "315437752093245441",
-		prefix: "-",
+		prefix: "/",
 		game: "DEFAULT",
 
 		// Valid values: ONLINE IDLE DND INVISIBLE
