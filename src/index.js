@@ -12,7 +12,7 @@ async function main() {
 
 	setInterval(async () => {
 		incrementBalance()
-	}, 1000 * 60)
+	}, 1000 * 60 * 5)
 
 	const commands = []
 	const client = new Client({
@@ -36,18 +36,6 @@ async function main() {
 		)
 		.setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator | PermissionsBitField.Flags.ManageMessages)
 		.setDMPermission(false);
-
-	// const autoban = new SlashCommandBuilder()
-	// 	.setName('autoban')
-	// 	.setDescription('Autoban')
-	// 	.addStringOption(option =>
-	// 		option.setName('enable')
-	// 			.setDescription('Randomly ban people UwU')
-	// 			.setRequired(true)
-	// 			.addChoices({ name: 'Enable', value: 'enable' }, { name: 'Disable', value: 'disable' })
-	// 	)
-	// 	//.setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator)
-	// 	.setDMPermission(false);
 
 	const ping = new SlashCommandBuilder()
 		.setName('ping')

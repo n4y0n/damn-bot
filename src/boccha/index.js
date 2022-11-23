@@ -10,7 +10,7 @@ const boccID = '224977582846640128'
 
 let boccis = null
 
-module.exports.pull = async function (user) {
+module.exports.pull = async function (user, pullCount = 1) {
     if (!boccis) {
         boccis = await prisma.bocc.findMany()
         for (const bocc of boccis) {
@@ -26,6 +26,7 @@ module.exports.pull = async function (user) {
         throw new Error('You don\'t have enough bocc coins to pull a bocc')
     }
 
+    let results = []
     let maxRarity = 0;
     let highestId = 0;
     let fiveStar = false;
@@ -35,45 +36,51 @@ module.exports.pull = async function (user) {
         totalWeight += baseRates[i] * weight[i];
     }
 
-    // for (i = 0; i < pullCount; i++) {
-    let r = Math.floor(Math.random() * totalWeight); // The roll
+    for (i = 0; i < pullCount; i++) {
+        let r = Math.floor(Math.random() * totalWeight); // The roll
 
-    let rarity = 0;
-    while (r >= 0) {
-        r -= baseRates[rarity] * weight[rarity];
-        rarity++;
-    }
-
-    if (rarity > maxRarity) {
-        maxRarity = rarity;
-        highestId = i;
-    }
-
-    if (rarity == 5) {
-        if (fiveStar) {
-            rarity = Math.ceil(Math.random() * 4);
+        let rarity = 0;
+        while (r >= 0) {
+            r -= baseRates[rarity] * weight[rarity];
+            rarity++;
         }
-        fiveStar = true;
+
+        if (rarity > maxRarity) {
+            maxRarity = rarity;
+            highestId = i;
+        }
+
+        if (rarity == 5) {
+            if (fiveStar) {
+                rarity = Math.ceil(Math.random() * 4);
+            }
+            fiveStar = true;
+        }
+
+        if (maxRarity <= 2 && i == 2) {
+            rarity = 3;
+        }
+
+        // We have our rarity, roll a random regain
+        let availableBoccis = boccis.filter(function (regain) {
+            return regain.rarity == rarity;
+        });
+
+        let regain = availableBoccis[Math.floor(Math.random() * availableBoccis.length)];
+        while (results.find(function (r) {
+            return r.id == regain.id
+        })) {
+            regain = availableBoccis[Math.floor(Math.random() * availableBoccis.length)];
+        }
+
+        await prisma.pull.create({
+            data: {
+                userId: user.id,
+                boccId: regain.id,
+            }
+        })
+        results.push(regain);
     }
-
-    if (maxRarity <= 2 && i == 2) {
-        rarity = 3;
-    }
-
-    // We have our rarity, roll a random regain
-    let availableBoccis = boccis.filter(function (regain) {
-        return regain.rarity == rarity;
-    });
-
-    let regain = availableBoccis[Math.floor(Math.random() * availableBoccis.length)];
-    //     while (results.find(function (r) {
-    //         return r.id == regain.id
-    //     })) {
-    //         regain = availableBoccis[Math.floor(Math.random() * availableBoccis.length)];
-    //     }
-
-    //     results.push(regain);
-    // }
 
     await prisma.user.update({
         where: {
@@ -81,19 +88,11 @@ module.exports.pull = async function (user) {
         },
         data: {
             balance: {
-                decrement: pullCost
+                decrement: pullCost * pullCount
             }
         }
     })
-
-    await prisma.pull.create({
-        data: {
-            userId: user.id,
-            boccId: regain.id,
-        }
-    })
-
-    return regain;
+    return results;
 }
 
 module.exports.getCollection = async function (user) {
@@ -182,7 +181,8 @@ module.exports.claimDaily = async function (user) {
         const lastDaily = new Date(u.lastDaily)
         const now = new Date()
         if (lastDaily.getDate() == now.getDate() && lastDaily.getMonth() == now.getMonth() && lastDaily.getFullYear() == now.getFullYear() && user.id !== boccID) {
-            throw new Error('You already claimed your daily bocc coins')
+            let { hours, minutes, seconds } = getTimeRemaining(new Date(lastDaily.getTime() + 86400000));
+            throw new Error(`You already claimed your daily bocc coins\nTry again in ${hours < 10 ? `0${hours}` : hours}H ${minutes < 10 ? `0${minutes}` : minutes}m ${seconds < 10 ? `0${seconds}` : seconds}s`)
         }
     }
 
@@ -212,4 +212,13 @@ async function findOrCreateUser(user) {
         u = await prisma.user.create({ data: { id: user.id, name: user.tag, balance: balance } })
     }
     return u
+}
+
+function getTimeRemaining(e) {
+    const total = e - new Date();
+    const seconds = Math.floor((total / 1000) % 60);
+    const minutes = Math.floor((total / 1000 / 60) % 60);
+    const hours = Math.floor((total / 1000 / 60 / 60) % 24);
+    const days = Math.floor((total / 1000 / 60 / 60 / 24));
+    return { total, days, hours, minutes, seconds};
 }
