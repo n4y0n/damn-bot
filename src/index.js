@@ -60,6 +60,13 @@ async function main() {
 	const pull = new SlashCommandBuilder()
 		.setName('pull')
 		.setDescription('Pulls a random bocc from the database of boccs')
+		.addIntegerOption(option =>
+			option.setName('amount')
+				.setDescription('The amount of boccs to pull')
+				.setRequired(false)
+				.setMinValue(1)
+				.setMaxValue(5)
+		)
 
 	const collection = new SlashCommandBuilder()
 		.setName('collection')
@@ -110,10 +117,31 @@ async function main() {
 			});
 		} else if (interaction.commandName === 'pull') {
 			try {
-				const bocc = await pullBocc(interaction.user);
-				log(`${interaction.user.tag} pulled ${bocc.stars}${bocc.name}`);
+				const amount = interaction.options.getInteger('amount') || 1
+				const boccs = await pullBocc(interaction.user, amount);
+
+				log(`${interaction.user.tag} pulled ${boccs.map(bocc => bocc.stars + bocc.name).join(", ")}`);
+				const embed = new EmbedBuilder({
+					"type": "rich",
+					"title": `Pulled ${boccs.length} boccs`,
+					"description": "",
+					"color": 0x00FFFF,
+					"fields": boccs.map(bocc => ({
+						name: "\u200B",
+						value: `${bocc.name} (${bocc.stars})`,
+					})),
+					"thumbnail": {
+						"url": `https://cdn.discordapp.com/avatars/224977582846640128/5ab1c937b374310da6b2bedc57f0a880.png?size=1024`,
+						"height": 0,
+						"width": 0
+					},
+					"footer": {
+						"text": ``,
+						"icon_url": `https://cdn.discordapp.com/avatars/224977582846640128/5ab1c937b374310da6b2bedc57f0a880.png?size=1024`
+					}
+				})
 				await interaction.reply({
-					content: `${bocc.stars} | ${bocc.name}`,
+					embeds: [embed],
 					ephemeral: true,
 				});
 			} catch (e) {

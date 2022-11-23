@@ -22,7 +22,7 @@ module.exports.pull = async function (user, pullCount = 1) {
     }
     const u = await findOrCreateUser(user)
 
-    if (u.balance < pullCost) {
+    if (u.balance < pullCost * pullCount) {
         throw new Error('You don\'t have enough bocc coins to pull a bocc')
     }
 
