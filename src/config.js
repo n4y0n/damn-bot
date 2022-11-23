@@ -145,7 +145,9 @@ module.exports.load = () => deserializeConfig();
 
 module.exports.save = () => serializeConfig();
 
+
 function getDefaultOrValue(key, value) {
+	const get = exports.get;
 	switch (key) {
 		case "game":
 			return value === "DEFAULT"
