@@ -4,8 +4,20 @@ const log = require("debug")("bot:main");
 const { load, get } = require("./config")
 load().then(main);
 
-const { pull: pullBocc, getCollection: getBoccs, getCollectionCount, getBalance, initBalance, incrementBalance, claimDaily } = require("./boccha")
+const { pull: pullBocc, getCollection: getBoccs, getCollectionCount, getBalance, initBalance, incrementBalance, claimDaily, fetchBoccImageURL } = require("./boccha")
 
+process.on("unhandledRejection", (err) => {
+	log("Unhandled promise rejection: %O", err);
+});
+
+process.on("uncaughtException", (err) => {
+	log("Uncaught exception: %O", err);
+});
+
+process.on("SIGINT", () => {
+	log("SIGINT received. Exiting...");
+	process.exit(0);
+});
 
 async function main() {
 	await initBalance()
@@ -113,7 +125,7 @@ async function main() {
 			const name = interaction.options.getString('name');
 			await interaction.reply({
 				content: getContentForMacro(name),
-				ephemeral: true,
+				ephemeral: false,
 			});
 		} else if (interaction.commandName === 'pull') {
 			try {
@@ -122,22 +134,22 @@ async function main() {
 
 				log(`${interaction.user.tag} pulled ${boccs.map(bocc => bocc.stars + bocc.name).join(", ")}`);
 				const embed = new EmbedBuilder({
-					"type": "rich",
-					"title": `Pulled ${boccs.length} boccs`,
-					"description": "",
-					"color": 0x00FFFF,
-					"fields": boccs.map(bocc => ({
+					type: "rich",
+					title: `Pulled ${boccs.length} boccs`,
+					description: "",
+					color: 0x00FFFF,
+					fields: boccs.map(bocc => ({
 						name: "\u200B",
 						value: `${bocc.name} (${bocc.stars})`,
 					})),
-					"thumbnail": {
-						"url": `https://cdn.discordapp.com/avatars/224977582846640128/5ab1c937b374310da6b2bedc57f0a880.png?size=1024`,
-						"height": 0,
-						"width": 0
+					thumbnail: {
+						url: fetchBoccImageURL(bocc),
+						height: 0,
+						width: 0
 					},
-					"footer": {
-						"text": ``,
-						"icon_url": `https://cdn.discordapp.com/avatars/224977582846640128/5ab1c937b374310da6b2bedc57f0a880.png?size=1024`
+					footer: {
+						text: ``,
+						icon_url: `https://cdn.discordapp.com/avatars/224977582846640128/5ab1c937b374310da6b2bedc57f0a880.png?size=1024`
 					}
 				})
 				await interaction.reply({
@@ -157,22 +169,22 @@ async function main() {
 			log(`${interaction.user.tag} has ${boccs.length} boccs`);
 
 			const embed = new EmbedBuilder({
-				"type": "rich",
-				"title": `Your Bocc List`,
-				"description": "",
-				"color": 0x00FFFF,
-				"fields": boccs.map(bocc => ({
+				title: `Bocc list`,
+				type: "rich",
+				description: "",
+				color: 0x00FFFF,
+				fields: boccs.map(bocc => ({
 					name: "\u200B",
 					value: `${bocc.name} (${bocc.stars})`,
 				})),
-				"thumbnail": {
-					"url": `https://cdn.discordapp.com/avatars/224977582846640128/5ab1c937b374310da6b2bedc57f0a880.png?size=1024`,
-					"height": 0,
-					"width": 0
+				thumbnail: {
+					url: `https://cdn.discordapp.com/avatars/224977582846640128/5ab1c937b374310da6b2bedc57f0a880.png?size=1024`,
+					height: 0,
+					width: 0
 				},
-				"footer": {
-					"text": `You have ${boccs.length}/${allBoccsCount} Boccs`,
-					"icon_url": `https://cdn.discordapp.com/avatars/224977582846640128/5ab1c937b374310da6b2bedc57f0a880.png?size=1024`
+				footer: {
+					text: `You have ${boccs.length}/${allBoccsCount} Boccs`,
+					icon_url: `https://cdn.discordapp.com/avatars/224977582846640128/5ab1c937b374310da6b2bedc57f0a880.png?size=1024`
 				}
 			})
 

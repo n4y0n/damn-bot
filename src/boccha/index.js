@@ -180,9 +180,9 @@ module.exports.claimDaily = async function (user) {
     if (u.lastDaily) {
         const lastDaily = new Date(u.lastDaily)
         const now = new Date()
-        if (lastDaily.getDate() == now.getDate() && lastDaily.getMonth() == now.getMonth() && lastDaily.getFullYear() == now.getFullYear() && user.id !== boccID) {
-            let { hours, minutes, seconds } = getTimeRemaining(new Date(lastDaily.getTime() + 86400000));
-            throw new Error(`You already claimed your daily bocc coins\nTry again in ${hours < 10 ? `0${hours}` : hours}H ${minutes < 10 ? `0${minutes}` : minutes}m ${seconds < 10 ? `0${seconds}` : seconds}s`)
+        if (lastDaily.getDate() === now.getDate() && user.id !== boccID) {
+            // let { hours, minutes, seconds } = getTimeRemaining(new Date(lastDaily.getTime() + 86400000));
+            throw new Error(`You already claimed your daily bocc coins\nTry again in at midnight.`)
         }
     }
 
@@ -201,6 +201,9 @@ module.exports.claimDaily = async function (user) {
     return dailyBalance
 }
 
+module.exports.fetchBoccImageURL = async function (bocc) {
+    return `https://nayon.xyz/api/boccis/${bocc.slag}`
+}
 
 async function findOrCreateUser(user) {
     let u = await prisma.user.findFirst({ where: { id: user.id } })
