@@ -54,11 +54,6 @@ async function main() {
 		.setDMPermission(false)
 		.setDescription('Replies with Pong!');
 
-	const help = new SlashCommandBuilder()
-		.setName('help')
-		.setDMPermission(false)
-		.setDescription('Replies with a list of commands');
-
 	const m = new SlashCommandBuilder()
 		.setName('m')
 		.setDescription('Macro commands')
@@ -83,6 +78,11 @@ async function main() {
 	const collection = new SlashCommandBuilder()
 		.setName('collection')
 		.setDescription('Shows your collection of boccs')
+		.addBooleanOption(option =>
+			option.setName('share')
+				.setDescription('Share your collection with the server')
+				.setRequired(false)
+		)
 
 	const balance = new SlashCommandBuilder()
 		.setName('balance')
@@ -116,11 +116,6 @@ async function main() {
 			await interaction.editReply({
 				content: `Cleared messages!`,
 			})
-		} else if (interaction.commandName === 'help') {
-			await interaction.reply({
-				content: `Commands: ${commands.map(command => command.name).join(", ")}`,
-				ephemeral: true,
-			});
 		} else if (interaction.commandName === 'm') {
 			const name = interaction.options.getString('name');
 			await interaction.reply({
@@ -159,6 +154,7 @@ async function main() {
 				});
 			}
 		} else if (interaction.commandName === 'collection') {
+			const share = interaction.options.getBoolean('share');
 			const boccs = await getBoccs(interaction.user);
 			const allBoccsCount = await getCollectionCount();
 			log(`${interaction.user.tag} has ${boccs.length} boccs`);
@@ -185,7 +181,7 @@ async function main() {
 
 			await interaction.reply({
 				embeds: [embed],
-				ephemeral: true,
+				ephemeral: !share,
 			});
 
 			if (boccs.length == allBoccsCount) {
