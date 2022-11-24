@@ -11,6 +11,7 @@ const seed = [
     { slag: "/bocc-il-signore-dei-pandori", name: 'Bocc il signore dei pandori', rarity: 5 },
     { slag: "/bocc-sssrplus", name: 'Bocc SSSR+', rarity: 4 },
     { slag: "/bocc-engine", name: 'The Bocc Engine', rarity: 5 },
+    { slag: "/the-boccinator", name: 'Boccinator', rarity: 5 },
 ]
 
 async function main() {
