@@ -9,7 +9,7 @@ const seed = [
     { slag: "/el-boccios", name: 'El Boccios', rarity: 3 },
     { slag: "/bocci-la-roccia", name: 'Bocci la roccia', rarity: 3 },
     { slag: "/bocc-sssrplus", name: 'Bocc SSSR+', rarity: 4 },
-    { slag: "/boccimage", name: 'Boccimage', rarity: 4 },
+    { slag: "/bocci-mage", name: 'Bocci mage', rarity: 4 },
     { slag: "/bocc-il-signore-dei-pandori", name: 'Bocc il signore dei pandori', rarity: 5 },
     { slag: "/bocc-engine", name: 'The Bocc Engine', rarity: 5 },
     { slag: "/the-boccinator", name: 'Boccinator', rarity: 5 },
