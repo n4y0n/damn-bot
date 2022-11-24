@@ -15,6 +15,10 @@ const seed = [
     { slag: "/the-boccinator", name: 'Boccinator', rarity: 5 },
 ]
 
+// Bocci mage : https://cdn.discordapp.com/avatars/224977582846640128/5ab1c937b374310da6b2bedc57f0a880.png?size=1024
+// Bocc : https://cdn.discordapp.com/attachments/351091696219586572/1045451536387538984/BoccSleep.png
+// Mbocc : https://cdn.discordapp.com/attachments/351091696219586572/1045453311756746783/Mbocc.png
+
 async function main() {
     await prisma.$connect()
     for (const bocc of seed) {
