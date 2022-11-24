@@ -188,7 +188,7 @@ async function main() {
 				ephemeral: true,
 			});
 
-			if (boccs.length == 8) {
+			if (boccs.length == allBoccsCount) {
 				await interaction.followUp({
 					content: `You have all boccs! Congratulations!`,
 					ephemeral: true,
