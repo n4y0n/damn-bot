@@ -142,11 +142,6 @@ async function main() {
 						name: "\u200B",
 						value: `${bocc.name} (${bocc.stars})`,
 					})),
-					thumbnail: {
-						url: fetchBoccImageURL(bocc),
-						height: 0,
-						width: 0
-					},
 					footer: {
 						text: ``,
 						icon_url: `https://cdn.discordapp.com/avatars/224977582846640128/5ab1c937b374310da6b2bedc57f0a880.png?size=1024`
