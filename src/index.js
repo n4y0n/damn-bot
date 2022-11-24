@@ -160,7 +160,7 @@ async function main() {
 			log(`${interaction.user.tag} has ${boccs.length} boccs`);
 
 			const embed = new EmbedBuilder({
-				title: `Bocc list`,
+				title: `${interaction.user.tag} Bocc list`,
 				type: "rich",
 				description: "",
 				color: 0x00FFFF,
@@ -169,7 +169,7 @@ async function main() {
 					value: `${bocc.name} (${bocc.stars})`,
 				})),
 				thumbnail: {
-					url: `https://cdn.discordapp.com/avatars/224977582846640128/5ab1c937b374310da6b2bedc57f0a880.png?size=1024`,
+					url: interaction.user.avatarURL({ format: "png", size: 1024 }),
 					height: 0,
 					width: 0
 				},
