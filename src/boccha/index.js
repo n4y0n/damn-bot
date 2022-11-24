@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
-const baseRates = [33, 27, 20, 13, 7];
+const baseRates = [33, 25, 15, 10, 2];
 const weight = [1, 1, 1, 2, 3];
 
 const pullCost = 10;
@@ -67,19 +67,22 @@ module.exports.pull = async function (user, pullCount = 1) {
         });
 
         let regain = availableBoccis[Math.floor(Math.random() * availableBoccis.length)];
-        while (results.find(function (r) {
-            return r.id == regain.id
-        })) {
-            regain = availableBoccis[Math.floor(Math.random() * availableBoccis.length)];
-        }
+        // while (results.find(function (r) {
+        //     return r.id === regain.id
+        // })) {
+        //     regain = availableBoccis[Math.floor(Math.random() * availableBoccis.length)];
+        // }
 
+        results.push(regain);
+    }
+
+    for (let regain of results) {
         await prisma.pull.create({
             data: {
                 userId: user.id,
                 boccId: regain.id,
             }
         })
-        results.push(regain);
     }
 
     await prisma.user.update({
@@ -118,7 +121,7 @@ module.exports.getCollection = async function (user) {
         }
     }
 
-    return collection
+    return collection.sort((a, b) => a.rarity - b.rarity)
 }
 
 module.exports.getCollectionCount = async function () {
@@ -223,5 +226,5 @@ function getTimeRemaining(e) {
     const minutes = Math.floor((total / 1000 / 60) % 60);
     const hours = Math.floor((total / 1000 / 60 / 60) % 24);
     const days = Math.floor((total / 1000 / 60 / 60 / 24));
-    return { total, days, hours, minutes, seconds};
+    return { total, days, hours, minutes, seconds };
 }

@@ -151,7 +151,7 @@ function getDefaultOrValue(key, value) {
 	switch (key) {
 		case "game":
 			return value === "DEFAULT"
-				? `Type ${get("prefix")}${get("help")}.`
+				? `Type ${exports.get("prefix")}${exports.get("help")}.`
 				: value;
 		case "prefix":
 			return value ? value : get("altprefix");
