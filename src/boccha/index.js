@@ -147,17 +147,22 @@ module.exports.addBalance = async function (user, amount) {
     })
 }
 
-module.exports.initBalance = async function () {
+module.exports.initBalance = async function (clear = true) {
     const users = await prisma.user.findMany()
+    const data = {
+        lastDaily: new Date(0)
+    }
+
+    if (clear) {
+        data.balance = 0
+    }
+
     for (const user of users) {
         await prisma.user.update({
             where: {
                 id: user.id
             },
-            data: {
-                balance: 0,
-                lastDaily: new Date(0)
-            }
+            data: data
         })
     }
 }

@@ -20,7 +20,7 @@ process.on("SIGINT", () => {
 });
 
 async function main() {
-	await initBalance()
+	await initBalance(get("clearBalanceOnStart"))
 
 	setInterval(async () => {
 		incrementBalance()
@@ -46,7 +46,6 @@ async function main() {
 				.setDescription('The number of messages to clear')
 				.setRequired(true)
 		)
-		.setDefaultMemberPermissions(PermissionsBitField.Flags.Administrator | PermissionsBitField.Flags.ManageMessages)
 		.setDMPermission(false);
 
 	const ping = new SlashCommandBuilder()
@@ -92,6 +91,10 @@ async function main() {
 		.setName('daily')
 		.setDescription('Claim your daily balance')
 
+	const help = new SlashCommandBuilder()
+		.setName('help')
+		.setDescription('Shows the help menu')
+
 
 	commands.push(clear, ping, help, m, pull, collection, balance, daily);
 
@@ -103,6 +106,16 @@ async function main() {
 				ephemeral: true,
 			});
 		} else if (interaction.commandName === 'clear') {
+			// check permissions for the user
+			const permissions = interaction.channel.permissionsFor(interaction.user);
+			if (!permissions.has(PermissionsBitField.FLAGS.MANAGE_MESSAGES) || !permissions.has(PermissionsBitField.FLAGS.ADMINISTRATOR) || interaction.user.id !== get("owner")) {
+				await interaction.reply({
+					content: "You don't have the permissions to do that",
+					ephemeral: true,
+				});
+				return;
+			}
+
 			await interaction.reply({
 				content: `Clearing messages...`,
 				ephemeral: true,
@@ -212,6 +225,11 @@ async function main() {
 					ephemeral: true,
 				});
 			}
+		} else if (interaction.commandName === 'help') {
+			await interaction.reply({
+				content: `Commands:\n\`/pull\` - Pull a bocc\n\`/collection\` - View your bocc collection\n\`/balance\` - View your bocc coin balance\n\`/daily\` - Claim your daily bocc coins\n\`/clear\` - Clear messages\n\`/m\` - Use a macro\n\`/help\` - View this help message`,
+				ephemeral: true,
+			});
 		}
 	});
 

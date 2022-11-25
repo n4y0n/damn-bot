@@ -64,6 +64,7 @@ const generateDefaultConfigurations = async () => {
 		// Keep in mind that being connected to a voice channel uses additional bandwith,
 		// so this option is not recommended if bandwidth is a concern.
 		stayinchannel: false,
+		clearBalanceOnStart: false,
 		aliases: {},
 	};
 
@@ -161,6 +162,8 @@ function getDefaultOrValue(key, value) {
 			return _client;
 		case "token":
 			return value ? value : process.env.TOKEN;
+		case "clearBalanceOnStart":
+			return value || false;
 		default:
 			return value;
 	}
