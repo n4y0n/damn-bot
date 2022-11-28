@@ -108,7 +108,7 @@ async function main() {
 		} else if (interaction.commandName === 'clear') {
 			// check permissions for the user
 			const permissions = interaction.channel.permissionsFor(interaction.user);
-			if (!permissions.has(PermissionsBitField.FLAGS.MANAGE_MESSAGES) || !permissions.has(PermissionsBitField.FLAGS.ADMINISTRATOR) || interaction.user.id !== get("owner")) {
+			if (!permissions.has(PermissionsBitField.Flags.ManageMessages) || !permissions.has(PermissionsBitField.Flags.Administrator) || interaction.user.id !== get("owner")) {
 				await interaction.reply({
 					content: "You don't have the permissions to do that",
 					ephemeral: true,
