@@ -128,6 +128,22 @@ module.exports.getCollectionCount = async function () {
     return prisma.bocc.count()
 }
 
+module.exports.getPullCount = async function (user) {
+    const result = await prisma.$queryRaw`select Bocc.rarity as Rarity, Bocc.id as ID, Bocc.name as Bocc, PullCount as Count from Bocc, (select boccId, count(*) as PullCount from pull where pull.userId = ${user.id} GROUP by boccId) as BCT where BCT.boccId = Bocc.id`
+    const counts = { total: 0 }
+    for (const row of result) {
+        const count = parseInt(row.Count)
+        counts.total += count
+        counts[row.ID] = {
+            id: row.ID,
+            count: count,
+            name: row.Bocc,
+            rarity: row.Rarity,
+        }
+    }
+    return counts
+}
+
 module.exports.getBalance = async function (user) {
     const u = await findOrCreateUser(user)
     return u.balance

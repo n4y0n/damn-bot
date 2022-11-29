@@ -4,7 +4,7 @@ const log = require("debug")("bot:main");
 const { load, get } = require("./config")
 load().then(main);
 
-const { pull: pullBocc, getCollection: getBoccs, getCollectionCount, getBalance, initBalance, incrementBalance, claimDaily } = require("./boccha")
+const { pull: pullBocc, getCollection: getBoccs, getCollectionCount, getBalance, initBalance, incrementBalance, claimDaily, getPullCount } = require("./boccha")
 
 process.on("unhandledRejection", (err) => {
 	log("Unhandled promise rejection: %O", err);
@@ -170,6 +170,7 @@ async function main() {
 			const share = interaction.options.getBoolean('share');
 			const boccs = await getBoccs(interaction.user);
 			const allBoccsCount = await getCollectionCount();
+			const counts = await getPullCount(interaction.user);
 			log(`${interaction.user.tag} has ${boccs.length} boccs`);
 
 			const embed = new EmbedBuilder({
@@ -179,7 +180,7 @@ async function main() {
 				color: 0x00FFFF,
 				fields: boccs.map(bocc => ({
 					name: "\u200B",
-					value: `${bocc.name} (${bocc.stars})`,
+					value: `${bocc.name} (${bocc.stars}) [${counts[bocc.id].count}]`,
 				})),
 				thumbnail: {
 					url: interaction.user.avatarURL({ format: "png", size: 1024 }),
@@ -187,7 +188,7 @@ async function main() {
 					width: 0
 				},
 				footer: {
-					text: `You have ${boccs.length}/${allBoccsCount} Boccs`,
+					text: `You have ${boccs.length}/${allBoccsCount} Boccs and have pulled ${counts.total} Boccs`,
 					icon_url: `https://cdn.discordapp.com/avatars/224977582846640128/5ab1c937b374310da6b2bedc57f0a880.png?size=1024`
 				}
 			})
