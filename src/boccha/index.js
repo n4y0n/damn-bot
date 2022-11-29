@@ -209,10 +209,6 @@ module.exports.claimDaily = async function (user) {
     return dailyBalance
 }
 
-module.exports.fetchBoccImageURL = async function (bocc) {
-    return `https://nayon.xyz/api/boccis/${bocc.slag}`
-}
-
 async function findOrCreateUser(user) {
     let u = await prisma.user.findFirst({ where: { id: user.id } })
     if (!u) {

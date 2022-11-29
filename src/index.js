@@ -4,7 +4,7 @@ const log = require("debug")("bot:main");
 const { load, get } = require("./config")
 load().then(main);
 
-const { pull: pullBocc, getCollection: getBoccs, getCollectionCount, getBalance, initBalance, incrementBalance, claimDaily, fetchBoccImageURL } = require("./boccha")
+const { pull: pullBocc, getCollection: getBoccs, getCollectionCount, getBalance, initBalance, incrementBalance, claimDaily } = require("./boccha")
 
 process.on("unhandledRejection", (err) => {
 	log("Unhandled promise rejection: %O", err);
