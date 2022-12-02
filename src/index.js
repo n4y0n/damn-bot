@@ -171,10 +171,10 @@ async function main() {
 			const boccs = await getBoccs(interaction.user);
 			const allBoccsCount = await getCollectionCount();
 			const counts = await getPullCount(interaction.user);
-			log(`${interaction.user.tag} has ${boccs.length} boccs`);
+			log(`${interaction.user.tag.split("#")[0]} has ${boccs.length} boccs`);
 
 			const embed = new EmbedBuilder({
-				title: `${interaction.user.tag} Bocc list`,
+				title: `${interaction.user.tag.split("#")[0]} Bocc list`,
 				type: "rich",
 				description: "",
 				color: 0x00FFFF,
