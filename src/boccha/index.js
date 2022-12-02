@@ -204,7 +204,7 @@ module.exports.claimDaily = async function (user) {
     if (u.lastDaily) {
         const lastDaily = new Date(u.lastDaily)
         const now = new Date()
-        if (lastDaily.getDate() === now.getDate() && user.id !== boccID) {
+        if ((lastDaily.getDate() === now.getDate() || (lastDaily.getDate() === now.getDate() && lastDaily.getMonth() === now.getMonth())) && user.id !== boccID) {
             // let { hours, minutes, seconds } = getTimeRemaining(new Date(lastDaily.getTime() + 86400000));
             throw new Error(`You already claimed your daily bocc coins\nTry again in at midnight.`)
         }
