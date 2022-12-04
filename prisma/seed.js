@@ -1,6 +1,13 @@
 const { PrismaClient } = require('@prisma/client')
-
 const prisma = new PrismaClient()
+
+const settings = {
+    baseRates: [33, 25, 15, 10, 2],
+    weight: [1, 1, 1, 2, 3],
+    pullCost: 10,
+    dailyBalance: 50,
+    boccID: '224977582846640128'
+}
 
 const seed = [
     { slag: "/bocc", name: 'Bocc', rarity: 1 },
@@ -16,17 +23,33 @@ const seed = [
     { slag: "/water-boccificator", name: 'Il Boccificatore dell\'acqua', rarity: 5 },
 ]
 
-// Bocci mage : https://cdn.discordapp.com/avatars/224977582846640128/5ab1c937b374310da6b2bedc57f0a880.png?size=1024
-// Bocc : https://cdn.discordapp.com/attachments/351091696219586572/1045451536387538984/BoccSleep.png
-// Mbocc : https://cdn.discordapp.com/attachments/351091696219586572/1045453311756746783/Mbocc.png
-
 async function main() {
     await prisma.$connect()
     for (const bocc of seed) {
-        await prisma.bocc.create({
-            data: bocc
+        await prisma.bocc.upsert({
+            create: bocc,
+            update: bocc,
+            where: {
+                slag: bocc.slag
+            }
         })
     }
+    for (const setting of Object.keys(settings)) {
+        await prisma.setting.upsert({
+            create: {
+                type: "json",
+                name: setting,
+                value: JSON.stringify(settings[setting]),
+            },
+            update: {
+                value: JSON.stringify(settings[setting]),
+            },
+            where: {
+                name: setting
+            }
+        })
+    }
+    await prisma.$disconnect()
 }
 
 main()

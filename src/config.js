@@ -4,6 +4,8 @@ const { createInterface } = require("readline");
 const child_process = require("child_process");
 const debug = require("debug");
 const { existsSync, readFileSync, writeFileSync } = require("fs");
+const { PrismaClient } = require('@prisma/client')
+const prisma = new PrismaClient()
 
 const log = debug("bot:config");
 const configPath = join(homedir(), ".discord-bot.json");
@@ -105,7 +107,7 @@ const serializeConfig = () => {
 	log("Serialization done.");
 };
 
-module.exports.getGuildConf = (guild, conf) => {
+const getGuildConf = (guild, conf) => {
 	let key;
 	if (typeof guild !== "string") {
 		key = guild.id;
@@ -117,7 +119,7 @@ module.exports.getGuildConf = (guild, conf) => {
 	return guilds[key][conf];
 };
 
-module.exports.setGuildConf = (guild, conf, value) => {
+const setGuildConf = (guild, conf, value) => {
 	let key;
 	if (typeof guild !== "string") {
 		key = guild.id;
@@ -130,11 +132,11 @@ module.exports.setGuildConf = (guild, conf, value) => {
 	guilds[key][conf] = value;
 };
 
-module.exports.setClient = (client) => {
+const setClient = (client) => {
 	_client = client;
 };
 
-module.exports.get = (key) => {
+const get = (key) => {
 	if (configs[key] === undefined) {
 		return null;
 	}
@@ -142,9 +144,9 @@ module.exports.get = (key) => {
 	return getDefaultOrValue(key, value);
 };
 
-module.exports.load = () => deserializeConfig();
+const load = () => deserializeConfig();
 
-module.exports.save = () => serializeConfig();
+const save = () => serializeConfig();
 
 
 function getDefaultOrValue(key, value) {
@@ -170,7 +172,7 @@ function getDefaultOrValue(key, value) {
 }
 
 const messageLogger = debug("bot:message");
-module.exports.Util = {
+const Util = {
 	removeMentions: (str) => {
 		return str.replace(/<@!?[0-9]+>/g, "").trim();
 	},
@@ -189,4 +191,56 @@ module.exports.Util = {
 	logMessage: async (message) => {
 		messageLogger(`[${message.guild.name}] ${message.author.username}: ${message.content}`);
 	}
+}
+
+/**
+ * 
+ * @param {string} name 
+ * @returns Promise<object>
+ */
+const getSetting = async name => {
+	const rawsetting = await prisma.setting.findFirst({
+		where: {
+			name
+		}
+	});
+	
+	let setting = null
+	switch (rawsetting.type) {
+		case "string":
+			setting = rawsetting.value
+			break;
+		case "number":
+			setting = Number(rawsetting.value)
+			break;
+		case "boolean":
+			setting = rawsetting.value === "true"
+			break;
+		case "json":
+			setting = JSON.parse(rawsetting.value)
+			break;
+		default:
+			throw new Error("Invalid setting type")
+	}
+
+	return setting
+}
+
+const Settings = {
+	PULL_COST: "pullCost",
+	DAILY_BALANCE: "dailyBalance",
+	BASE_RATES: "baseRates",
+	WEIGHT: "weight",
+}
+
+module.exports = {
+	getSetting,
+	Settings,
+	Util,
+	load,
+	save,
+	get,
+	setClient,
+	setGuildConf,
+	getGuildConf,
 }
