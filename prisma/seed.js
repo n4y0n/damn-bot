@@ -13,6 +13,7 @@ const seed = [
     { slag: "/bocc-il-signore-dei-pandori", name: 'Bocc il signore dei pandori', rarity: 5 },
     { slag: "/bocc-engine", name: 'The Bocc Engine', rarity: 5 },
     { slag: "/the-boccinator", name: 'Boccinator', rarity: 5 },
+    { slag: "/water-boccificator", name: 'Il Boccificatore dell\'acqua', rarity: 5 },
 ]
 
 // Bocci mage : https://cdn.discordapp.com/avatars/224977582846640128/5ab1c937b374310da6b2bedc57f0a880.png?size=1024
