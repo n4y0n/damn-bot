@@ -10,7 +10,7 @@ async function setup() {
     setInterval(async () => {
         const users = await fetchUsers()
         for (const user of users) {
-		    incrementBalance(user)
+		    await incrementBalance(user)
         }
 	}, 1000 * 60 * 5)
 
