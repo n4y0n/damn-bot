@@ -1,5 +1,5 @@
 const { claimDailyBalance, advancedPull } = require('./gacha')
-const { getCollection, getPullCount, getCollectionCount, getBalance, initBalance, incrementBalance } = require('./database')
+const { getCollection, getPullCount, getCollectionCount, getBalance, initBalance, incrementBalance, fetchUsers } = require('./database')
 
 module.exports = {
     claimDaily: claimDailyBalance,
@@ -9,5 +9,6 @@ module.exports = {
     getCollectionCount,
     getBalance,
     initBalance,
-    incrementBalance
+    incrementBalance,
+    fetchUsers,
 }

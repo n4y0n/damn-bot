@@ -1,5 +1,5 @@
 const { generateStars } = require('./utils')
-const { findOrCreateUser } = require('./database')
+const { findOrCreateUser, newPull, decrementBalance, incrementBalance, fetchBoccs } = require('./database')
 const { getSetting, Settings } = require('../config')
 
 const randomPullFromArray = async (pool, count) => {
@@ -18,41 +18,41 @@ const randomPullFromArray = async (pool, count) => {
 
     for (i = 0; i < count; i++) {
         let r = Math.floor(Math.random() * totalWeight); // The roll
-    
+
         let rarity = 0;
         while (r >= 0) {
             r -= baseRates[rarity] * weight[rarity];
             rarity++;
         }
-    
+
         if (rarity > maxRarity) {
             maxRarity = rarity;
             highestId = i;
         }
-    
+
         if (rarity == 5) {
             if (fiveStar) {
                 rarity = Math.ceil(Math.random() * 4);
             }
             fiveStar = true;
         }
-    
+
         if (maxRarity <= 2 && i == 2) {
             rarity = 3;
         }
-    
+
         // We have our rarity, roll a random regain
         let availablePool = pool.filter(function (regain) {
             return regain.rarity == rarity;
         });
-    
+
         let regain = availablePool[Math.floor(Math.random() * availablePool.length)];
         // while (results.find(function (r) {
         //     return r.id === regain.id
         // })) {
         //     regain = availableBoccis[Math.floor(Math.random() * availableBoccis.length)];
         // }
-    
+
         results.push(regain);
     }
 
@@ -67,28 +67,15 @@ const advancedPull = async (discordUser, pullCount) => {
         throw new Error('You don\'t have enough bocc coins to pull a bocc')
     }
 
-    const availableBoccis = await prisma.bocc.findMany()
+    const availableBoccis = await fetchBoccs()
 
-    const results = randomPullFromArray(availableBoccis, pullCount)
+    const results = await randomPullFromArray(availableBoccis, pullCount)
 
     for (const regain of results) {
-        await prisma.pull.create({
-            data: {
-                userId: discordUser.id,
-                boccId: regain.id,
-            }
-        })
+        await newPull(discordUser, regain)
     }
-    await prisma.user.update({
-        where: {
-            id: discordUser.id
-        },
-        data: {
-            balance: {
-                decrement: pullCost * pullCount
-            }
-        }
-    })
+
+    await decrementBalance(discordUser, pullCost * pullCount)
 
     generateStars(results)
     return results
@@ -97,6 +84,7 @@ const advancedPull = async (discordUser, pullCount) => {
 const claimDailyBalance = async discordUser => {
     const gameUser = await findOrCreateUser(discordUser)
     const dailyBalance = await getSetting(Settings.DAILY_BALANCE)
+    const boccID = await getSetting(Settings.BOCC_ID)
 
     if (gameUser.lastDaily) {
         const lastDaily = new Date(gameUser.lastDaily)
@@ -107,17 +95,7 @@ const claimDailyBalance = async discordUser => {
         }
     }
 
-    await prisma.user.update({
-        where: {
-            id: discordUser.id
-        },
-        data: {
-            balance: {
-                increment: dailyBalance
-            },
-            lastDaily: new Date()
-        }
-    })
+    await incrementBalance(discordUser, dailyBalance, true)
 
     return dailyBalance
 }

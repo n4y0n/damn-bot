@@ -1,19 +1,16 @@
 const { homedir } = require("os");
 const { join } = require("path");
 const { createInterface } = require("readline");
-const child_process = require("child_process");
-const debug = require("debug");
 const { existsSync, readFileSync, writeFileSync } = require("fs");
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
-const log = debug("bot:config");
+const log = require("debug")("bot:config");
 const configPath = join(homedir(), ".discord-bot.json");
 
 let configs = {};
 let guilds = {};
 let _client;
-
 
 const generateDefaultConfigurations = async () => {
 	log("Configuration file not found. Generating one with default values.");
@@ -148,9 +145,7 @@ const load = () => deserializeConfig();
 
 const save = () => serializeConfig();
 
-
 function getDefaultOrValue(key, value) {
-	const get = exports.get;
 	switch (key) {
 		case "game":
 			return value === "DEFAULT"
@@ -171,28 +166,6 @@ function getDefaultOrValue(key, value) {
 	}
 }
 
-const messageLogger = debug("bot:message");
-const Util = {
-	removeMentions: (str) => {
-		return str.replace(/<@!?[0-9]+>/g, "").trim();
-	},
-	removeMention: (str, id) => {
-		return str.replace(RegExp("^<@!?" + id + ">"), "").trim();
-	},
-	displayProcessBy: (pattern) => {
-		let command = process.platform === 'win32' ? 'tasklist | findstr ' + pattern : 'ps -ef | grep' + pattern;
-		return new Promise((resolve, reject) => {
-			child_process.exec(command, (err, stdout, stdin) => {
-				if (err) return reject(err);
-				resolve(stdout);
-			});
-		});
-	},
-	logMessage: async (message) => {
-		messageLogger(`[${message.guild.name}] ${message.author.username}: ${message.content}`);
-	}
-}
-
 /**
  * 
  * @param {string} name 
@@ -204,6 +177,11 @@ const getSetting = async name => {
 			name
 		}
 	});
+
+	if (!rawsetting) {
+		log(`[ERROR] Setting ${name} not found!`);
+		return null;
+	}
 	
 	let setting = null
 	switch (rawsetting.type) {
@@ -231,12 +209,12 @@ const Settings = {
 	DAILY_BALANCE: "dailyBalance",
 	BASE_RATES: "baseRates",
 	WEIGHT: "weight",
+	BOCC_ID: "boccID",
 }
 
 module.exports = {
 	getSetting,
 	Settings,
-	Util,
 	load,
 	save,
 	get,
