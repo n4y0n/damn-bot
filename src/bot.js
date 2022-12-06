@@ -14,7 +14,7 @@ async function setup() {
         }
 	}, 1000 * 60 * 5)
 
-    const clear = new SlashCommandBuilder()
+    const clearCommand = new SlashCommandBuilder()
         .setName('clear')
         .setDescription('Clears messages')
         .addNumberOption(option =>
@@ -28,14 +28,14 @@ async function setup() {
     
     log("Setting up clear command");
 
-    const ping = new SlashCommandBuilder()
+    const pingCommand = new SlashCommandBuilder()
         .setName('ping')
         .setDMPermission(false)
         .setDescription('Replies with Pong!');
 
     log("Setting up ping command");
 
-    const m = new SlashCommandBuilder()
+    const macroCommand = new SlashCommandBuilder()
         .setName('m')
         .setDescription('Macro commands')
         .addStringOption(option =>
@@ -46,7 +46,7 @@ async function setup() {
         )
     log("Setting up m command");
 
-    const pull = new SlashCommandBuilder()
+    const pullCommand = new SlashCommandBuilder()
         .setName('pull')
         .setDescription('Pulls a random bocc from the database of boccs')
         .addIntegerOption(option =>
@@ -59,7 +59,7 @@ async function setup() {
 
     log("Setting up pull command");
 
-    const collection = new SlashCommandBuilder()
+    const collectionCommand = new SlashCommandBuilder()
         .setName('collection')
         .setDescription('Shows your collection of boccs')
         .addBooleanOption(option =>
@@ -70,25 +70,25 @@ async function setup() {
 
     log("Setting up collection command");
 
-    const balance = new SlashCommandBuilder()
+    const balanceCommand = new SlashCommandBuilder()
         .setName('balance')
         .setDescription('Shows your balance')
 
     log("Setting up balance command");
 
-    const daily = new SlashCommandBuilder()
+    const dailyCurrencyCommand = new SlashCommandBuilder()
         .setName('daily')
         .setDescription('Claim your daily balance')
 
     log("Setting up daily command");
 
-    const help = new SlashCommandBuilder()
+    const helpCommand = new SlashCommandBuilder()
         .setName('help')
         .setDescription('Shows the help menu')
 
     log("Setting up help command");
 
-    COMMANDS.push(clear, ping, help, m, pull, collection, balance, daily);
+    COMMANDS.push(clearCommand, pingCommand, helpCommand, macroCommand, pullCommand, collectionCommand, balanceCommand, dailyCurrencyCommand);
 }
 
 async function onInteraction(interaction) {
