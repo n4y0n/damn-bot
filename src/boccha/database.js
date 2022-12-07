@@ -52,7 +52,7 @@ const getCollection = async user => {
 
 /**
 * @param {DiscordUser|PrismaUser} user
-* @returns {Promise<{total: number, [id: number]: {id: number, count: number, name: string, rarity: number}}>}
+* @returns {Promise<BoccCountResult>}
 * @example
 * {
 *  total: 10,
