@@ -8,6 +8,10 @@ const { User: DiscordUser } = require("discord.js")
 const prisma = new PrismaClient()
 
 /**
+ * @typedef {{total: number, [id: number]: {id: number, count: number, name: string, rarity: number}}} BoccCountResult
+ */
+
+/**
  * @param {DiscordUser|PrismaUser} user 
  * @returns {Promise<PrismaUser>}
  */
