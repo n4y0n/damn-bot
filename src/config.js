@@ -141,18 +141,18 @@ const get = (key) => {
 	return getDefaultOrValue(key, value);
 };
 
-const load = () => {
-	deserializeConfig();
+const load = async () => {
+	await deserializeConfig();
 	watchConfigFile()
 }
 
 const save = () => serializeConfig();
 
 function watchConfigFile() {
-	watchFile(configPath, (curr, prev) => {
+	watchFile(configPath, async (curr, prev) => {
 		if (curr.mtime !== prev.mtime) {
 			log("Configuration file has changed. Reloading...");
-			deserializeConfig();
+			await deserializeConfig();
 		}
 	});
 }
