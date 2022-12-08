@@ -1,7 +1,7 @@
 const { homedir } = require("os");
 const { join } = require("path");
 const { createInterface } = require("readline");
-const { existsSync, readFileSync, writeFileSync } = require("fs");
+const { existsSync, readFileSync, writeFileSync, watchFile } = require("fs");
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
@@ -141,9 +141,21 @@ const get = (key) => {
 	return getDefaultOrValue(key, value);
 };
 
-const load = () => deserializeConfig();
+const load = () => {
+	deserializeConfig();
+	watchConfigFile()
+}
 
 const save = () => serializeConfig();
+
+function watchConfigFile() {
+	watchFile(configPath, (curr, prev) => {
+		if (curr.mtime !== prev.mtime) {
+			log("Configuration file has changed. Reloading...");
+			deserializeConfig();
+		}
+	});
+}
 
 function getDefaultOrValue(key, value) {
 	switch (key) {
@@ -169,7 +181,7 @@ function getDefaultOrValue(key, value) {
 /**
  * 
  * @param {string} name 
- * @returns Promise<object>
+ * @returns {Promise<any>}
  */
 const getSetting = async name => {
 	const rawsetting = await prisma.setting.findFirst({
@@ -182,7 +194,7 @@ const getSetting = async name => {
 		log(`[ERROR] Setting ${name} not found!`);
 		return null;
 	}
-	
+
 	let setting = null
 	switch (rawsetting.type) {
 		case "string":
