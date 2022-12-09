@@ -10,7 +10,6 @@ const configPath = join(homedir(), ".discord-bot.json");
 
 let configs = {};
 let guilds = {};
-let _client;
 
 const generateDefaultConfigurations = async () => {
 	log("Configuration file not found. Generating one with default values.");
@@ -129,10 +128,6 @@ const setGuildConf = (guild, conf, value) => {
 	guilds[key][conf] = value;
 };
 
-const setClient = (client) => {
-	_client = client;
-};
-
 const get = (key) => {
 	if (configs[key] === undefined) {
 		return null;
@@ -230,7 +225,6 @@ module.exports = {
 	load,
 	save,
 	get,
-	setClient,
 	setGuildConf,
 	getGuildConf,
 }
