@@ -8,6 +8,8 @@ const prisma = new PrismaClient()
 const log = require("debug")("bot:config");
 const configPath = join(homedir(), ".discord-bot.json");
 
+const settingReloadCallbacks = [];
+
 let configs = {};
 let guilds = {};
 
@@ -148,6 +150,7 @@ function watchConfigFile() {
 		if (curr.mtime !== prev.mtime) {
 			log("Configuration file has changed. Reloading...");
 			await deserializeConfig();
+			settingReloadCallbacks.forEach(callback => callback());
 		}
 	});
 }
@@ -211,6 +214,10 @@ const getSetting = async name => {
 	return setting
 }
 
+const onChange = async callback => {
+	settingReloadCallbacks.push(callback)
+}
+
 const Settings = {
 	PULL_COST: "pullCost",
 	DAILY_BALANCE: "dailyBalance",
@@ -227,4 +234,5 @@ module.exports = {
 	get,
 	setGuildConf,
 	getGuildConf,
+	onChange,
 }

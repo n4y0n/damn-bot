@@ -244,6 +244,13 @@ async function onReady(client, rest) {
     console.log("Use this url to make me join your server: %s", inviteUrl);
 }
 
+async function onReloadSettings(client) {
+    const status = get("status");
+    const game = get("game");
+    client.user.setActivity(game);
+    client.user.setStatus(status);
+}
+
 
 async function fetchMessages(channel, limit) {
 	return channel.messages.fetch({ limit });
@@ -282,4 +289,5 @@ module.exports = {
     setup,
     onInteraction,
     onReady,
+    onReloadSettings,
 }
