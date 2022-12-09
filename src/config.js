@@ -214,7 +214,7 @@ const getSetting = async name => {
 	return setting
 }
 
-const onChange = async callback => {
+const onSettingsReloaded = async callback => {
 	settingReloadCallbacks.push(callback)
 }
 
@@ -234,5 +234,5 @@ module.exports = {
 	get,
 	setGuildConf,
 	getGuildConf,
-	onChange,
+	onSettingsReloaded,
 }

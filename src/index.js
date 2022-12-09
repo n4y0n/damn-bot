@@ -1,7 +1,7 @@
 const { Client, REST, GatewayIntentBits } = require("discord.js");
 const { setup, onReady, onInteraction, onReloadSettings } = require("./bot");
 // Load bot configurations from $HOME/.discord-bot.json
-const { load, get, onChange } = require("./config")
+const { load, get, onSettingsReloaded } = require("./config")
 load().then(startBot);
 
 async function startBot() {
@@ -47,7 +47,7 @@ async function startBot() {
 		log("[📡] Bot ready!");
 	});
 
-	onChange(async () => {
+	onSettingsReloaded(async () => {
 		log("[📡] Settings reloaded!");
 		await onReloadSettings(client)
 	});
