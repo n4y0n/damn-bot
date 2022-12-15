@@ -1,18 +1,18 @@
 const log = require("debug")("bot:application");
-const { SlashCommandBuilder, OAuth2Scopes, Routes, EmbedBuilder, PermissionsBitField } = require("discord.js");
+const { SlashCommandBuilder, OAuth2Scopes, Routes, EmbedBuilder, PermissionsBitField, Message, AttachmentBuilder, Client, REST } = require("discord.js");
 const { fetchUsers, pull: pullBocc, getCollection: getBoccs, getCollectionCount, getBalance, initBalance, incrementBalance, claimDaily, getPullCount } = require("./boccha");
 const { get } = require("./config");
 
 const COMMANDS = []
 
 async function setup() {
-	await initBalance(get("clearBalanceOnStart"))
+    await initBalance(get("clearBalanceOnStart"))
     setInterval(async () => {
         const users = await fetchUsers()
         for (const user of users) {
-		    await incrementBalance(user)
+            await incrementBalance(user)
         }
-	}, 1000 * 60 * 5)
+    }, 1000 * 60 * 5)
 
     const clearCommand = new SlashCommandBuilder()
         .setName('clear')
@@ -25,7 +25,7 @@ async function setup() {
                 .setRequired(true)
         )
         .setDMPermission(false);
-    
+
     log("Setting up clear command");
 
     const pingCommand = new SlashCommandBuilder()
@@ -227,6 +227,11 @@ async function onInteraction(interaction) {
     }
 }
 
+/**
+ * 
+ * @param {Client} client 
+ * @param {REST} rest 
+ */
 async function onReady(client, rest) {
     const status = get("status");
     const game = get("game");
@@ -253,17 +258,17 @@ async function onReloadSettings(client) {
 
 
 async function fetchMessages(channel, limit) {
-	return channel.messages.fetch({ limit });
+    return channel.messages.fetch({ limit });
 };
 
 function deleteMessages(channel, messagesCollection) {
-	return channel.bulkDelete(messagesCollection, true);
+    return channel.bulkDelete(messagesCollection, true);
 };
 
 function getContentForMacro(name) {
-	switch (name) {
-		case 'bonk':
-			return `⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠻⣿⣿⣿⣿⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣿⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
+    switch (name) {
+        case 'bonk':
+            return `⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠻⣿⣿⣿⣿⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣿⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
 			⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠰⡡⢌⢆⠂⡀⢌⢎⠜⡌⢎⢎⢞⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
 			⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠀⡜⡔⡌⡜⡌⢎⢌⠜⡜⡜⡜⢆⢎⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
 			⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠄⠀⠠⠂⡐⡰⡡⡡⣌⢎⢎⢎⢎⢎⢞⢽⠂⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢢⢢⣿⣿⣿⣿⣿⣿⣿
@@ -280,20 +285,37 @@ function getContentForMacro(name) {
 			⣿⣇⠄⠄⢂⠄⡐⡐⡐⠄⠀⠄⢢⢌⢒⢱⢭⣫⢫⢫⢫⢎⢍⢯⣻⢯⢯⢺⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⡱⣼⣿⠀⠀⠀⠰⢢⢂⠄⠀⡌⡞⡽⡭⢎⢎⠢⢂⠄⠄⠄⠄⠄⠄⠄⠸⣿
 			⣿⣿⣷⠐⠄⠄⠄⠄⡀⠀⠀⠠⠢⡱⡱⡱⡽⣘⡜⡜⡜⢀⠠⣘⣟⣟⣟⡝⢿⣿⣿⣿⣿⣿⣿⣿⣿⢡⣸⣿⣿⣿⣦⠀⠀⠠⡀⠀⠄⢆⢣⣏⢯⢫⣊⢆⠆⢂⠄⠄⠠⡀⠄⠄⡐⠄⢽
 			⣿⣿⣿⣿⣦⡀⠄⡀⠀⠀⠀⡐⡐⠥⢣⢫⢯⢎⢞⡜⡖⡄⡀⢢⢫⢯⣻⣳⣷⣡⣡⢩⢋⢯⢻⢍⢢⣿⣿⣿⣿⣿⣿⣿⣿⣯⢢⢢⢣⡹⣹⡹⡹⡜⡌⠆⠄⠄⠄⠄⠠⠠⡐⡐⡐⡐⠌`;
-		default:
-			return 'Macro not found';
-	}
+        default:
+            return 'Macro not found';
+    }
 }
 
+/**
+ * 
+ * @param {Message} message 
+ */
 async function onDM(message) {
     log(message.author.username + ' sent a DM: ' + message.content);
+    const bot = message.client;
 
     if (message.content.startsWith('!')) {
         const args = message.content.slice(1).trim().split(/ +/g);
         const command = args.shift().toLowerCase();
 
-        if (command === 'ping') {
-            await message.reply('Pong!');
+        if (command === 'relay') {
+            if(!message.attachments.first()) 
+                return message.reply("You need to attach an image to relay it to the server!");
+
+            const guild = await bot.guilds.fetch("147068676275830785")
+            const channel = guild.channels.cache.find(channel => channel.name === "roberandom");
+            const image = new AttachmentBuilder()
+                .setFile(message.attachments.first().url)
+                .setName(message.attachments.first().name)
+            await channel.sendTyping()
+            await channel.send({
+                content: "_ _",
+                files: [image]
+            });
         }
     }
 }
