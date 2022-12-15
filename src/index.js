@@ -45,6 +45,7 @@ async function startBot() {
 
 	client.on("messageCreate", async message => {
 		if (message.author.bot) return;
+		log(message.channel.type)
 		if (message.channel.type !== "DM") return;
 		log("[messageCreate] message: %s by %s", message.content, message.author.tag);
 		await onDM(message)
