@@ -19,11 +19,13 @@ async function startBot() {
 
 	process.on("unhandledRejection", err => {
 		log("Unhandled promise rejection: %O", err);
+		client.destroy();
 		process.exit(0);
 	});
 
 	process.on("uncaughtException", err => {
 		log("Uncaught exception: %O", err);
+		client.destroy();
 		process.exit(0);
 	});
 
