@@ -1,4 +1,4 @@
-const { Client, REST, GatewayIntentBits } = require("discord.js");
+const { Client, REST, GatewayIntentBits, IntentsBitField, Partials } = require("discord.js");
 const { setup, onReady, onInteraction, onReloadSettings, onDM } = require("./bot");
 // Load bot configurations from $HOME/.discord-bot.json
 const { load, get, onSettingsReloaded } = require("./config")
@@ -9,9 +9,18 @@ async function startBot() {
 
 	const client = new Client({
 		intents: [
-			GatewayIntentBits.Guilds,
-			GatewayIntentBits.GuildMessages,
-			GatewayIntentBits.GuildScheduledEvents,
+			IntentsBitField.Flags.Guilds,
+			IntentsBitField.Flags.GuildMessages,
+			IntentsBitField.Flags.GuildScheduledEvents,
+			IntentsBitField.Flags.DirectMessages,
+			IntentsBitField.Flags.MessageContent,
+			IntentsBitField.Flags.DirectMessageTyping,
+			IntentsBitField.Flags.DirectMessageReactions,
+		],
+		partials: [
+			Partials.Channel,
+			Partials.Message,
+			Partials.Reaction,
 		],
 	});
 	const rest = new REST({ version: '10' }).setToken(get("token"));
@@ -36,7 +45,7 @@ async function startBot() {
 	});
 
 	await setup(client)
-	
+
 	client.on('interactionCreate', async interaction => {
 		log("[interactionCreate] command: %s by %s", interaction.commandName, interaction.user.tag);
 		if (!interaction.isChatInputCommand()) return;
@@ -44,9 +53,7 @@ async function startBot() {
 	});
 
 	client.on("messageCreate", async message => {
-		if (message.author.bot) return;
-		log(message.channel.type)
-		if (message.channel.type !== "DM") return;
+		if (message.guild) return;
 		log("[messageCreate] message: %s by %s", message.content, message.author.tag);
 		await onDM(message)
 	});

@@ -286,7 +286,6 @@ function getContentForMacro(name) {
 }
 
 async function onDM(message) {
-    if (message.author.bot) return;
     log(message.author.username + ' sent a DM: ' + message.content);
 
     if (message.content.startsWith('!')) {
