@@ -285,9 +285,24 @@ function getContentForMacro(name) {
 	}
 }
 
+async function onDM(message) {
+    if (message.author.bot) return;
+    log(message.author.username + ' sent a DM: ' + message.content);
+
+    if (message.content.startsWith('!')) {
+        const args = message.content.slice(1).trim().split(/ +/g);
+        const command = args.shift().toLowerCase();
+
+        if (command === 'ping') {
+            await message.reply('Pong!');
+        }
+    }
+}
+
 module.exports = {
     setup,
     onInteraction,
     onReady,
     onReloadSettings,
+    onDM,
 }

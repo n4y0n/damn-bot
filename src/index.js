@@ -1,5 +1,5 @@
 const { Client, REST, GatewayIntentBits } = require("discord.js");
-const { setup, onReady, onInteraction, onReloadSettings } = require("./bot");
+const { setup, onReady, onInteraction, onReloadSettings, onDM } = require("./bot");
 // Load bot configurations from $HOME/.discord-bot.json
 const { load, get, onSettingsReloaded } = require("./config")
 load().then(startBot);
@@ -35,13 +35,19 @@ async function startBot() {
 		process.exit(0);
 	});
 
-
 	await setup(client)
 	
 	client.on('interactionCreate', async interaction => {
 		log("[interactionCreate] command: %s by %s", interaction.commandName, interaction.user.tag);
 		if (!interaction.isChatInputCommand()) return;
 		await onInteraction(interaction)
+	});
+
+	client.on("messageCreate", async message => {
+		if (message.author.bot) return;
+		if (message.channel.type !== "DM") return;
+		log("[messageCreate] message: %s by %s", message.content, message.author.tag);
+		await onDM(message)
 	});
 
 	client.on("ready", async () => {
