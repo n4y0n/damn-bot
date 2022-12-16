@@ -1,5 +1,5 @@
 const log = require("debug")("bot:application");
-const { SlashCommandBuilder, OAuth2Scopes, Routes, EmbedBuilder, PermissionsBitField, Message, AttachmentBuilder, Client, REST } = require("discord.js");
+const { SlashCommandBuilder, OAuth2Scopes, Routes, EmbedBuilder, PermissionsBitField, Message, AttachmentBuilder, Client, REST, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { fetchUsers, pull: pullBocc, getCollection: getBoccs, getCollectionCount, getBalance, initBalance, incrementBalance, claimDaily, getPullCount } = require("./boccha");
 const { get } = require("./config");
 
@@ -88,11 +88,85 @@ async function setup() {
 
     log("Setting up help command");
 
-    COMMANDS.push(clearCommand, pingCommand, helpCommand, macroCommand, pullCommand, collectionCommand, balanceCommand, dailyCurrencyCommand);
+    const gachaCommand = new SlashCommandBuilder()
+        .setName('gacha')
+        .setDescription('Shows the gacha menu')
+
+    log("Setting up gacha command");
+
+    COMMANDS.push(clearCommand, pingCommand, helpCommand, macroCommand, pullCommand, collectionCommand, balanceCommand, dailyCurrencyCommand, gachaCommand);
 }
 
+/**
+ * @param {import("discord.js").Interaction} interaction 
+ * @returns 
+ */
 async function onInteraction(interaction) {
-    if (interaction.commandName === 'ping') {
+    if (interaction.isButton()) {
+        log("[onInteraction] Button pressed");
+        if (interaction.customId === 'pull') {
+            const boccs = await pullBocc(interaction.user, 1)
+            const embed = new EmbedBuilder()
+                .setTitle(`You pulled`)
+                .setDescription(boccs.map(bocc => bocc.name).join(", "))
+                .setFooter({ text: `You now have ${(await getPullCount(interaction.user)).total} pulls` })
+                .setColor(0x00ff00)
+            await interaction.update({ embeds: [embed] })
+        } else if (interaction.customId === 'collection') {
+            const collection = await getBoccs(interaction.user)
+            const embed = new EmbedBuilder()
+                .setTitle(`Your collection`)
+                .setDescription(collection.map(bocc => bocc.name).join(", "))
+                .setFooter({ text: `You have ${await getCollectionCount(interaction.user)} boccs` })
+                .setColor(0x00ff00)
+            await interaction.update({ embeds: [embed] })
+        } else if (interaction.customId === 'balance') {
+            const balance = await getBalance(interaction.user)
+            const embed = new EmbedBuilder()
+                .setTitle(`Your balance`)
+                .setDescription(`You have ${balance} bocc currency`)
+                .setColor(0x00ff00)
+            await interaction.update({ embeds: [embed] })
+        } else if (interaction.customId === 'daily') {
+            const balance = await claimDaily(interaction.user)
+            const embed = new EmbedBuilder()
+                .setTitle(`Your daily balance`)
+                .setDescription(`You have claimed ${balance} bocc currency`)
+                .setColor(0x00ff00)
+            await interaction.update({ embeds: [embed] })
+        }
+        return;
+    }
+
+    if (interaction.commandName === 'gacha') {
+        const row = new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('pull')
+                    .setLabel('Pull')
+                    .setStyle(ButtonStyle.Primary),
+            )
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('collection')
+                    .setLabel('Collection')
+                    .setStyle(ButtonStyle.Secondary),
+            )
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('balance')
+                    .setLabel('Balance')
+                    .setStyle(ButtonStyle.Secondary),
+            )
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('daily')
+                    .setLabel('Daily')
+                    .setStyle(ButtonStyle.Secondary),
+            );
+
+        await interaction.reply({ content: 'Gacha commands:', components: [row] });
+    } else if (interaction.commandName === 'ping') {
         await interaction.reply({
             content: `Pong! API Latency is ${Math.round(interaction.client.ws.ping)}ms`,
             ephemeral: true,
@@ -290,8 +364,8 @@ function getContentForMacro(name) {
     }
 }
 
+// FIXME: Fix this
 /**
- * 
  * @param {Message} message 
  */
 async function onDM(message) {
@@ -303,7 +377,7 @@ async function onDM(message) {
         const command = args.shift().toLowerCase();
 
         if (command === 'relay') {
-            if(!message.attachments.first()) 
+            if (!message.attachments.first())
                 return message.reply("You need to attach an image to relay it to the server!");
 
             const guild = await bot.guilds.fetch("147068676275830785")

@@ -1,4 +1,4 @@
-const { Client, REST, GatewayIntentBits, IntentsBitField, Partials } = require("discord.js");
+const { Client, REST, IntentsBitField, Partials, Events } = require("discord.js");
 const { setup, onReady, onInteraction, onReloadSettings, onDM } = require("./bot");
 // Load bot configurations from $HOME/.discord-bot.json
 const { load, get, onSettingsReloaded } = require("./config")
@@ -46,19 +46,30 @@ async function startBot() {
 
 	await setup(client)
 
-	client.on('interactionCreate', async interaction => {
-		log("[interactionCreate] command: %s by %s", interaction.commandName, interaction.user.tag);
-		if (!interaction.isChatInputCommand()) return;
+	client.on(Events.InteractionCreate, async interaction => {
+		if (interaction.isChatInputCommand())
+			log("[interactionCreate] command: %s by %s", interaction.commandName, interaction.user.tag);
+		if (interaction.isButton())
+			log("[interactionCreate] button: %s by %s", interaction.customId, interaction.user.tag);
 		await onInteraction(interaction)
 	});
 
-	client.on("messageCreate", async message => {
-		if (message.guild) return;
+	client.on(Events.MessageCreate, async message => {
+		if (message.guild || message.author.bot) return;
 		log("[messageCreate] message: %s by %s", message.content, message.author.tag);
+		// const row = new ActionRowBuilder()
+		// 	.addComponents(
+		// 		new ButtonBuilder()
+		// 			.setCustomId('primary')
+		// 			.setLabel('Click me!')
+		// 			.setStyle(ButtonStyle.Primary),
+		// 	);
+
+		// await message.reply({ content: 'I think you should,', components: [row] });
 		await onDM(message)
 	});
 
-	client.on("ready", async () => {
+	client.on(Events.ClientReady, async () => {
 		await onReady(client, rest)
 		log("[📡] Bot ready!");
 	});
