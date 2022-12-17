@@ -341,14 +341,43 @@ async function onReloadSettings(client) {
     client.user.setStatus(status);
 }
 
+// FIXME: Fix this
+/**
+ * @param {Message} message 
+ */
+ async function onDM(message) {
+    log(message.author.username + ' sent a DM: ' + message.content);
+    const bot = message.client;
+
+    if (message.content.startsWith('!')) {
+        const args = message.content.slice(1).trim().split(/ +/g);
+        const command = args.shift().toLowerCase();
+
+        if (command === 'relay') {
+            if (!message.attachments.first())
+                return message.reply("You need to attach an image to relay it to the server!");
+
+            const guild = await bot.guilds.fetch("147068676275830785")
+            const channel = guild.channels.cache.find(channel => channel.name === "roberandom");
+            const image = new AttachmentBuilder()
+                .setFile(message.attachments.first().url)
+                .setName(message.attachments.first().name)
+            await channel.sendTyping()
+            await channel.send({
+                content: "_ _",
+                files: [image]
+            });
+        }
+    }
+}
 
 async function fetchMessages(channel, limit) {
     return channel.messages.fetch({ limit });
-};
+}
 
 function deleteMessages(channel, messagesCollection) {
     return channel.bulkDelete(messagesCollection, true);
-};
+}
 
 function getContentForMacro(name) {
     switch (name) {
@@ -372,36 +401,6 @@ function getContentForMacro(name) {
 			⣿⣿⣿⣿⣦⡀⠄⡀⠀⠀⠀⡐⡐⠥⢣⢫⢯⢎⢞⡜⡖⡄⡀⢢⢫⢯⣻⣳⣷⣡⣡⢩⢋⢯⢻⢍⢢⣿⣿⣿⣿⣿⣿⣿⣿⣯⢢⢢⢣⡹⣹⡹⡹⡜⡌⠆⠄⠄⠄⠄⠠⠠⡐⡐⡐⡐⠌`;
         default:
             return 'Macro not found';
-    }
-}
-
-// FIXME: Fix this
-/**
- * @param {Message} message 
- */
-async function onDM(message) {
-    log(message.author.username + ' sent a DM: ' + message.content);
-    const bot = message.client;
-
-    if (message.content.startsWith('!')) {
-        const args = message.content.slice(1).trim().split(/ +/g);
-        const command = args.shift().toLowerCase();
-
-        if (command === 'relay') {
-            if (!message.attachments.first())
-                return message.reply("You need to attach an image to relay it to the server!");
-
-            const guild = await bot.guilds.fetch("147068676275830785")
-            const channel = guild.channels.cache.find(channel => channel.name === "roberandom");
-            const image = new AttachmentBuilder()
-                .setFile(message.attachments.first().url)
-                .setName(message.attachments.first().name)
-            await channel.sendTyping()
-            await channel.send({
-                content: "_ _",
-                files: [image]
-            });
-        }
     }
 }
 
