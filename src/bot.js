@@ -102,50 +102,6 @@ async function setup() {
  * @returns 
  */
 async function onInteraction(interaction) {
-    if (interaction.isButton()) {
-        log("[onInteraction] Button pressed");
-        if (interaction.customId === 'pull') {
-            const boccs = await pullBocc(interaction.user, 1)
-            const embed = new EmbedBuilder()
-                .setTitle(`You pulled`)
-                .setDescription(boccs.map(bocc => bocc.name).join(", "))
-                .setFooter({ text: `You now have ${(await getPullCount(interaction.user)).total} pulls` })
-                .setColor(0x00ff00)
-            await interaction.update({ embeds: [embed], ephemeral: true })
-        } else if (interaction.customId === 'collection') {
-            const collection = await getBoccs(interaction.user)
-            const embed = new EmbedBuilder()
-                .setTitle(`Your collection`)
-                .setDescription(collection.map(bocc => bocc.name).join(", "))
-                .setFooter({ text: `You have ${await getCollectionCount(interaction.user)} boccs` })
-                .setColor(0x00ff00)
-            await interaction.update({ embeds: [embed], ephemeral: true })
-        } else if (interaction.customId === 'balance') {
-            const balance = await getBalance(interaction.user)
-            const embed = new EmbedBuilder()
-                .setTitle(`Your balance`)
-                .setDescription(`You have ${balance} bocc currency`)
-                .setColor(0x00ff00)
-            await interaction.update({ embeds: [embed], ephemeral: true })
-        } else if (interaction.customId === 'daily') {
-            try {
-                const balance = await claimDaily(interaction.user)
-                const embed = new EmbedBuilder()
-                    .setTitle(`Your daily balance`)
-                    .setDescription(`You have claimed ${balance} bocc currency`)
-                    .setColor(0x00ff00)
-                await interaction.update({ embeds: [embed], ephemeral: true })
-            } catch (e) {
-                const embed = new EmbedBuilder()
-                    .setTitle(`Your daily balance`)
-                    .setDescription(`You have already claimed your daily balance`)
-                    .setColor(0xff0000)
-                await interaction.update({ embeds: [embed], ephemeral: true })
-            }
-        }
-        return;
-    }
-
     if (interaction.commandName === 'gacha') {
         const row = new ActionRowBuilder()
             .addComponents(
@@ -311,6 +267,53 @@ async function onInteraction(interaction) {
 
 /**
  * 
+ * @param {import("discord.js").Interaction} interaction 
+ */
+async function onButton(interaction) {
+    log("[onInteraction] Button pressed");
+    if (interaction.customId === 'pull') {
+        const boccs = await pullBocc(interaction.user, 1)
+        const embed = new EmbedBuilder()
+            .setTitle(`You pulled`)
+            .setDescription(boccs.map(bocc => bocc.name).join(", "))
+            .setFooter({ text: `You now have ${(await getPullCount(interaction.user)).total} pulls` })
+            .setColor(0x00ff00)
+        await interaction.reply({ embeds: [embed], ephemeral: true })
+    } else if (interaction.customId === 'collection') {
+        const collection = await getBoccs(interaction.user)
+        const embed = new EmbedBuilder()
+            .setTitle(`Your collection`)
+            .setDescription(collection.map(bocc => bocc.name).join(", "))
+            .setFooter({ text: `You have ${await getCollectionCount(interaction.user)} boccs` })
+            .setColor(0x00ff00)
+        await interaction.reply({ embeds: [embed], ephemeral: true })
+    } else if (interaction.customId === 'balance') {
+        const balance = await getBalance(interaction.user)
+        const embed = new EmbedBuilder()
+            .setTitle(`Your balance`)
+            .setDescription(`You have ${balance} bocc currency`)
+            .setColor(0x00ff00)
+        await interaction.reply({ embeds: [embed], ephemeral: true })
+    } else if (interaction.customId === 'daily') {
+        try {
+            const balance = await claimDaily(interaction.user)
+            const embed = new EmbedBuilder()
+                .setTitle(`Your daily balance`)
+                .setDescription(`You have claimed ${balance} bocc currency`)
+                .setColor(0x00ff00)
+            await interaction.reply({ embeds: [embed], ephemeral: true })
+        } catch (e) {
+            const embed = new EmbedBuilder()
+                .setTitle(`Your daily balance`)
+                .setDescription(`You have already claimed your daily balance`)
+                .setColor(0xff0000)
+            await interaction.reply({ embeds: [embed], ephemeral: true })
+        }
+    }
+}
+
+/**
+ * 
  * @param {Client} client 
  * @param {REST} rest 
  */
@@ -407,5 +410,6 @@ module.exports = {
     onInteraction,
     onReady,
     onReloadSettings,
+    onButton,
     onDM,
 }

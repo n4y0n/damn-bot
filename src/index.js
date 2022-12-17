@@ -1,5 +1,5 @@
 const { Client, REST, IntentsBitField, Partials, Events } = require("discord.js");
-const { setup, onReady, onInteraction, onReloadSettings, onDM } = require("./bot");
+const { setup, onReady, onInteraction, onReloadSettings, onDM, onButton } = require("./bot");
 // Load bot configurations from $HOME/.discord-bot.json
 const { load, get, onSettingsReloaded } = require("./config")
 load().then(startBot);
@@ -47,11 +47,13 @@ async function startBot() {
 	await setup(client)
 
 	client.on(Events.InteractionCreate, async interaction => {
-		if (interaction.isChatInputCommand())
+		if (interaction.isChatInputCommand()) {
 			log("[interactionCreate] command: %s by %s", interaction.commandName, interaction.user.tag);
-		if (interaction.isButton())
+			await onInteraction(interaction)
+		} else if (interaction.isButton()) {
 			log("[interactionCreate] button: %s by %s", interaction.customId, interaction.user.tag);
-		await onInteraction(interaction)
+			await onButton(interaction)
+		}
 	});
 
 	client.on(Events.MessageCreate, async message => {
