@@ -1,0 +1,2 @@
+dev.db filter=git-crypt diff=git-crypt
+dev.bk.db filter=git-crypt diff=git-crypt
